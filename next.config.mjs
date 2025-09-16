@@ -1,25 +1,38 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   eslint: {
-    ignoreDuringBuilds: true,
+    ignoreDuringBuilds: process.env.NODE_ENV !== 'production',
   },
   typescript: {
-    ignoreBuildErrors: true,
+    ignoreBuildErrors: process.env.NODE_ENV !== 'production',
   },
   images: {
     unoptimized: true,
   },
-  // Configure for Replit environment
+  // Configure headers for Replit environment with proper security
   async headers() {
+    const isProduction = process.env.NODE_ENV === 'production';
+    
     return [
       {
         source: '/(.*)',
-        headers: [
-          {
-            key: 'X-Frame-Options',
-            value: 'ALLOWALL',
-          },
-        ],
+        headers: isProduction 
+          ? [
+              {
+                key: 'X-Frame-Options',
+                value: 'SAMEORIGIN',
+              },
+              {
+                key: 'Content-Security-Policy',
+                value: "frame-ancestors 'self'",
+              },
+            ]
+          : [
+              {
+                key: 'Content-Security-Policy',
+                value: "frame-ancestors 'self' *.replit.dev *.repl.co",
+              },
+            ],
       },
     ]
   },
