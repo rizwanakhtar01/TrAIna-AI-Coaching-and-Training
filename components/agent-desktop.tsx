@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -68,9 +69,16 @@ function FloatingCoachingWidget({
   };
 
   return (
-    <>
+    <AnimatePresence>
       {isCollapsed ? (
-        <div className="fixed bottom-6 right-6 z-50">
+        <motion.div
+          key="collapsed"
+          initial={{ opacity: 0, scale: 0.5, y: 50 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.5, y: 50 }}
+          transition={{ duration: 0.3 }}
+          className="fixed bottom-6 right-6 z-50"
+        >
           <Card
     className="w-20 h-20 flex items-center justify-center cursor-pointer 
                rounded-full shadow-xl 
@@ -80,9 +88,16 @@ function FloatingCoachingWidget({
   >
     <MessageCircle className="h-10 w-10 text-white" />
   </Card>
-        </div>
+        </motion.div>
       ) : (
-        <div className="fixed bottom-6 right-6 z-50 w-96 max-h-[80vh] overflow-hidden">
+        <motion.div
+          key="expanded"
+          initial={{ opacity: 0, scale: 0.8, y: 50 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.8, y: 50 }}
+          transition={{ duration: 0.3, ease: "easeOut" }}
+          className="fixed bottom-6 right-6 z-50 w-96 max-h-[80vh] overflow-hidden"
+        >
           <Card className="shadow-xl border-2 border-blue-200 bg-white/95 backdrop-blur-sm">
             <CardHeader className="pb-3 border-b border-gray-100">
               <div className="flex items-center justify-between">
@@ -193,9 +208,9 @@ function FloatingCoachingWidget({
               </Button>
             </CardContent>
           </Card>
-        </div>
+        </motion.div>
       )}
-    </>
+    </AnimatePresence>
   );
 }
 
