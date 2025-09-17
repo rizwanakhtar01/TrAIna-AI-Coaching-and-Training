@@ -20,13 +20,18 @@ import {
   Star,
   ArrowRight,
   Eye,
+  LogOut,
 } from "lucide-react"
 import { ContactReviewsList } from "./contact-review-card"
 import { ChallengePatternsScreen } from "./challenge-patterns"
 import { SentimentTrendsScreen } from "./sentiment-trends"
 import { InteractiveCoachingScreen } from "./interactive-coaching"
 
-export function AiCoachingDashboard() {
+interface AiCoachingDashboardProps {
+  onLogout: () => void
+}
+
+export function AiCoachingDashboard({ onLogout }: AiCoachingDashboardProps) {
   const [activeTab, setActiveTab] = useState("dashboard")
 
   const navigateToReviews = () => setActiveTab("reviews")
@@ -50,11 +55,17 @@ export function AiCoachingDashboard() {
               Agent View
             </Badge>
           </div>
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <span>Rizwan - Agent</span>
-            <div className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center">
-              <span className="text-xs font-medium text-primary-foreground">R</span>
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <span>Rizwan - Agent</span>
+              <div className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center">
+                <span className="text-xs font-medium text-primary-foreground">R</span>
+              </div>
             </div>
+            <Button variant="ghost" size="sm" onClick={onLogout}>
+              <LogOut className="h-4 w-4 mr-2" />
+              Logout
+            </Button>
           </div>
         </div>
       </header>
