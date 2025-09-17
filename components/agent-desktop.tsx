@@ -73,32 +73,30 @@ function FloatingCoachingWidget({
       {isCollapsed ? (
         <motion.div
           key="collapsed"
-          initial={{ opacity: 0, scale: 0.5, y: 50 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.5, y: 50 }}
-          transition={{ duration: 0.3 }}
-          className="fixed bottom-6 right-6 z-50"
+          initial={{ opacity: 0, x: "100%" }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: "100%" }}
+          transition={{ type: "spring", stiffness: 120, damping: 20 }}
+          className="fixed top-1/2 right-0 -translate-y-1/2 z-50"
         >
-          <Card
-            className="w-20 h-20 flex items-center justify-center cursor-pointer 
-               rounded-full shadow-xl 
-               bg-gradient-to-r from-blue-600 to-indigo-600 
-               hover:scale-110 hover:shadow-2xl transition-all duration-300"
+          <div
+            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-l-lg shadow-lg cursor-pointer transition-colors duration-200 flex items-center gap-2"
             onClick={() => setIsCollapsed(false)}
           >
-            <MessageCircle className="h-10 w-10 text-white" />
-          </Card>
+            <MessageCircle className="h-5 w-5" />
+            <span className="text-sm font-medium">Coaching</span>
+          </div>
         </motion.div>
       ) : (
         <motion.div
           key="expanded"
-          initial={{ opacity: 0, scale: 0.8, y: 50 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.8, y: 50 }}
-          transition={{ duration: 0.3, ease: "easeOut" }}
-          className="fixed inset-0 flex items-center justify-center z-50"
+          initial={{ x: "100%" }}
+          animate={{ x: 0 }}
+          exit={{ x: "100%" }}
+          transition={{ type: "spring", stiffness: 120, damping: 20 }}
+          className="fixed top-0 right-0 h-full w-[400px] md:w-[500px] lg:w-[600px] z-50"
         >
-          <Card className="shadow-xl border-2 border-blue-200 bg-white/95 backdrop-blur-sm">
+          <Card className="h-full border-l-2 border-blue-200 bg-white/95 backdrop-blur-sm rounded-none shadow-xl">
             <CardHeader className="pb-3 border-b border-gray-100">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
