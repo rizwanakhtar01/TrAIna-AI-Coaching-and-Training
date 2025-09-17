@@ -11,9 +11,10 @@ import { AlertCircle } from "lucide-react"
 
 interface LoginScreenProps {
   onLogin: (role: "agent" | "supervisor" | "admin") => void
+  onAgentDesktop: () => void
 }
 
-export function LoginScreen({ onLogin }: LoginScreenProps) {
+export function LoginScreen({ onLogin, onAgentDesktop }: LoginScreenProps) {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
@@ -47,7 +48,19 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
+      {/* Top-right Agent Desktop link */}
+      <div className="absolute top-4 right-4">
+        <Button 
+          variant="outline" 
+          onClick={onAgentDesktop}
+          className="bg-white/80 backdrop-blur-sm hover:bg-white/90 transition-colors"
+        >
+          Agent Desktop
+        </Button>
+      </div>
+      
+      <div className="min-h-screen flex items-center justify-center">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold text-gray-900">OmniHive AI Coaching</CardTitle>
@@ -106,6 +119,7 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
           </div>
         </CardContent>
       </Card>
+      </div>
     </div>
   )
 }
