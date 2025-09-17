@@ -80,14 +80,14 @@ function FloatingCoachingWidget({
           className="fixed bottom-6 right-6 z-50"
         >
           <Card
-    className="w-20 h-20 flex items-center justify-center cursor-pointer 
+            className="w-20 h-20 flex items-center justify-center cursor-pointer 
                rounded-full shadow-xl 
                bg-gradient-to-r from-blue-600 to-indigo-600 
                hover:scale-110 hover:shadow-2xl transition-all duration-300"
-    onClick={() => setIsCollapsed(false)}
-  >
-    <MessageCircle className="h-10 w-10 text-white" />
-  </Card>
+            onClick={() => setIsCollapsed(false)}
+          >
+            <MessageCircle className="h-10 w-10 text-white" />
+          </Card>
         </motion.div>
       ) : (
         <motion.div
@@ -96,7 +96,7 @@ function FloatingCoachingWidget({
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.8, y: 50 }}
           transition={{ duration: 0.3, ease: "easeOut" }}
-          className="fixed bottom-6 right-6 z-50 w-96 max-h-[80vh] overflow-hidden"
+          className="fixed inset-0 flex items-center justify-center z-50"
         >
           <Card className="shadow-xl border-2 border-blue-200 bg-white/95 backdrop-blur-sm">
             <CardHeader className="pb-3 border-b border-gray-100">
@@ -154,7 +154,10 @@ function FloatingCoachingWidget({
                         className="p-2 bg-orange-50 rounded-md border border-orange-200"
                       >
                         <div className="flex items-center justify-between">
-                          <Badge variant="outline" className="text-xs font-mono">
+                          <Badge
+                            variant="outline"
+                            className="text-xs font-mono"
+                          >
                             {contact.id}
                           </Badge>
                           <span className="text-xs text-gray-500">
@@ -165,7 +168,7 @@ function FloatingCoachingWidget({
                           {contact.issue}
                         </p>
                       </div>
-                    )
+                    ),
                   )}
                 </div>
               </div>
