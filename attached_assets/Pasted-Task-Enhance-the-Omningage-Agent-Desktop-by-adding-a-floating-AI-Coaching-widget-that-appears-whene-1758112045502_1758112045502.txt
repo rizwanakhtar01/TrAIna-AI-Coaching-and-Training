@@ -1,0 +1,69 @@
+Task: Enhance the Omningage Agent Desktop by adding a floating AI Coaching widget that appears whenever an agent logs in.
+
+🔐 Login Page Update
+
+On the existing Login Page, add a new link/button labeled "Agent Desktop".
+
+When clicked, redirect to the Agent Desktop view (use the attached screenshot as the main background layout).
+
+🎯 Floating Widget Specifications
+Placement & Behavior
+
+Floating widget should pop up automatically once the agent logs into Omningage.
+
+Position: bottom-right corner of the Agent Desktop screen.
+
+Style: Rounded card with subtle shadow, minimal design to avoid blocking key dashboard metrics.
+
+Collapsible: Add an expand/collapse button so agents can hide or reopen it.
+
+Content (Daily Coaching Snapshot)
+
+Greeting
+
+Personalized text:
+"Hey [Agent Name], Good day!"
+
+Fetch agent’s name from login session.
+
+Yesterday’s Performance Overview
+
+Show 3–4 short sections in bullet or card format:
+
+Areas where agent struggled the most (e.g., empathy, product policy explanation).
+
+Contact references where issues occurred (show 2–3 recent contact IDs with links to full review).
+
+Areas to focus on today (highlight skills to improve).
+
+Tips for improvement (AI-generated actionable coaching tip).
+
+CTA Button
+
+“See Details” button at the bottom.
+
+On click → Redirect agent to the full Agent View (AI Coaching module) for detailed analysis.
+
+🎨 UX/UI Guidelines
+
+Use the attached Agent Desktop screenshot as the page background (simulate realistic integration).
+
+Widget dimensions: ~350px width, auto height based on content.
+
+Colors: match Omningage’s branding (light blue/white with accent highlights).
+
+Typography consistent with current dashboard.
+
+✅ Expected Output
+
+On login, agents see the Agent Desktop screen with:
+
+The existing dashboard as background.
+
+A floating coaching widget in the bottom-right.
+
+Widget greets agent by name and shows yesterday’s performance summary.
+
+Agents can click See Details to open full Agent View for deeper coaching insights.
+
+Add a link to “Agent Desktop” on login page to access this experience.
