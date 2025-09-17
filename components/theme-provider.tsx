@@ -3,12 +3,12 @@
 import * as React from "react";
 import {
   ThemeProvider as NextThemesProvider,
-  ThemeProviderProps,
+  type ThemeProviderProps,
 } from "next-themes";
 
 export function ThemeProvider({
   children,
   ...props
-}: ThemeProviderProps & { children: React.ReactNode }) {
+}: React.PropsWithChildren<ThemeProviderProps>) {
   return <NextThemesProvider {...props}>{children}</NextThemesProvider>;
 }
