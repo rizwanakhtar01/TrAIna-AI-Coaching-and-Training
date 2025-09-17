@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -10,21 +11,12 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
 import {
   ArrowLeft,
   MessageCircle,
-  Phone,
-  Mail,
   X,
-  ChevronDown,
-  ChevronUp,
   Eye,
-  Clock,
-  Users,
   BarChart3,
-  Bell,
-  Search,
   Star,
 } from "lucide-react";
 
@@ -76,171 +68,181 @@ function FloatingCoachingWidget({
       "Try using more empathetic phrases like 'I understand your frustration' before explaining policies.",
   };
 
-  if (isCollapsed) {
-    return (
-      <div className="fixed bottom-6 right-6 z-50">
-        <Card
-          className="w-16 h-16 flex items-center justify-center cursor-pointer shadow-lg bg-white/90 backdrop-blur-sm border-2 border-blue-200"
-          onClick={() => setIsCollapsed(false)}
-        >
-          <MessageCircle className="h-6 w-6 text-blue-600" />
-        </Card>
-      </div>
-    );
-  }
-
   return (
-    <div className="fixed bottom-6 right-6 z-50 w-96 max-h-[80vh] overflow-hidden">
-      <Card className="shadow-xl border-2 border-blue-200 bg-white/95 backdrop-blur-sm">
-        <CardHeader className="pb-3 border-b border-gray-100">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <MessageCircle className="h-5 w-5 text-blue-600" />
-              <CardTitle className="text-lg font-semibold text-gray-900">
-                Daily Coaching
-              </CardTitle>
-            </div>
-            <div className="flex gap-1">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setIsCollapsed(true)}
-                className="h-7 w-7 p-0"
-              >
-                <ChevronDown className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setIsCollapsed(true)}
-                className="h-7 w-7 p-0"
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-          <CardDescription className="text-base font-medium text-blue-600">
-            Hey {agentName}, Good day! 👋
-          </CardDescription>
-        </CardHeader>
-
-        <CardContent className="p-4 space-y-4 max-h-96 overflow-y-auto">
-          {/* Areas where agent struggled */}
-          <div className="space-y-2">
-            <h4 className="font-semibold text-gray-800 text-sm flex items-center gap-2">
-              <BarChart3 className="h-4 w-4 text-red-500" />
-              Yesterday's Challenge Areas
-            </h4>
-            <ul className="space-y-1">
-              {yesterdayPerformance.struggledAreas.map((area, index) => (
-                <li
-                  key={index}
-                  className="text-sm text-gray-600 pl-4 border-l-2 border-red-200"
-                >
-                  • {area}
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Contact references */}
-          <div className="space-y-2">
-            <h4 className="font-semibold text-gray-800 text-sm flex items-center gap-2">
-              <Eye className="h-4 w-4 text-orange-500" />
-              Recent Contact Issues
-            </h4>
-            <div className="space-y-2">
-              {yesterdayPerformance.contactReferences.map((contact, index) => (
-                <div
-                  key={index}
-                  className="p-2 bg-orange-50 rounded-md border border-orange-200"
-                >
-                  <div className="flex items-center justify-between">
-                    <Badge variant="outline" className="text-xs font-mono">
-                      {contact.id}
-                    </Badge>
-                    <span className="text-xs text-gray-500">
-                      {contact.time}
-                    </span>
-                  </div>
-                  <p className="text-xs text-gray-600 mt-1">{contact.issue}</p>
+    <AnimatePresence>
+      {isCollapsed ? (
+        <motion.div
+          key="collapsed"
+          initial={{ opacity: 0, scale: 0.5, y: 50 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.5, y: 50 }}
+          transition={{ duration: 0.3 }}
+          className="fixed bottom-6 right-6 z-50"
+        >
+          <Card
+    className="w-20 h-20 flex items-center justify-center cursor-pointer 
+               rounded-full shadow-xl 
+               bg-gradient-to-r from-blue-600 to-indigo-600 
+               hover:scale-110 hover:shadow-2xl transition-all duration-300"
+    onClick={() => setIsCollapsed(false)}
+  >
+    <MessageCircle className="h-10 w-10 text-white" />
+  </Card>
+        </motion.div>
+      ) : (
+        <motion.div
+          key="expanded"
+          initial={{ opacity: 0, scale: 0.8, y: 50 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.8, y: 50 }}
+          transition={{ duration: 0.3, ease: "easeOut" }}
+          className="fixed inset-0 flex items-center justify-center z-50"
+        >
+          <Card className="shadow-xl border-2 border-blue-200 bg-white/95 backdrop-blur-sm">
+            <CardHeader className="pb-3 border-b border-gray-100">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <MessageCircle className="h-5 w-5 text-blue-600" />
+                  <CardTitle className="text-lg font-semibold text-gray-900">
+                    It's you AI buddy 🙂
+                  </CardTitle>
                 </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Areas to focus on today */}
-          <div className="space-y-2">
-            <h4 className="font-semibold text-gray-800 text-sm flex items-center gap-2">
-              <Star className="h-4 w-4 text-blue-500" />
-              Today's Focus Areas
-            </h4>
-            <ul className="space-y-1">
-              {yesterdayPerformance.focusAreas.map((area, index) => (
-                <li
-                  key={index}
-                  className="text-sm text-gray-600 pl-4 border-l-2 border-blue-200"
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setIsCollapsed(true)}
+                  className="h-7 w-7 p-0"
                 >
-                  • {area}
-                </li>
-              ))}
-            </ul>
-          </div>
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+              <CardDescription className="text-base font-medium text-blue-600">
+                Hey {agentName}, Good day! 👋
+              </CardDescription>
+            </CardHeader>
 
-          {/* AI Tip */}
-          <div className="p-3 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-md border border-blue-200">
-            <h4 className="font-semibold text-gray-800 text-sm mb-2 flex items-center gap-2">
-              <MessageCircle className="h-4 w-4 text-blue-600" />
-              AI Coaching Tip
-            </h4>
-            <p className="text-sm text-gray-700 italic">
-              {yesterdayPerformance.aiTip}
-            </p>
-          </div>
+            <CardContent className="p-4 space-y-4 max-h-96 overflow-y-auto">
+              {/* Areas where agent struggled */}
+              <div className="space-y-2">
+                <h4 className="font-semibold text-gray-800 text-sm flex items-center gap-2">
+                  <BarChart3 className="h-4 w-4 text-red-500" />
+                  Yesterday&apos;s Challenge Areas
+                </h4>
+                <ul className="space-y-1">
+                  {yesterdayPerformance.struggledAreas.map((area, index) => (
+                    <li
+                      key={index}
+                      className="text-sm text-gray-600 pl-4 border-l-2 border-red-200"
+                    >
+                      • {area}
+                    </li>
+                  ))}
+                </ul>
+              </div>
 
-          {/* CTA Button */}
-          <Button
-            onClick={onSeeDetails}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white"
-          >
-            See Details
-          </Button>
-        </CardContent>
-      </Card>
-    </div>
+              {/* Contact references */}
+              <div className="space-y-2">
+                <h4 className="font-semibold text-gray-800 text-sm flex items-center gap-2">
+                  <Eye className="h-4 w-4 text-orange-500" />
+                  Recent Contact Issues
+                </h4>
+                <div className="space-y-2">
+                  {yesterdayPerformance.contactReferences.map(
+                    (contact, index) => (
+                      <div
+                        key={index}
+                        className="p-2 bg-orange-50 rounded-md border border-orange-200"
+                      >
+                        <div className="flex items-center justify-between">
+                          <Badge variant="outline" className="text-xs font-mono">
+                            {contact.id}
+                          </Badge>
+                          <span className="text-xs text-gray-500">
+                            {contact.time}
+                          </span>
+                        </div>
+                        <p className="text-xs text-gray-600 mt-1">
+                          {contact.issue}
+                        </p>
+                      </div>
+                    )
+                  )}
+                </div>
+              </div>
+
+              {/* Areas to focus on today */}
+              <div className="space-y-2">
+                <h4 className="font-semibold text-gray-800 text-sm flex items-center gap-2">
+                  <Star className="h-4 w-4 text-blue-500" />
+                  Today&apos;s Focus Areas
+                </h4>
+                <ul className="space-y-1">
+                  {yesterdayPerformance.focusAreas.map((area, index) => (
+                    <li
+                      key={index}
+                      className="text-sm text-gray-600 pl-4 border-l-2 border-blue-200"
+                    >
+                      • {area}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* AI Tip */}
+              <div className="p-3 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-md border border-blue-200">
+                <h4 className="font-semibold text-gray-800 text-sm mb-2 flex items-center gap-2">
+                  <MessageCircle className="h-4 w-4 text-blue-600" />
+                  Tips
+                </h4>
+                <p className="text-sm text-gray-700 italic">
+                  {yesterdayPerformance.aiTip}
+                </p>
+              </div>
+
+              {/* CTA Button */}
+              <Button
+                onClick={onSeeDetails}
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+              >
+                See Details
+              </Button>
+            </CardContent>
+          </Card>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }
 
 export function AgentDesktop({ onBack, onCoachingDetails }: AgentDesktopProps) {
-  // Agent name from session (mock data for demo)
   const agentName = "Thomson";
 
   return (
     <div
-      className="min-h-screen bg-cover bg-center bg-no-repeat relative"
+      className="min-h-screen w-screen bg-cover bg-center bg-no-repeat relative overflow-y-auto"
       style={{
         backgroundImage: `url('/agent-dashboard.png')`,
         backgroundColor: "#f8fafc",
+        backgroundSize: "contain",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+        backgroundAttachment: "scroll",
       }}
     >
-      {/* Header with back button */}
+      {/* Back button */}
       <div className="relative z-10 p-4">
-        <div className="flex items-center justify-between">
-          <Button
-            variant="outline"
-            onClick={onBack}
-            className="bg-white/90 backdrop-blur-sm hover:bg-white transition-colors"
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Login
-          </Button>
-
-          <div className="text-white bg-black/50 px-4 py-2 rounded-lg backdrop-blur-sm">
-            <h1 className="text-xl font-bold">OmniHive Agent Desktop</h1>
-            <p className="text-sm opacity-90">Welcome back, {agentName}</p>
-          </div>
-        </div>
+        <Button
+          variant="outline"
+          onClick={onBack}
+          className="fixed bottom-6 left-6 z-50 bg-white/80 backdrop-blur-sm hover:bg-primary hover:text-white/90 "
+        >
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Back to Login
+        </Button>
       </div>
+
+      {/* Spacer content */}
+      <div className="h-[150vh]"></div>
 
       {/* Floating AI Coaching Widget */}
       <FloatingCoachingWidget

@@ -54,7 +54,7 @@ export function LoginScreen({ onLogin, onAgentDesktop }: LoginScreenProps) {
         <Button 
           variant="outline" 
           onClick={onAgentDesktop}
-          className="bg-white/80 backdrop-blur-sm hover:bg-white/90 transition-colors"
+          className="bg-white/80 backdrop-blur-sm hover:bg-primary hover:text-white/90 "
         >
           Agent Desktop
         </Button>
