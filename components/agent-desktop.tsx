@@ -169,13 +169,10 @@ export function AgentDesktop({ onBack, onCoachingDetails }: AgentDesktopProps) {
     <div 
       className="min-h-screen bg-cover bg-center bg-no-repeat relative"
       style={{
-        backgroundImage: `url('/api/placeholder/1920/1080')`,
+        backgroundImage: `url('/placeholder-agent-desktop.png')`,
         backgroundColor: '#f8fafc'
       }}
     >
-      {/* Dark overlay for better readability */}
-      <div className="absolute inset-0 bg-black/20" />
-      
       {/* Header with back button */}
       <div className="relative z-10 p-4">
         <div className="flex items-center justify-between">
@@ -195,148 +192,14 @@ export function AgentDesktop({ onBack, onCoachingDetails }: AgentDesktopProps) {
         </div>
       </div>
 
-      {/* Simulated Agent Desktop Interface */}
-      <div className="relative z-10 p-6">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-            
-            {/* Contact Statistics */}
-            <Card className="lg:col-span-1 bg-white/90 backdrop-blur-sm">
-              <CardHeader>
-                <CardTitle className="text-lg">Contact Statistics</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="text-center p-3 bg-green-50 rounded-lg">
-                    <div className="text-2xl font-bold text-green-600">80</div>
-                    <div className="text-sm text-gray-600">Handled</div>
-                  </div>
-                  <div className="text-center p-3 bg-blue-50 rounded-lg">
-                    <div className="text-2xl font-bold text-blue-600">45</div>
-                    <div className="text-sm text-gray-600">Transfer</div>
-                  </div>
-                  <div className="text-center p-3 bg-red-50 rounded-lg">
-                    <div className="text-2xl font-bold text-red-600">20</div>
-                    <div className="text-sm text-gray-600">Missed</div>
-                  </div>
-                  <div className="text-center p-3 bg-yellow-50 rounded-lg">
-                    <div className="text-2xl font-bold text-yellow-600">25</div>
-                    <div className="text-sm text-gray-600">Conference</div>
-                  </div>
-                </div>
-                
-                <div className="text-center p-4 bg-gray-50 rounded-lg">
-                  <div className="text-3xl font-bold text-gray-900">26,751</div>
-                  <div className="text-sm text-gray-600">Total Contacts</div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Performance Chart */}
-            <Card className="lg:col-span-2 bg-white/90 backdrop-blur-sm">
-              <CardHeader>
-                <CardTitle className="text-lg">Performance Overview</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="h-48 bg-gradient-to-r from-blue-100 to-indigo-100 rounded-lg flex items-center justify-center">
-                  <div className="text-center">
-                    <BarChart3 className="h-12 w-12 text-blue-600 mx-auto mb-2" />
-                    <p className="text-sm text-gray-600">Performance Chart Placeholder</p>
-                    <p className="text-xs text-gray-500 mt-1">Voice, Chat, Email, SMS Analytics</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Agent Status */}
-            <Card className="lg:col-span-1 bg-white/90 backdrop-blur-sm">
-              <CardHeader>
-                <CardTitle className="text-lg">Agent Status</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm">Available</span>
-                    <Badge variant="default" className="bg-green-500">03:58:03</Badge>
-                  </div>
-                  <Progress value={75} className="w-full" />
-                </div>
-                
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span>Not Ready</span>
-                    <span>00:30:15</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span>Busy</span>
-                    <span>02:45:29</span>
-                  </div>
-                </div>
-
-                <div className="pt-4 border-t">
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-gray-900">30</div>
-                    <div className="text-sm text-gray-600">Waiting Contacts</div>
-                    <Clock className="h-4 w-4 mx-auto mt-1 text-gray-500" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Additional mock sections */}
-          <div className="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <Card className="bg-white/90 backdrop-blur-sm">
-              <CardHeader>
-                <CardTitle className="text-lg">Team Statistics</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="text-center">
-                    <div className="text-xl font-bold text-blue-600">114</div>
-                    <div className="text-xs text-gray-600">Inbound (25%)</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-xl font-bold text-green-600">97</div>
-                    <div className="text-xs text-gray-600">Outbound (33%)</div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-white/90 backdrop-blur-sm">
-              <CardHeader>
-                <CardTitle className="text-lg">Queue Statistics</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span>Available</span>
-                    <span>25</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span>Handled</span>
-                    <span>356</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span>In Queue</span>
-                    <span>33</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-white/90 backdrop-blur-sm">
-              <CardHeader>
-                <CardTitle className="text-lg">Handle Time</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-purple-600">00:15:03</div>
-                  <div className="text-sm text-gray-600">Average Handle Time</div>
-                </div>
-              </CardContent>
-            </Card>
+      {/* Placeholder for agent desktop background */}
+      <div className="relative z-10 flex-1 flex items-center justify-center p-6">
+        <div className="text-center bg-white/10 backdrop-blur-sm rounded-lg p-8 border border-white/20">
+          <div className="text-white/80 mb-4">
+            <BarChart3 className="h-16 w-16 mx-auto mb-4" />
+            <h2 className="text-2xl font-semibold mb-2">Agent Desktop Background</h2>
+            <p className="text-lg">Replace '/placeholder-agent-desktop.png' with your desired background image</p>
+            <p className="text-sm mt-2 opacity-75">This placeholder will be replaced with your custom agent dashboard screenshot</p>
           </div>
         </div>
       </div>
