@@ -169,7 +169,7 @@ export function AgentDesktop({ onBack, onCoachingDetails }: AgentDesktopProps) {
     <div 
       className="min-h-screen bg-cover bg-center bg-no-repeat relative"
       style={{
-        backgroundImage: `url('/placeholder-agent-desktop.png')`,
+        backgroundImage: `url('/agent-dashboard.png')`,
         backgroundColor: '#f8fafc'
       }}
     >
