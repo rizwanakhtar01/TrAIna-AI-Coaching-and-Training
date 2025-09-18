@@ -676,6 +676,364 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
     )
   }
 
+  // If viewing pattern details, show that page
+  if (showPatternDetails && selectedPattern) {
+    const pattern = challengingPatterns.find(p => p.id === selectedPattern)
+    if (!pattern) return null
+
+    const affectedAgentsData = agents.filter(a => pattern.affectedAgents.includes(a.id))
+    
+    // Generate detailed data based on pattern type
+    const getPatternDetails = (pattern: ChallengingPattern) => {
+      const baseData = {
+        errorRateTrend: [
+          { day: 'Day 1', rate: pattern.errorRate - 8 },
+          { day: 'Day 7', rate: pattern.errorRate - 5 },
+          { day: 'Day 14', rate: pattern.errorRate - 3 },
+          { day: 'Day 21', rate: pattern.errorRate - 1 },
+          { day: 'Day 28', rate: pattern.errorRate },
+        ],
+        peakTimes: ['10:00-11:00 AM', '2:00-3:00 PM', '7:00-8:00 PM'],
+        volumeSpikes: ['Monday mornings', 'Friday afternoons', 'Month-end periods']
+      }
+
+      switch (pattern.name) {
+        case 'Refund Processing':
+          return {
+            ...baseData,
+            rootCauses: [
+              { type: 'Policy unclear explanation', frequency: '35%' },
+              { type: 'System timeout during processing', frequency: '28%' },
+              { type: 'Agent lacks refund authorization', frequency: '20%' },
+              { type: 'Customer documentation incomplete', frequency: '12%' },
+              { type: 'Processing workflow confusion', frequency: '5%' }
+            ],
+            impact: {
+              customerSatisfaction: '-0.8 points',
+              handleTime: '+2.3 minutes',
+              escalationRate: '15% higher than baseline',
+              revenueImpact: '$12,400 in delayed refunds'
+            }
+          }
+        case 'Billing Inquiries':
+          return {
+            ...baseData,
+            rootCauses: [
+              { type: 'Complex billing structure explanation', frequency: '40%' },
+              { type: 'Proration calculation errors', frequency: '25%' },
+              { type: 'Invoice discrepancy resolution', frequency: '18%' },
+              { type: 'Payment method update issues', frequency: '12%' },
+              { type: 'Billing cycle misunderstanding', frequency: '5%' }
+            ],
+            impact: {
+              customerSatisfaction: '-0.5 points',
+              handleTime: '+1.8 minutes',
+              escalationRate: '8% higher than baseline',
+              revenueImpact: '$8,200 in billing disputes'
+            }
+          }
+        case 'Technical Support':
+          return {
+            ...baseData,
+            rootCauses: [
+              { type: 'Complex troubleshooting steps', frequency: '45%' },
+              { type: 'Agent technical knowledge gaps', frequency: '30%' },
+              { type: 'Escalation threshold uncertainty', frequency: '15%' },
+              { type: 'Tool/system limitations', frequency: '7%' },
+              { type: 'Customer technical literacy', frequency: '3%' }
+            ],
+            impact: {
+              customerSatisfaction: '-1.2 points',
+              handleTime: '+3.5 minutes',
+              escalationRate: '22% higher than baseline',
+              revenueImpact: '$15,600 in support overhead'
+            }
+          }
+        default:
+          return {
+            ...baseData,
+            rootCauses: [
+              { type: 'Process complexity', frequency: '30%' },
+              { type: 'Training gaps', frequency: '25%' },
+              { type: 'System limitations', frequency: '20%' },
+              { type: 'Policy confusion', frequency: '15%' },
+              { type: 'Communication barriers', frequency: '10%' }
+            ],
+            impact: {
+              customerSatisfaction: '-0.6 points',
+              handleTime: '+2.0 minutes',
+              escalationRate: '10% higher than baseline',
+              revenueImpact: '$9,500 in efficiency loss'
+            }
+          }
+      }
+    }
+
+    const patternDetails = getPatternDetails(pattern)
+
+    return (
+      <div className="space-y-6">
+        {/* Header */}
+        <header className="border-b border-border bg-card">
+          <div className="flex h-16 items-center justify-between px-6">
+            <div className="flex items-center gap-4">
+              <Button variant="ghost" size="sm" onClick={() => {
+                setShowPatternDetails(false)
+                setSelectedPattern(null)
+              }}>
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Back to Challenge Patterns
+              </Button>
+              <div className="flex items-center gap-2">
+                <div className="h-8 w-8 rounded bg-primary flex items-center justify-center">
+                  <AlertTriangle className="h-4 w-4 text-primary-foreground" />
+                </div>
+                <h1 className="text-xl font-semibold text-foreground">{pattern.name} Challenge Pattern</h1>
+              </div>
+              <Badge variant="secondary" className="bg-blue-100 text-blue-800 font-medium">
+                Supervisor View
+              </Badge>
+            </div>
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <span>Team Lead - Customer Support</span>
+                <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center">
+                  <span className="text-xs font-medium text-blue-800">TL</span>
+                </div>
+              </div>
+              <Button variant="ghost" size="sm" onClick={onLogout}>
+                <LogOut className="h-4 w-4 mr-2" />
+                Logout
+              </Button>
+            </div>
+          </div>
+        </header>
+
+        <div className="p-6 space-y-6">
+          {/* Pattern Overview */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <BarChart3 className="h-5 w-5 text-primary" />
+                Pattern Overview
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-4 gap-4">
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-destructive">{pattern.errorRate}%</div>
+                  <div className="text-sm text-muted-foreground">Error Rate</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-foreground">{pattern.frequency}</div>
+                  <div className="text-sm text-muted-foreground">Occurrences</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-foreground">{pattern.affectedAgents.length}</div>
+                  <div className="text-sm text-muted-foreground">Affected Agents</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-chart-5">{pattern.dateRange}</div>
+                  <div className="text-sm text-muted-foreground">Timeframe</div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Error Rate Trend */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <TrendingUp className="h-5 w-5 text-chart-1" />
+                Error Rate Trend (Last 30 days)
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="h-64">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={patternDetails.errorRateTrend}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="day" />
+                    <YAxis />
+                    <Tooltip />
+                    <Line type="monotone" dataKey="rate" stroke="#ef4444" strokeWidth={2} />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <h4 className="font-medium mb-2">Peak Error Days and Times</h4>
+                  <ul className="space-y-1">
+                    {patternDetails.peakTimes.map((time, index) => (
+                      <li key={index} className="text-sm text-muted-foreground flex items-center gap-2">
+                        <Clock className="h-3 w-3" />
+                        {time}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <div>
+                  <h4 className="font-medium mb-2">Correlation with Volume Spikes</h4>
+                  <ul className="space-y-1">
+                    {patternDetails.volumeSpikes.map((spike, index) => (
+                      <li key={index} className="text-sm text-muted-foreground flex items-center gap-2">
+                        <Activity className="h-3 w-3" />
+                        {spike}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Root Cause Analysis */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Target className="h-5 w-5 text-chart-2" />
+                Root Cause Analysis
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <h4 className="font-medium mb-3">Top 5 Error Types and Frequencies</h4>
+                <div className="space-y-2">
+                  {patternDetails.rootCauses.map((cause, index) => (
+                    <div key={index} className="flex items-center justify-between p-3 bg-muted rounded-lg">
+                      <span className="text-sm">{cause.type}</span>
+                      <Badge variant="outline">{cause.frequency}</Badge>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4 pt-4 border-t">
+                <div>
+                  <h4 className="font-medium mb-2">System/Process Issues</h4>
+                  <div className="text-sm text-muted-foreground">
+                    <p>• Workflow complexity and system limitations</p>
+                    <p>• Integration delays and timeout issues</p>
+                    <p>• Authorization and access restrictions</p>
+                  </div>
+                </div>
+                <div>
+                  <h4 className="font-medium mb-2">Agent Skill Issues</h4>
+                  <div className="text-sm text-muted-foreground">
+                    <p>• Knowledge gaps in policy interpretation</p>
+                    <p>• Communication and explanation skills</p>
+                    <p>• Decision-making confidence levels</p>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Impact Assessment */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <AlertTriangle className="h-5 w-5 text-chart-3" />
+                Impact Assessment
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between p-3 bg-red-50 rounded-lg border border-red-200">
+                    <span className="text-sm font-medium">Customer Satisfaction Impact</span>
+                    <span className="text-red-600 font-bold">{patternDetails.impact.customerSatisfaction}</span>
+                  </div>
+                  <div className="flex items-center justify-between p-3 bg-orange-50 rounded-lg border border-orange-200">
+                    <span className="text-sm font-medium">Average Handle Time Increase</span>
+                    <span className="text-orange-600 font-bold">{patternDetails.impact.handleTime}</span>
+                  </div>
+                </div>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between p-3 bg-yellow-50 rounded-lg border border-yellow-200">
+                    <span className="text-sm font-medium">Escalation Rate</span>
+                    <span className="text-yellow-600 font-bold">{patternDetails.impact.escalationRate}</span>
+                  </div>
+                  <div className="flex items-center justify-between p-3 bg-purple-50 rounded-lg border border-purple-200">
+                    <span className="text-sm font-medium">Revenue Impact</span>
+                    <span className="text-purple-600 font-bold">{patternDetails.impact.revenueImpact}</span>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Agent Performance Distribution */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Users className="h-5 w-5 text-chart-4" />
+                Agent Performance Distribution
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-3 gap-6">
+                <div>
+                  <h4 className="font-medium mb-3 text-chart-4">High Performers</h4>
+                  <p className="text-sm text-muted-foreground mb-3">Agents handling this issue well</p>
+                  <div className="space-y-2">
+                    {affectedAgentsData
+                      .filter(agent => agent.status === 'excellent' || agent.status === 'good')
+                      .map((agent) => (
+                        <div key={agent.id} className="flex items-center gap-2 p-2 bg-green-50 rounded border border-green-200">
+                          <div className="h-6 w-6 rounded-full bg-green-100 flex items-center justify-center">
+                            <span className="text-xs font-medium text-green-800">{agent.avatar}</span>
+                          </div>
+                          <span className="text-sm">{agent.name}</span>
+                          <CheckCircle className="h-3 w-3 text-green-600 ml-auto" />
+                        </div>
+                      ))}
+                  </div>
+                </div>
+                
+                <div>
+                  <h4 className="font-medium mb-3 text-destructive">Struggling Agents</h4>
+                  <p className="text-sm text-muted-foreground mb-3">Needing immediate support</p>
+                  <div className="space-y-2">
+                    {affectedAgentsData
+                      .filter(agent => agent.status === 'at-risk' || agent.status === 'needs-attention')
+                      .map((agent) => (
+                        <div key={agent.id} className="flex items-center gap-2 p-2 bg-red-50 rounded border border-red-200">
+                          <div className="h-6 w-6 rounded-full bg-red-100 flex items-center justify-center">
+                            <span className="text-xs font-medium text-red-800">{agent.avatar}</span>
+                          </div>
+                          <span className="text-sm">{agent.name}</span>
+                          <XCircle className="h-3 w-3 text-red-600 ml-auto" />
+                        </div>
+                      ))}
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="font-medium mb-3 text-chart-5">Training Status</h4>
+                  <p className="text-sm text-muted-foreground mb-3">Completion by agent</p>
+                  <div className="space-y-3">
+                    {affectedAgentsData.map((agent) => {
+                      const completionRate = Math.floor((agent.sessionsCompleted / agent.sessionsTarget) * 100)
+                      return (
+                        <div key={agent.id} className="space-y-1">
+                          <div className="flex justify-between text-sm">
+                            <span>{agent.name}</span>
+                            <span>{completionRate}%</span>
+                          </div>
+                          <Progress value={completionRate} className="h-2" />
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
