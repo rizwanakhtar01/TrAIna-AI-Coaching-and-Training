@@ -119,7 +119,7 @@ function FloatingCoachingWidget({
               </CardDescription>
             </CardHeader>
 
-            <CardContent className="p-4 space-y-4 max-h-96 overflow-y-auto">
+            <CardContent className="p-4 space-y-4">
               {/* Areas where agent struggled */}
               <div className="space-y-2">
                 <h4 className="font-semibold text-gray-800 text-sm flex items-center gap-2">
