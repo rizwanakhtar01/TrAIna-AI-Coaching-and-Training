@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { Sparkles } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import {
@@ -38,9 +39,8 @@ function FloatingCoachingWidget({
 
   const yesterdayPerformance = {
     struggledAreas: [
-      "Empathy in customer interactions",
-      "Product policy explanations",
-      "Call resolution time",
+      "Maintained positive tone across most interactions",
+      "Resolved 80% of issues on first call",
     ],
     contactReferences: [
       {
@@ -54,18 +54,18 @@ function FloatingCoachingWidget({
         time: "16:15",
       },
       {
-        id: "CNT-2024-003",
+        id: "CNT-2024-001",
         issue: "Refund request - policy not explained well",
         time: "17:45",
       },
     ],
     focusAreas: [
-      "Practice active listening techniques",
-      "Review product return policies",
-      "Work on call pacing and efficiency",
+      "Practice active listening: repeat back what the customer says before replying",
+      "Review product return policy (Knowledge Base > Policies)",
+      "Work on pacing: aim to resolve within target handle time",
     ],
     aiTip:
-      "Try using more empathetic phrases like 'I understand your frustration' before explaining policies.",
+      "Use empathy phrases like “I completely understand how that feels” before explaining policies. This builds trust and makes customers more receptive.",
   };
 
   return (
@@ -80,11 +80,13 @@ function FloatingCoachingWidget({
           className="fixed top-1/2 right-0 -translate-y-1/2 z-50"
         >
           <div
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-l-lg shadow-lg cursor-pointer transition-colors duration-200 flex items-center gap-2"
+            className="bg-blue-600 text-white px-4 py-3 h-12 w-30 rounded-l-lg flex items-center justify-center text-center leading-snug"
             onClick={() => setIsCollapsed(false)}
           >
-            <MessageCircle className="h-5 w-5" />
-            <span className="text-sm font-medium">Your AI Coach</span>
+            <Sparkles className="h-5 w-5" />
+            <span className="text-sm font-medium whitespace-normal break-words">
+              Your AI Coach
+            </span>
           </div>
         </motion.div>
       ) : (
@@ -94,15 +96,15 @@ function FloatingCoachingWidget({
           animate={{ x: 0 }}
           exit={{ x: "100%" }}
           transition={{ type: "spring", stiffness: 120, damping: 20 }}
-          className="fixed top-0 right-0 h-full w-[400px] md:w-[500px] lg:w-[600px] z-50"
+          className="fixed top-0 right-0 h-screen w-[400px] md:w-[500px] lg:w-[600px] z-50 overflow-hidden"
         >
-          <Card className="h-full bg-white/95 backdrop-blur-sm rounded-none shadow-xl">
+          <Card className="h-full bg-white/95 backdrop-blur-sm rounded-none shadow-xl overflow-hidden">
             <CardHeader className="pb-3 border-b border-gray-100">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <MessageCircle className="h-5 w-5 text-blue-600" />
                   <CardTitle className="text-lg font-semibold text-gray-900">
-                    It's you AI buddy 🙂
+                    Hey {agentName}, Good day! 👋
                   </CardTitle>
                 </div>
                 <Button
@@ -115,16 +117,16 @@ function FloatingCoachingWidget({
                 </Button>
               </div>
               <CardDescription className="text-base font-medium text-blue-600">
-                Hey {agentName}, Good day! 👋
+                I’m your AI Coach. Let’s reflect on yesterday and get ready for today 🚀
               </CardDescription>
             </CardHeader>
 
-            <CardContent className="p-4 space-y-4">
+            <CardContent className="p-4 space-y-4 h-full overflow-hidden">
               {/* Areas where agent struggled */}
               <div className="space-y-2">
                 <h4 className="font-semibold text-gray-800 text-sm flex items-center gap-2">
                   <BarChart3 className="h-4 w-4 text-red-500" />
-                  Yesterday&apos;s Challenge Areas
+                  Yesterday’s Wins
                 </h4>
                 <ul className="space-y-1">
                   {yesterdayPerformance.struggledAreas.map((area, index) => (
@@ -142,7 +144,7 @@ function FloatingCoachingWidget({
               <div className="space-y-2">
                 <h4 className="font-semibold text-gray-800 text-sm flex items-center gap-2">
                   <Eye className="h-4 w-4 text-orange-500" />
-                  Recent Contact Issues
+                  Recent Contacts to Learn From
                 </h4>
                 <div className="space-y-2">
                   {yesterdayPerformance.contactReferences.map(
@@ -175,7 +177,7 @@ function FloatingCoachingWidget({
               <div className="space-y-2">
                 <h4 className="font-semibold text-gray-800 text-sm flex items-center gap-2">
                   <Star className="h-4 w-4 text-blue-500" />
-                  Today&apos;s Focus Areas
+                  Today's Focus Areas
                 </h4>
                 <ul className="space-y-1">
                   {yesterdayPerformance.focusAreas.map((area, index) => (
@@ -193,7 +195,7 @@ function FloatingCoachingWidget({
               <div className="p-3 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-md border border-blue-200">
                 <h4 className="font-semibold text-gray-800 text-sm mb-2 flex items-center gap-2">
                   <MessageCircle className="h-4 w-4 text-blue-600" />
-                  Tips
+                  Pro Tip for Today
                 </h4>
                 <p className="text-sm text-gray-700 italic">
                   {yesterdayPerformance.aiTip}
