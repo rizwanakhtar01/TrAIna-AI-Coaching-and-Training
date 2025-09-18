@@ -84,7 +84,7 @@ function FloatingCoachingWidget({
             onClick={() => setIsCollapsed(false)}
           >
             <MessageCircle className="h-5 w-5" />
-            <span className="text-sm font-medium">Coaching</span>
+            <span className="text-sm font-medium">Your AI Coach</span>
           </div>
         </motion.div>
       ) : (
@@ -96,7 +96,7 @@ function FloatingCoachingWidget({
           transition={{ type: "spring", stiffness: 120, damping: 20 }}
           className="fixed top-0 right-0 h-full w-[400px] md:w-[500px] lg:w-[600px] z-50"
         >
-          <Card className="h-full border-l-2 border-blue-200 bg-white/95 backdrop-blur-sm rounded-none shadow-xl">
+          <Card className="h-full bg-white/95 backdrop-blur-sm rounded-none shadow-xl">
             <CardHeader className="pb-3 border-b border-gray-100">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -119,7 +119,7 @@ function FloatingCoachingWidget({
               </CardDescription>
             </CardHeader>
 
-            <CardContent className="p-4 space-y-4 max-h-96 overflow-y-auto">
+            <CardContent className="p-4 space-y-4">
               {/* Areas where agent struggled */}
               <div className="space-y-2">
                 <h4 className="font-semibold text-gray-800 text-sm flex items-center gap-2">
