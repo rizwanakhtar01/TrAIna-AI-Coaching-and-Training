@@ -83,7 +83,7 @@ function FloatingCoachingWidget({
             className="bg-blue-600 text-white px-4 py-3 h-12 w-30 rounded-l-lg flex items-center justify-center text-center leading-snug"
             onClick={() => setIsCollapsed(false)}
           >
-            <Sparkles className="h-5 w-5" />
+            <Sparkles className="h-7 w-7" />
             <span className="text-sm font-medium whitespace-normal break-words">
               Your AI Coach
             </span>
@@ -96,7 +96,7 @@ function FloatingCoachingWidget({
           animate={{ x: 0 }}
           exit={{ x: "100%" }}
           transition={{ type: "spring", stiffness: 120, damping: 20 }}
-          className="fixed top-0 right-0 h-screen w-[400px] md:w-[500px] lg:w-[600px] z-50 overflow-hidden"
+          className="fixed top-0 right-0 h-screen border-l w-[300px] md:w-[400px] lg:w-[500px] z-50 overflow-hidden"
         >
           <Card className="h-full bg-white/95 backdrop-blur-sm rounded-none shadow-xl overflow-hidden">
             <CardHeader className="pb-3 border-b border-gray-100">

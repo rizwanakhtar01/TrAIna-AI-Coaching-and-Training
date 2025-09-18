@@ -991,17 +991,6 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
                           <Eye className="h-4 w-4 mr-2" />
                           View Details
                         </Button>
-                        <Button variant="outline" size="sm" onClick={() => {
-                          // Drill down to affected agents
-                          const affectedAgents = agents.filter(a => pattern.affectedAgents.includes(a.id))
-                          if (affectedAgents.length > 0) {
-                            setActiveTab('progress')
-                            setAgentFilter('affected')
-                          }
-                        }}>
-                          <Users className="h-4 w-4 mr-2" />
-                          Drill Down
-                        </Button>
                       </div>
                     </div>
                     
