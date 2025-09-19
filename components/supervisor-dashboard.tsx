@@ -121,6 +121,10 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
   const [selectedPattern, setSelectedPattern] = useState<string | null>(null)
   const [showPatternDetails, setShowPatternDetails] = useState(false)
 
+  // State for daily summary agent details
+  const [showDailyAgentDetails, setShowDailyAgentDetails] = useState(false)
+  const [selectedDailyAgent, setSelectedDailyAgent] = useState<string | null>(null)
+
   // Comprehensive mock data for supervisor dashboard
   const agents: Agent[] = [
     {
@@ -214,6 +218,122 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
       notes: 'Strong performance across all metrics. Great team player.'
     }
   ]
+
+  // Daily team coaching summary data
+  const dailyTeamSummary = {
+    date: "2024-01-15",
+    team_performance: {
+      overall_score: 8.2,
+      improvement_vs_yesterday: 0.3,
+      agents_above_target: 9,
+      agents_below_target: 3,
+      coaching_sessions_needed: 4
+    },
+    individual_agent_insights: [
+      {
+        agent: "Sarah Mitchell",
+        daily_score: 8.7,
+        trend: "improving",
+        strengths: ["empathy", "problem_resolution"],
+        improvement_areas: ["efficiency"],
+        coaching_priority: "low",
+        coaching_prep: {
+          talking_points: [
+            "Congratulate on excellent empathy scores",
+            "Discuss time management techniques",
+            "Share Call #2847 as best practice example"
+          ],
+          suggested_duration: "15 minutes",
+          focus_area: "efficiency_improvement"
+        }
+      },
+      {
+        agent: "John Davis", 
+        daily_score: 6.8,
+        trend: "declining",
+        strengths: ["technical_knowledge"],
+        improvement_areas: ["compliance", "soft_skills"],
+        coaching_priority: "high",
+        coaching_prep: {
+          talking_points: [
+            "Address compliance warning dismissals",
+            "Review identity verification process",
+            "Practice customer acknowledgment techniques"
+          ],
+          suggested_duration: "30 minutes", 
+          focus_area: "compliance_and_soft_skills"
+        }
+      },
+      {
+        agent: "Lisa Kim",
+        daily_score: 9.1,
+        trend: "stable",
+        strengths: ["empathy", "technical_knowledge", "problem_resolution"],
+        improvement_areas: ["response_speed"],
+        coaching_priority: "low",
+        coaching_prep: {
+          talking_points: [
+            "Recognize exceptional performance across all areas",
+            "Explore mentoring opportunities for junior agents",
+            "Discuss response time optimization techniques"
+          ],
+          suggested_duration: "10 minutes",
+          focus_area: "mentoring_development"
+        }
+      },
+      {
+        agent: "Mike Rodriguez",
+        daily_score: 7.5,
+        trend: "improving",
+        strengths: ["product_knowledge"],
+        improvement_areas: ["empathy", "resolution_time"],
+        coaching_priority: "medium",
+        coaching_prep: {
+          talking_points: [
+            "Acknowledge improvement in product knowledge application",
+            "Practice active listening techniques",
+            "Review efficient troubleshooting workflows"
+          ],
+          suggested_duration: "20 minutes",
+          focus_area: "soft_skills_development"
+        }
+      },
+      {
+        agent: "Emma Wilson",
+        daily_score: 7.8,
+        trend: "improving",
+        strengths: ["communication"],
+        improvement_areas: ["technical_knowledge", "confidence"],
+        coaching_priority: "medium",
+        coaching_prep: {
+          talking_points: [
+            "Praise improvement in customer communication",
+            "Provide additional technical training resources",
+            "Build confidence through structured practice sessions"
+          ],
+          suggested_duration: "25 minutes",
+          focus_area: "technical_skills_building"
+        }
+      },
+      {
+        agent: "David Chen",
+        daily_score: 8.5,
+        trend: "stable",
+        strengths: ["problem_resolution", "efficiency"],
+        improvement_areas: ["empathy"],
+        coaching_priority: "low",
+        coaching_prep: {
+          talking_points: [
+            "Commend efficiency and problem-solving skills",
+            "Discuss customer emotional needs recognition",
+            "Share examples of empathetic responses"
+          ],
+          suggested_duration: "15 minutes",
+          focus_area: "empathy_enhancement"
+        }
+      }
+    ]
+  }
 
   const challengingPatterns: ChallengingPattern[] = [
     {
@@ -1192,10 +1312,11 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
       <div className="p-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <div className="flex items-center justify-between">
-            <TabsList className="grid w-full grid-cols-4 lg:w-[600px] bg-zinc-100">
+            <TabsList className="grid w-full grid-cols-5 lg:w-[750px] bg-zinc-100">
               <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
               <TabsTrigger value="patterns">Challenging Patterns</TabsTrigger>
               <TabsTrigger value="progress">Coaching Progress</TabsTrigger>
+              <TabsTrigger value="daily-summary">Daily Summary</TabsTrigger>
               <TabsTrigger value="reports">Weekly Reports</TabsTrigger>
             </TabsList>
 
