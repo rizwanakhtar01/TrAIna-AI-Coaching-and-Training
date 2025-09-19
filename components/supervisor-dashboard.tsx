@@ -51,6 +51,7 @@ import {
   Edit3,
   Save,
   ArrowLeft,
+  Minus,
 } from "lucide-react"
 
 // Comprehensive data models for supervisor dashboard
@@ -1845,6 +1846,162 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
                     )
                   })}
                 </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Daily Team Coaching Summary */}
+          <TabsContent value="daily-summary" className="space-y-6">
+            {/* Team Performance Overview */}
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Overall Score</CardTitle>
+                  <TrendingUp className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{dailyTeamSummary.team_performance.overall_score}</div>
+                  <p className="text-xs text-green-600">
+                    +{dailyTeamSummary.team_performance.improvement_vs_yesterday} vs yesterday
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Above Target</CardTitle>
+                  <CheckCircle className="h-4 w-4 text-green-600" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-green-600">{dailyTeamSummary.team_performance.agents_above_target}</div>
+                  <p className="text-xs text-muted-foreground">agents performing well</p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Below Target</CardTitle>
+                  <AlertTriangle className="h-4 w-4 text-red-600" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-red-600">{dailyTeamSummary.team_performance.agents_below_target}</div>
+                  <p className="text-xs text-muted-foreground">need attention</p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Coaching Needed</CardTitle>
+                  <Users className="h-4 w-4 text-orange-600" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-orange-600">{dailyTeamSummary.team_performance.coaching_sessions_needed}</div>
+                  <p className="text-xs text-muted-foreground">sessions scheduled</p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Date</CardTitle>
+                  <Calendar className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-lg font-bold">{new Date(dailyTeamSummary.date).toLocaleDateString()}</div>
+                  <p className="text-xs text-muted-foreground">today's summary</p>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Individual Agent Insights */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Users className="h-5 w-5 text-primary" />
+                  Individual Agent Performance
+                </CardTitle>
+                <p className="text-sm text-muted-foreground">
+                  Daily performance insights and coaching preparation for each team member
+                </p>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {dailyTeamSummary.individual_agent_insights.map((agentInsight, index) => {
+                  const getTrendIcon = (trend: string) => {
+                    switch (trend) {
+                      case 'improving':
+                        return <TrendingUp className="h-4 w-4 text-green-600" />
+                      case 'declining':
+                        return <TrendingDown className="h-4 w-4 text-red-600" />
+                      case 'stable':
+                        return <Minus className="h-4 w-4 text-blue-600" />
+                      default:
+                        return <Minus className="h-4 w-4 text-gray-600" />
+                    }
+                  }
+
+                  const getPriorityBadge = (priority: string) => {
+                    switch (priority) {
+                      case 'high':
+                        return { variant: 'destructive' as const, text: 'High Priority' }
+                      case 'medium':
+                        return { variant: 'secondary' as const, text: 'Medium Priority' }
+                      case 'low':
+                        return { variant: 'outline' as const, text: 'Low Priority' }
+                      default:
+                        return { variant: 'outline' as const, text: 'Unknown' }
+                    }
+                  }
+
+                  const priorityBadge = getPriorityBadge(agentInsight.coaching_priority)
+
+                  return (
+                    <div key={index} className="border rounded-lg p-4 hover:bg-muted/50 transition-colors">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-3">
+                          <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+                            <span className="font-medium text-primary">
+                              {agentInsight.agent.split(' ').map(n => n[0]).join('')}
+                            </span>
+                          </div>
+                          <div>
+                            <h4 className="font-semibold">{agentInsight.agent}</h4>
+                            <div className="flex items-center gap-2">
+                              <span className="text-sm text-muted-foreground">Score: </span>
+                              <span className="font-medium">{agentInsight.daily_score}</span>
+                              {getTrendIcon(agentInsight.trend)}
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Badge {...priorityBadge}>
+                            {priorityBadge.text}
+                          </Badge>
+                          <Button variant="outline" size="sm" onClick={() => {
+                            setSelectedDailyAgent(agentInsight.agent)
+                            setShowDailyAgentDetails(true)
+                          }}>
+                            <Eye className="h-4 w-4 mr-2" />
+                            View Details
+                          </Button>
+                        </div>
+                      </div>
+                      
+                      <div className="grid grid-cols-2 gap-4 text-sm">
+                        <div>
+                          <span className="text-muted-foreground">Strengths: </span>
+                          <span className="font-medium">
+                            {agentInsight.strengths.map(s => s.replace('_', ' ')).join(', ')}
+                          </span>
+                        </div>
+                        <div>
+                          <span className="text-muted-foreground">Improvement Areas: </span>
+                          <span className="font-medium">
+                            {agentInsight.improvement_areas.map(a => a.replace('_', ' ')).join(', ')}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  )
+                })}
               </CardContent>
             </Card>
           </TabsContent>
