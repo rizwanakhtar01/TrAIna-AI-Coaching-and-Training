@@ -42,6 +42,11 @@ function FloatingCoachingWidget({
       "Maintained positive tone across most interactions",
       "Resolved 80% of issues on first call",
     ],
+    challengingAreas: [
+      "Showing empathy in tough conversations",
+      "Explaining product policies clearly",
+      "Managing call resolution time efficiently",
+    ],
     contactReferences: [
       {
         id: "CNT-2024-001",
@@ -98,7 +103,7 @@ function FloatingCoachingWidget({
           transition={{ type: "spring", stiffness: 120, damping: 20 }}
           className="fixed top-0 right-0 h-screen border-l w-[300px] md:w-[400px] lg:w-[500px] z-50 overflow-hidden"
         >
-          <Card className="h-full bg-white/95 backdrop-blur-sm rounded-none shadow-xl overflow-hidden">
+          <Card className="h-full bg-white/95 backdrop-blur-sm rounded-none shadow-xl overflow-hidden flex flex-col">
             <CardHeader className="pb-3 border-b border-gray-100">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -121,7 +126,7 @@ function FloatingCoachingWidget({
               </CardDescription>
             </CardHeader>
 
-            <CardContent className="p-4 space-y-4 h-full overflow-hidden">
+            <CardContent className="p-4 space-y-4 flex-1 overflow-y-auto">
               {/* Areas where agent struggled */}
               <div className="space-y-2">
                 <h4 className="font-semibold text-gray-800 text-sm flex items-center gap-2">
@@ -130,6 +135,24 @@ function FloatingCoachingWidget({
                 </h4>
                 <ul className="space-y-1">
                   {yesterdayPerformance.struggledAreas.map((area, index) => (
+                    <li
+                      key={index}
+                      className="text-sm text-gray-600 pl-4 border-l-2 border-red-200"
+                    >
+                      • {area}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Challenging Areas */}
+              <div className="space-y-2">
+                <h4 className="font-semibold text-gray-800 text-sm flex items-center gap-2">
+                  <BarChart3 className="h-4 w-4 text-red-500" />
+                  Challenging Areas
+                </h4>
+                <ul className="space-y-1">
+                  {yesterdayPerformance.challengingAreas.map((area, index) => (
                     <li
                       key={index}
                       className="text-sm text-gray-600 pl-4 border-l-2 border-red-200"

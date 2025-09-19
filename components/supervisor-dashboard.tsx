@@ -554,6 +554,89 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
             </CardContent>
           </Card>
 
+          {/* Detailed Agent Analysis */}
+          <div className="grid gap-6 md:grid-cols-2">
+            {/* Performance Metrics */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Performance Metrics</CardTitle>
+                <CardDescription>Comparison vs team averages</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <ul className="space-y-2 text-sm text-muted-foreground">
+                  <li>• 45% error rate vs team average 23%</li>
+                  <li>• 12.5 min avg handle time vs team 8.2 min</li>
+                  <li>• Customer satisfaction: 3.1/5 vs team 4.2/5</li>
+                  <li>• 3 escalations in last 7 days</li>
+                </ul>
+              </CardContent>
+            </Card>
+
+            {/* Error Pattern Analysis */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Error Pattern Analysis</CardTitle>
+                <CardDescription>Where issues most frequently occur</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <ul className="space-y-2 text-sm text-muted-foreground">
+                  <li>• Most common error: Policy interpretation (60%)</li>
+                  <li>• System navigation struggles: 25%</li>
+                  <li>• Documentation issues: 15%</li>
+                  <li>• Timing: Errors spike during complex cases</li>
+                </ul>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="grid gap-6 md:grid-cols-2">
+            {/* Specific Interaction Examples */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Specific Interaction Examples</CardTitle>
+                <CardDescription>Representative successes and failures</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <ul className="space-y-2 text-sm text-muted-foreground">
+                  <li>• Failed Interaction #1: Partial refund confusion</li>
+                  <li>• Failed Interaction #2: Authorization escalation missed</li>
+                  <li>• Success Example: Simple return handled correctly</li>
+                </ul>
+              </CardContent>
+            </Card>
+
+            {/* AI Coaching Recommendations */}
+            <Card>
+              <CardHeader>
+                <CardTitle>AI Coaching Recommendations</CardTitle>
+                <CardDescription>Prioritized plan of action</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <ul className="space-y-2 text-sm text-muted-foreground">
+                  <li>• Priority 1: Refund policy deep-dive training</li>
+                  <li>• Priority 2: System workflow practice sessions</li>
+                  <li>• Priority 3: Pair with Sarah M. for mentoring</li>
+                  <li>• Suggested timeline: 2-week intensive support plan</li>
+                </ul>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Progress Tracking */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Progress Tracking</CardTitle>
+              <CardDescription>Training completion and improvement trend</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li>• Previous coaching session outcomes</li>
+                <li>• Training module completion: 40%</li>
+                <li>• Improvement trend: -5% error rate last week</li>
+              </ul>
+            </CardContent>
+          </Card>
+
           <div className="grid gap-6 md:grid-cols-2">
             {/* Session History */}
             <Card>
