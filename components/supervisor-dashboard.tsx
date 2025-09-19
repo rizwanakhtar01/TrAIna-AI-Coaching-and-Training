@@ -1238,6 +1238,246 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
     )
   }
 
+  // If viewing daily agent details, show that page
+  if (showDailyAgentDetails && selectedDailyAgent) {
+    const agentInsight = dailyTeamSummary.individual_agent_insights.find(a => a.agent === selectedDailyAgent)
+    if (!agentInsight) return null
+
+    const getTrendIcon = (trend: string) => {
+      switch (trend) {
+        case 'improving':
+          return <TrendingUp className="h-4 w-4 text-green-600" />
+        case 'declining':
+          return <TrendingDown className="h-4 w-4 text-red-600" />
+        case 'stable':
+          return <Minus className="h-4 w-4 text-blue-600" />
+        default:
+          return <Minus className="h-4 w-4 text-gray-600" />
+      }
+    }
+
+    const getPriorityColor = (priority: string) => {
+      switch (priority) {
+        case 'high':
+          return 'text-red-600 bg-red-50 border-red-200'
+        case 'medium':
+          return 'text-orange-600 bg-orange-50 border-orange-200'
+        case 'low':
+          return 'text-green-600 bg-green-50 border-green-200'
+        default:
+          return 'text-gray-600 bg-gray-50 border-gray-200'
+      }
+    }
+
+    return (
+      <div className="space-y-6">
+        {/* Header */}
+        <header className="border-b border-border bg-card">
+          <div className="flex h-16 items-center justify-between px-6">
+            <div className="flex items-center gap-4">
+              <Button variant="ghost" size="sm" onClick={() => {
+                setShowDailyAgentDetails(false)
+                setSelectedDailyAgent(null)
+              }}>
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Back to Daily Summary
+              </Button>
+              <div className="flex items-center gap-2">
+                <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+                  <span className="text-xs font-medium text-primary">
+                    {agentInsight.agent.split(' ').map(n => n[0]).join('')}
+                  </span>
+                </div>
+                <h1 className="text-xl font-semibold text-foreground">{agentInsight.agent} - Coaching Details</h1>
+              </div>
+              <Badge variant="secondary" className="bg-blue-100 text-blue-800 font-medium">
+                Daily Summary
+              </Badge>
+            </div>
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <span>Team Lead - Customer Support</span>
+                <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center">
+                  <span className="text-xs font-medium text-blue-800">TL</span>
+                </div>
+              </div>
+              <Button variant="ghost" size="sm" onClick={onLogout}>
+                <LogOut className="h-4 w-4 mr-2" />
+                Logout
+              </Button>
+            </div>
+          </div>
+        </header>
+
+        <div className="p-6 space-y-6">
+          {/* Agent Performance Overview */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Users className="h-5 w-5 text-primary" />
+                Performance Overview
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-4 gap-4">
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-foreground">{agentInsight.daily_score}</div>
+                  <div className="text-sm text-muted-foreground">Daily Score</div>
+                </div>
+                <div className="text-center flex flex-col items-center">
+                  <div className="flex items-center gap-1">
+                    {getTrendIcon(agentInsight.trend)}
+                    <div className="text-2xl font-bold text-foreground capitalize">{agentInsight.trend}</div>
+                  </div>
+                  <div className="text-sm text-muted-foreground">Trend</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-foreground">{agentInsight.strengths.length}</div>
+                  <div className="text-sm text-muted-foreground">Key Strengths</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-foreground">{agentInsight.improvement_areas.length}</div>
+                  <div className="text-sm text-muted-foreground">Areas to Improve</div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Coaching Priority */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Target className="h-5 w-5 text-chart-2" />
+                Coaching Priority
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className={`p-4 rounded-lg border ${getPriorityColor(agentInsight.coaching_priority)}`}>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="font-semibold capitalize">{agentInsight.coaching_priority} Priority</h3>
+                    <p className="text-sm mt-1">
+                      {agentInsight.coaching_priority === 'high' && 'Requires immediate attention and focused coaching session'}
+                      {agentInsight.coaching_priority === 'medium' && 'Should be addressed in regular coaching schedule'}
+                      {agentInsight.coaching_priority === 'low' && 'Maintenance coaching with positive reinforcement'}
+                    </p>
+                  </div>
+                  <div className="text-2xl font-bold">
+                    {agentInsight.coaching_priority === 'high' && '🔴'}
+                    {agentInsight.coaching_priority === 'medium' && '🟡'}
+                    {agentInsight.coaching_priority === 'low' && '🟢'}
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Strengths and Improvement Areas */}
+          <div className="grid grid-cols-2 gap-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <CheckCircle className="h-5 w-5 text-green-600" />
+                  Key Strengths
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {agentInsight.strengths.map((strength, index) => (
+                  <div key={index} className="flex items-center gap-2 p-2 bg-green-50 rounded border border-green-200">
+                    <CheckCircle className="h-4 w-4 text-green-600" />
+                    <span className="text-sm font-medium capitalize">{strength.replace('_', ' ')}</span>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <AlertTriangle className="h-5 w-5 text-orange-600" />
+                  Improvement Areas
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {agentInsight.improvement_areas.map((area, index) => (
+                  <div key={index} className="flex items-center gap-2 p-2 bg-orange-50 rounded border border-orange-200">
+                    <AlertTriangle className="h-4 w-4 text-orange-600" />
+                    <span className="text-sm font-medium capitalize">{area.replace('_', ' ')}</span>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Coaching Preparation */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <BookOpen className="h-5 w-5 text-chart-4" />
+                Coaching Preparation
+              </CardTitle>
+              <p className="text-sm text-muted-foreground">
+                Ready-to-use talking points and session structure for your coaching conversation
+              </p>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* Session Details */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                  <h4 className="font-medium text-blue-800 mb-2">Suggested Duration</h4>
+                  <div className="text-2xl font-bold text-blue-600">{agentInsight.coaching_prep.suggested_duration}</div>
+                </div>
+                <div className="p-4 bg-purple-50 rounded-lg border border-purple-200">
+                  <h4 className="font-medium text-purple-800 mb-2">Focus Area</h4>
+                  <div className="text-lg font-semibold text-purple-600 capitalize">
+                    {agentInsight.coaching_prep.focus_area.replace('_', ' ')}
+                  </div>
+                </div>
+              </div>
+
+              {/* Talking Points */}
+              <div>
+                <h4 className="font-medium mb-3 flex items-center gap-2">
+                  <MessageSquare className="h-4 w-4" />
+                  Coaching Talking Points
+                </h4>
+                <div className="space-y-2">
+                  {agentInsight.coaching_prep.talking_points.map((point, index) => (
+                    <div key={index} className="flex items-start gap-3 p-3 bg-muted rounded-lg">
+                      <div className="h-6 w-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-medium mt-0.5">
+                        {index + 1}
+                      </div>
+                      <p className="text-sm flex-1">{point}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Quick Actions */}
+              <div className="pt-4 border-t">
+                <h4 className="font-medium mb-3">Quick Actions</h4>
+                <div className="flex gap-2">
+                  <Button variant="outline" size="sm">
+                    <Calendar className="h-4 w-4 mr-2" />
+                    Schedule Session
+                  </Button>
+                  <Button variant="outline" size="sm">
+                    <FileText className="h-4 w-4 mr-2" />
+                    Generate Notes
+                  </Button>
+                  <Button variant="outline" size="sm">
+                    <MessageSquare className="h-4 w-4 mr-2" />
+                    Send Preparation Email
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
