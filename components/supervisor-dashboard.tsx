@@ -64,7 +64,42 @@ import {
   Save,
   ArrowLeft,
   Minus,
+  Phone,
+  Mail,
+  Play,
+  Pause,
+  Search,
 } from "lucide-react";
+
+// Contact Review interface for supervisor view
+interface ContactReview {
+  id: string
+  timestamp: string
+  duration: string
+  channel: "chat" | "phone" | "email"
+  customerIssue: string
+  contactSummary: string
+  queue: string
+  customer: {
+    name: string
+    email: string
+    phone?: string
+    contactTimestamp: string
+    previousContacts: number
+  }
+  overallScore: number
+  whatWentWell: string
+  couldImprove: string
+  tipForNextTime: string
+  transcript: {
+    speaker: "agent" | "customer"
+    message: string
+    timestamp: string
+    highlight?: "positive" | "negative" | "neutral"
+    aiNote?: string
+  }[]
+  agentName: string // Add agent mapping
+}
 
 // Comprehensive data models for supervisor dashboard
 interface Agent {
@@ -350,6 +385,481 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
       },
     ],
   };
+
+  // Sample contact reviews data mapped to agents
+  const sampleContactReviews: ContactReview[] = [
+    {
+      id: "1",
+      timestamp: "2 minutes ago",
+      duration: "3:45",
+      channel: "chat",
+      customerIssue: "Subscription cancellation request",
+      contactSummary: "Customer requested subscription cancellation due to low usage. Refund processed successfully but missed retention opportunity.",
+      queue: "Billing & Subscriptions",
+      customer: {
+        name: "Sarah Johnson",
+        email: "sarah.johnson@email.com",
+        phone: "+1 (555) 123-4567",
+        contactTimestamp: "2024-01-15 14:32:15",
+        previousContacts: 2,
+      },
+      overallScore: 8.2,
+      whatWentWell: "You clearly explained the refund process and timeline to the customer",
+      couldImprove: "Consider offering retention options before processing cancellation",
+      tipForNextTime: 'Ask "Is there anything we can do to keep you as a customer?" before proceeding',
+      transcript: [
+        {
+          speaker: "customer",
+          message: "Hi, I want to cancel my subscription",
+          timestamp: "14:32",
+          highlight: "neutral",
+        },
+        {
+          speaker: "agent",
+          message: "I understand you'd like to cancel. Can I ask what's prompting this decision?",
+          timestamp: "14:33",
+          highlight: "positive",
+          aiNote: "Good empathetic opening",
+        },
+        { speaker: "customer", message: "I'm not using the service enough to justify the cost", timestamp: "14:33" },
+        {
+          speaker: "agent",
+          message: "I can process that cancellation for you right away. Your refund will be processed within 5-7 business days.",
+          timestamp: "14:34",
+          highlight: "negative",
+          aiNote: "Missed opportunity to offer retention options",
+        },
+        { speaker: "customer", message: "Thank you for the quick help", timestamp: "14:35" },
+      ],
+      agentName: "Sarah Mitchell"
+    },
+    {
+      id: "2",
+      timestamp: "15 minutes ago",
+      duration: "6:12",
+      channel: "phone",
+      customerIssue: "Refund inquiry - 10 days overdue",
+      contactSummary: "Customer frustrated about delayed refund. Issue escalated to expedite processing. Good recovery after initial misstep.",
+      queue: "Customer Support",
+      customer: {
+        name: "Michael Chen",
+        email: "m.chen@company.com",
+        phone: "+1 (555) 987-6543",
+        contactTimestamp: "2024-01-15 14:15:22",
+        previousContacts: 1,
+      },
+      overallScore: 7.8,
+      whatWentWell: "Clear explanation of refund policy and next steps",
+      couldImprove: "Opening lacked empathy for customer frustration",
+      tipForNextTime: 'Start with "I understand how frustrating delayed refunds can be" to acknowledge their concern',
+      transcript: [
+        { speaker: "agent", message: "Hello, how can I help you today?", timestamp: "14:15", highlight: "neutral" },
+        {
+          speaker: "customer",
+          message: "My refund hasn't arrived after 10 days. This is unacceptable!",
+          timestamp: "14:15",
+          highlight: "negative",
+        },
+        {
+          speaker: "agent",
+          message: "Let me look into your account. Can you provide your order number?",
+          timestamp: "14:16",
+          highlight: "negative",
+          aiNote: "Should acknowledge frustration first",
+        },
+        { speaker: "customer", message: "It's ORD-12345", timestamp: "14:16" },
+        {
+          speaker: "agent",
+          message: "I see the refund was processed 8 days ago. Sometimes bank processing takes 7-10 business days. I'll escalate this to expedite it.",
+          timestamp: "14:17",
+          highlight: "positive",
+          aiNote: "Good explanation and proactive solution",
+        },
+      ],
+      agentName: "John Davis"
+    },
+    {
+      id: "3",
+      timestamp: "1 hour ago",
+      duration: "8:23",
+      channel: "email",
+      customerIssue: "Technical support - third contact attempt",
+      contactSummary: "Repeat technical issue with login. Customer frustrated after multiple failed attempts. Finally escalated to technical team.",
+      queue: "Technical Support",
+      customer: {
+        name: "Emma Rodriguez",
+        email: "emma.rodriguez@startup.io",
+        contactTimestamp: "2024-01-15 13:20:45",
+        previousContacts: 3,
+      },
+      overallScore: 6.5,
+      whatWentWell: "Remained calm and professional under pressure",
+      couldImprove: "Should have escalated to technical team sooner",
+      tipForNextTime: "For repeat technical issues, escalate after the second failed troubleshooting attempt",
+      transcript: [
+        {
+          speaker: "customer",
+          message: "This is my third email about the same login issue. I've tried everything you suggested twice already.",
+          timestamp: "13:20",
+          highlight: "negative",
+        },
+        {
+          speaker: "agent",
+          message: "I apologize for the continued inconvenience. Let me try a different approach to resolve this.",
+          timestamp: "13:25",
+          highlight: "positive",
+          aiNote: "Good acknowledgment of frustration",
+        },
+        {
+          speaker: "agent",
+          message: "Can you try clearing your browser cache and cookies again?",
+          timestamp: "13:26",
+          highlight: "negative",
+          aiNote: "Repeating previous solutions - should escalate",
+        },
+        {
+          speaker: "customer",
+          message: "I already did that twice. This is getting ridiculous.",
+          timestamp: "13:30",
+          highlight: "negative",
+        },
+        {
+          speaker: "agent",
+          message: "Let me escalate this to our technical team immediately for a priority resolution.",
+          timestamp: "13:35",
+          highlight: "positive",
+          aiNote: "Good recovery and escalation",
+        },
+      ],
+      agentName: "Lisa Kim"
+    },
+    {
+      id: "4",
+      timestamp: "2 hours ago",
+      duration: "4:15",
+      channel: "chat",
+      customerIssue: "Product information inquiry",
+      contactSummary: "Customer asking about advanced features and pricing options. Agent provided comprehensive information and guided toward upgrade.",
+      queue: "Sales Support",
+      customer: {
+        name: "James Wilson",
+        email: "james.w@example.com",
+        contactTimestamp: "2024-01-15 12:15:30",
+        previousContacts: 0,
+      },
+      overallScore: 9.1,
+      whatWentWell: "Excellent product knowledge and clear communication of features and benefits",
+      couldImprove: "Could have been more proactive in suggesting trial options",
+      tipForNextTime: "Offer free trial or demo when customers show interest in premium features",
+      transcript: [
+        {
+          speaker: "customer",
+          message: "Can you tell me about your premium features?",
+          timestamp: "12:15",
+          highlight: "neutral",
+        },
+        {
+          speaker: "agent",
+          message: "I'd be happy to help! Our premium plan includes advanced analytics, custom integrations, and priority support. What specific features are you most interested in?",
+          timestamp: "12:16",
+          highlight: "positive",
+          aiNote: "Good qualifying question",
+        },
+        {
+          speaker: "customer",
+          message: "I'm particularly interested in the analytics and custom integrations",
+          timestamp: "12:16",
+        },
+        {
+          speaker: "agent",
+          message: "Perfect! Our analytics dashboard provides real-time insights with custom reporting, and we support integrations with over 50 popular tools. Would you like me to send you some examples?",
+          timestamp: "12:17",
+          highlight: "positive",
+          aiNote: "Great product knowledge demonstration",
+        },
+      ],
+      agentName: "Mike Rodriguez"
+    },
+    {
+      id: "5",
+      timestamp: "3 hours ago",
+      duration: "5:30",
+      channel: "phone",
+      customerIssue: "Account setup assistance",
+      contactSummary: "New customer needed help setting up their account and understanding the platform. Agent provided thorough walkthrough and follow-up resources.",
+      queue: "Customer Onboarding",
+      customer: {
+        name: "Maria Garcia",
+        email: "maria.garcia@startup.com",
+        phone: "+1 (555) 456-7890",
+        contactTimestamp: "2024-01-15 11:30:45",
+        previousContacts: 0,
+      },
+      overallScore: 8.8,
+      whatWentWell: "Patient guidance and comprehensive explanation of platform features",
+      couldImprove: "Could have scheduled a follow-up call to ensure successful onboarding",
+      tipForNextTime: "Offer scheduled follow-up calls for new customers to ensure smooth onboarding experience",
+      transcript: [
+        {
+          speaker: "agent",
+          message: "Welcome to our platform! I'm here to help you get set up. What would you like to start with?",
+          timestamp: "11:30",
+          highlight: "positive",
+          aiNote: "Warm, welcoming opening",
+        },
+        {
+          speaker: "customer",
+          message: "I'm completely new to this. I'm not sure where to begin.",
+          timestamp: "11:31",
+        },
+        {
+          speaker: "agent",
+          message: "No problem at all! Let's start with the basics. I'll walk you through creating your first project step by step.",
+          timestamp: "11:31",
+          highlight: "positive",
+          aiNote: "Reassuring tone, structured approach",
+        },
+        {
+          speaker: "customer",
+          message: "That sounds great, thank you!",
+          timestamp: "11:32",
+        },
+      ],
+      agentName: "Emma Wilson"
+    },
+    {
+      id: "6",
+      timestamp: "4 hours ago",
+      duration: "7:45",
+      channel: "email",
+      customerIssue: "Billing discrepancy resolution",
+      contactSummary: "Customer questioned unexpected charges on their account. Agent investigated, found system error, and processed refund with apology.",
+      queue: "Billing & Subscriptions",
+      customer: {
+        name: "Robert Taylor",
+        email: "robert.taylor@company.org",
+        contactTimestamp: "2024-01-15 10:45:15",
+        previousContacts: 1,
+      },
+      overallScore: 8.5,
+      whatWentWell: "Thorough investigation and quick resolution with appropriate compensation",
+      couldImprove: "Could have provided more explanation about how the error occurred",
+      tipForNextTime: "When system errors cause billing issues, explain the root cause to build customer confidence",
+      transcript: [
+        {
+          speaker: "customer",
+          message: "I was charged twice for my subscription this month. Can you help me understand why?",
+          timestamp: "10:45",
+          highlight: "neutral",
+        },
+        {
+          speaker: "agent",
+          message: "I sincerely apologize for this billing error. Let me investigate your account immediately to understand what happened.",
+          timestamp: "10:50",
+          highlight: "positive",
+          aiNote: "Immediate acknowledgment and action",
+        },
+        {
+          speaker: "agent",
+          message: "I found the issue - there was a system glitch during our recent update. I'm processing a full refund for the duplicate charge right now.",
+          timestamp: "10:55",
+          highlight: "positive",
+          aiNote: "Clear explanation and immediate solution",
+        },
+        {
+          speaker: "customer",
+          message: "Thank you for resolving this so quickly!",
+          timestamp: "11:00",
+        },
+      ],
+      agentName: "David Chen"
+    }
+  ];
+
+  // Contact Review Card Component for Supervisor Dashboard
+  function ContactReviewCard({ review }: { review: ContactReview }) {
+    const [isExpanded, setIsExpanded] = useState(false)
+    const [isPlaying, setIsPlaying] = useState(false)
+    const [currentTime, setCurrentTime] = useState(0)
+    const [duration] = useState(225) // 3:45 in seconds
+
+    const getChannelIcon = (channel: string) => {
+      switch (channel) {
+        case "phone":
+          return <Phone className="h-4 w-4" />
+        case "email":
+          return <Mail className="h-4 w-4" />
+        default:
+          return <MessageSquare className="h-4 w-4" />
+      }
+    }
+
+    const getScoreColor = (score: number) => {
+      if (score >= 8) return "text-chart-4"
+      if (score >= 7) return "text-chart-5"
+      return "text-destructive"
+    }
+
+    const getHighlightColor = (highlight?: string) => {
+      switch (highlight) {
+        case "positive":
+          return "bg-chart-4/10 border-l-4 border-chart-4"
+        case "negative":
+          return "bg-destructive/10 border-l-4 border-destructive"
+        default:
+          return "bg-muted/50"
+      }
+    }
+
+    const togglePlayback = () => {
+      setIsPlaying(!isPlaying)
+      if (!isPlaying) {
+        const interval = setInterval(() => {
+          setCurrentTime((prev) => {
+            if (prev >= duration) {
+              setIsPlaying(false)
+              clearInterval(interval)
+              return 0
+            }
+            return prev + 1
+          })
+        }, 1000)
+      }
+    }
+
+    const formatTime = (seconds: number) => {
+      const mins = Math.floor(seconds / 60)
+      const secs = seconds % 60
+      return `${mins}:${secs.toString().padStart(2, "0")}`
+    }
+
+    return (
+      <Card className="w-full">
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2 text-primary">
+                {getChannelIcon(review.channel)}
+                <Badge variant="outline" className="capitalize">
+                  {review.channel}
+                </Badge>
+                {review.channel === "phone" && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={togglePlayback}
+                    className="h-7 px-2 text-xs bg-transparent"
+                  >
+                    {isPlaying ? (
+                      <>
+                        <Pause className="h-3 w-3 mr-1" />
+                        {formatTime(currentTime)}
+                      </>
+                    ) : (
+                      <>
+                        <Play className="h-3 w-3 mr-1" />
+                        {review.duration}
+                      </>
+                    )}
+                  </Button>
+                )}
+              </div>
+              <span className="text-sm text-muted-foreground">{review.timestamp}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className={`text-lg font-bold ${getScoreColor(review.overallScore)}`}>
+                {review.overallScore}
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsExpanded(!isExpanded)}
+                className="h-8 w-8 p-0"
+              >
+                {isExpanded ? (
+                  <TrendingUp className="h-4 w-4 rotate-180" />
+                ) : (
+                  <TrendingDown className="h-4 w-4" />
+                )}
+              </Button>
+            </div>
+          </div>
+          <div>
+            <h4 className="font-semibold text-foreground">{review.customerIssue}</h4>
+            <p className="text-sm text-muted-foreground">{review.contactSummary}</p>
+          </div>
+        </CardHeader>
+
+        {isExpanded && (
+          <CardContent className="space-y-4">
+            {/* Customer Details */}
+            <div className="grid grid-cols-2 gap-4 p-4 bg-muted/30 rounded-lg">
+              <div>
+                <h5 className="font-medium text-sm">Customer Information</h5>
+                <p className="text-sm">{review.customer.name}</p>
+                <p className="text-xs text-muted-foreground">{review.customer.email}</p>
+                {review.customer.phone && (
+                  <p className="text-xs text-muted-foreground">{review.customer.phone}</p>
+                )}
+              </div>
+              <div>
+                <h5 className="font-medium text-sm">Contact Details</h5>
+                <p className="text-sm">Queue: {review.queue}</p>
+                <p className="text-xs text-muted-foreground">Duration: {review.duration}</p>
+                <p className="text-xs text-muted-foreground">
+                  Previous contacts: {review.customer.previousContacts}
+                </p>
+              </div>
+            </div>
+
+            {/* AI Feedback */}
+            <div className="grid grid-cols-1 gap-4">
+              <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
+                <h5 className="font-medium text-green-800 text-sm mb-1">What Went Well</h5>
+                <p className="text-sm text-green-700">{review.whatWentWell}</p>
+              </div>
+              <div className="p-3 bg-orange-50 border border-orange-200 rounded-lg">
+                <h5 className="font-medium text-orange-800 text-sm mb-1">Could Improve</h5>
+                <p className="text-sm text-orange-700">{review.couldImprove}</p>
+              </div>
+              <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                <h5 className="font-medium text-blue-800 text-sm mb-1">Tip for Next Time</h5>
+                <p className="text-sm text-blue-700">{review.tipForNextTime}</p>
+              </div>
+            </div>
+
+            {/* Transcript */}
+            <div className="space-y-2">
+              <h5 className="font-medium text-sm">Conversation Transcript</h5>
+              <div className="max-h-64 overflow-y-auto space-y-2">
+                {review.transcript.map((message, index) => (
+                  <div
+                    key={index}
+                    className={`p-3 rounded-lg ${getHighlightColor(message.highlight)}`}
+                  >
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="font-medium text-xs capitalize">
+                        {message.speaker}
+                      </span>
+                      <span className="text-xs text-muted-foreground">
+                        {message.timestamp}
+                      </span>
+                    </div>
+                    <p className="text-sm">{message.message}</p>
+                    {message.aiNote && (
+                      <p className="text-xs text-muted-foreground mt-2 italic">
+                        AI Note: {message.aiNote}
+                      </p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </CardContent>
+        )}
+      </Card>
+    )
+  }
 
   const challengingPatterns: ChallengingPattern[] = [
     {
@@ -1731,6 +2241,53 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
                   </Button>
                 </div>
               </div>
+            </CardContent>
+          </Card>
+
+          {/* Contact Reviews Section */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <MessageSquare className="h-5 w-5 text-chart-1" />
+                Recent Contact Reviews
+              </CardTitle>
+              <p className="text-sm text-muted-foreground">
+                AI-generated feedback from {agentInsight.agent}'s customer interactions
+              </p>
+            </CardHeader>
+            <CardContent>
+              {(() => {
+                const agentContactReviews = sampleContactReviews.filter(
+                  review => review.agentName === agentInsight.agent
+                )
+                
+                if (agentContactReviews.length === 0) {
+                  return (
+                    <div className="text-center py-8">
+                      <MessageSquare className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                      <p className="text-muted-foreground">No contact reviews available for this agent yet.</p>
+                    </div>
+                  )
+                }
+
+                return (
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <Badge variant="secondary" className="bg-primary/10 text-primary">
+                        {agentContactReviews.length} Review{agentContactReviews.length !== 1 ? 's' : ''} Today
+                      </Badge>
+                      <div className="text-sm text-muted-foreground">
+                        Average Score: {(agentContactReviews.reduce((acc, review) => acc + review.overallScore, 0) / agentContactReviews.length).toFixed(1)}
+                      </div>
+                    </div>
+                    <div className="space-y-4">
+                      {agentContactReviews.map((review) => (
+                        <ContactReviewCard key={review.id} review={review} />
+                      ))}
+                    </div>
+                  </div>
+                )
+              })()}
             </CardContent>
           </Card>
         </div>
