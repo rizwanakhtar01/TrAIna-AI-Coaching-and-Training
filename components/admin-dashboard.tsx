@@ -35,6 +35,10 @@ import {
   Database,
   Brain,
   Activity,
+  Network,
+  Route,
+  BarChart3,
+  PieChart,
   ChevronLeft,
   ChevronRight,
   FileText,
@@ -97,26 +101,6 @@ interface UploadedDocument {
   suggestions: string[];
 }
 
-interface EnhancedAgentConfig {
-  // Step 1: Quick Start
-  useTemplate: boolean;
-  selectedTemplate: string;
-  
-  // Step 2: Basic Config
-  agentName: string;
-  topicCategory: string;
-  description: string;
-  
-  // Step 3: Documents
-  documents: UploadedDocument[];
-  
-  // Step 4: Instructions
-  instructions: InstructionTemplate;
-  
-  // Step 5: Test & Activate
-  testResults: any[];
-  readyToActivate: boolean;
-}
 
 export function AdminDashboard({ onLogout }: AdminDashboardProps) {
   const [activeTab, setActiveTab] = useState("overview")

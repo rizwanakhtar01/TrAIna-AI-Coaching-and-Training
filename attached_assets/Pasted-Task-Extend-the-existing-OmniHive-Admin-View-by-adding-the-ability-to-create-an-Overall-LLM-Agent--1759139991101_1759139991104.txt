@@ -1,0 +1,86 @@
+Task: Extend the existing OmniHive Admin View by adding the ability to create an Overall LLM Agent (Orchestrator). This agent will ingest business-wide documents, detect contact intent, and route contacts to the correct topic-specific AI agent.
+
+🔐 Access Control
+
+This feature is available only in Admin View.
+
+Existing Agent View and Supervisor View remain unchanged.
+
+⚙️ Admin Workflow
+1. Upload Generic Business Documents
+
+Allow admins to upload multiple files (PDF, DOCX, TXT).
+
+Store uploaded documents securely and embed into a vector database for retrieval.
+
+Display uploaded documents in a list with:
+
+File name
+
+Upload date
+
+Option to delete or replace
+
+2. Create Overall LLM Agent
+
+Add a new section under Admin Dashboard: “Overall LLM Agent”.
+
+Configurable fields:
+
+Agent Name (default: “OmniHive Orchestrator”).
+
+Instruction Set (text area where admin can define global rules, e.g., “Always comply with refund policies first”).
+
+Knowledge Source (list of uploaded business documents).
+
+Save this profile so it becomes the default orchestrator.
+
+3. Intent Detection & Routing
+
+When analyzing a contact:
+
+The Overall LLM Agent scans the interaction transcript.
+
+Detects intent/topic (e.g., refund, cancellation, billing).
+
+Routes the contact to the correct specialized AI agent already configured for that intent.
+
+If no match is found → provide fallback analysis using generic orchestrator knowledge.
+
+4. Orchestrator Dashboard
+
+Show routing analytics:
+
+% of contacts routed to each topic-specific AI agent.
+
+% of fallback cases (no matching agent).
+
+Show intent distribution trends over time (bar chart or pie chart).
+
+Show training status of orchestrator (last updated, number of docs loaded).
+
+🎨 UX/UI Guidelines
+
+Place “Overall LLM Agent” tab in Admin navigation sidebar.
+
+UI layout:
+
+Top section → Create/Edit Overall Agent (name, rules, docs).
+
+Middle section → Uploaded documents list.
+
+Bottom section → Routing analytics + charts.
+
+Match design style of existing OmniHive dashboards (cards, rounded edges, light blue theme).
+
+✅ Expected Output
+
+Admins can upload business-wide documents.
+
+Admins can configure and save an Overall LLM Orchestrator Agent.
+
+Contacts are first processed by orchestrator → routed to correct specialized agent.
+
+Fallback coaching is available when no specific agent matches.
+
+Orchestrator dashboard shows document list, routing analytics, and intent distribution.
