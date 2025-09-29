@@ -89,7 +89,7 @@ interface UploadedDocument {
   qualityScore: number;
   relevanceScore: number;
   analysisResults: {
-    hasAclearPolicies: boolean;
+    hasClearPolicies: boolean;
     hasExamples: boolean;
     hasEscalationRules: boolean;
     missingElements: string[];
@@ -498,7 +498,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
       qualityScore,
       relevanceScore,
       analysisResults: {
-        hasAclearPolicies: qualityScore > 85,
+        hasClearPolicies: qualityScore > 85,
         hasExamples: fileSizeKB > 200,
         hasEscalationRules: filename.includes('escalation') || filename.includes('policy'),
         missingElements
