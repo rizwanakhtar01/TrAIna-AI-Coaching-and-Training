@@ -101,6 +101,70 @@ interface UploadedDocument {
   suggestions: string[];
 }
 
+interface EnhancedAgentConfig {
+  // Step 1: Quick Start
+  useTemplate: boolean;
+  selectedTemplate: string;
+  
+  // Step 2: Basic Config
+  agentName: string;
+  topicCategory: string;
+  description: string;
+  
+  // Step 3: Documents
+  documents: UploadedDocument[];
+  
+  // Step 4: Instructions
+  instructions: InstructionTemplate;
+  
+  // Step 5: Test & Activate
+  testResults: any[];
+  readyToActivate: boolean;
+}
+
+// New interfaces for Overall LLM Agent (Orchestrator)
+interface BusinessDocument {
+  id: string;
+  name: string;
+  type: 'pdf' | 'docx' | 'txt';
+  size: string;
+  uploadDate: string;
+  status: 'processing' | 'ready' | 'error';
+  vectorEmbedded: boolean;
+}
+
+interface OrchestratorConfig {
+  agentName: string;
+  instructionSet: string;
+  knowledgeSources: string[]; // document IDs
+  isActive: boolean;
+  lastUpdated: string;
+  documentsCount: number;
+}
+
+interface RoutingAnalytics {
+  totalContacts: number;
+  routedToAgents: {
+    agentName: string;
+    count: number;
+    percentage: number;
+  }[];
+  fallbackCases: {
+    count: number;
+    percentage: number;
+  };
+  intentDistribution: {
+    intent: string;
+    count: number;
+    percentage: number;
+  }[];
+  dailyTrends: {
+    date: string;
+    totalContacts: number;
+    routedSuccessfully: number;
+    fallbacks: number;
+  }[];
+}
 
 export function AdminDashboard({ onLogout }: AdminDashboardProps) {
   const [activeTab, setActiveTab] = useState("overview")
@@ -126,6 +190,112 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
     testResults: [],
     readyToActivate: false
   })
+
+  // Overall LLM Agent (Orchestrator) state
+  const [businessDocuments, setBusinessDocuments] = useState<BusinessDocument[]>([])
+  const [orchestratorConfig, setOrchestratorConfig] = useState<OrchestratorConfig>({
+    agentName: 'OmniHive Orchestrator',
+    instructionSet: 'Always comply with refund policies first. Route contacts to the most appropriate specialized agent based on intent detection.',
+    knowledgeSources: [],
+    isActive: false,
+    lastUpdated: new Date().toISOString(),
+    documentsCount: 0
+  })
+  const [isUploadingDoc, setIsUploadingDoc] = useState(false)
+
+  // Sample routing analytics data (in a real app, this would come from API)
+  const routingAnalytics: RoutingAnalytics = {
+    totalContacts: 1247,
+    routedToAgents: [
+      { agentName: 'Billing Support', count: 423, percentage: 33.9 },
+      { agentName: 'Technical Support', count: 312, percentage: 25.0 },
+      { agentName: 'Account Management', count: 198, percentage: 15.9 },
+      { agentName: 'Sales Support', count: 156, percentage: 12.5 }
+    ],
+    fallbackCases: { count: 158, percentage: 12.7 },
+    intentDistribution: [
+      { intent: 'Billing Inquiry', count: 423, percentage: 33.9 },
+      { intent: 'Technical Issue', count: 312, percentage: 25.0 },
+      { intent: 'Account Changes', count: 198, percentage: 15.9 },
+      { intent: 'Sales Question', count: 156, percentage: 12.5 },
+      { intent: 'General Support', count: 158, percentage: 12.7 }
+    ],
+    dailyTrends: [
+      { date: '2024-01-01', totalContacts: 89, routedSuccessfully: 78, fallbacks: 11 },
+      { date: '2024-01-02', totalContacts: 92, routedSuccessfully: 81, fallbacks: 11 },
+      { date: '2024-01-03', totalContacts: 87, routedSuccessfully: 76, fallbacks: 11 },
+      { date: '2024-01-04', totalContacts: 95, routedSuccessfully: 83, fallbacks: 12 },
+      { date: '2024-01-05', totalContacts: 98, routedSuccessfully: 86, fallbacks: 12 },
+      { date: '2024-01-06', totalContacts: 103, routedSuccessfully: 91, fallbacks: 12 },
+      { date: '2024-01-07', totalContacts: 91, routedSuccessfully: 80, fallbacks: 11 }
+    ]
+  }
+
+  // Helper functions for orchestrator
+  const handleBusinessDocumentUpload = (files: File[]) => {
+    setIsUploadingDoc(true)
+    
+    // Simulate document processing
+    setTimeout(() => {
+      const newDocs: BusinessDocument[] = files.map(file => ({
+        id: Math.random().toString(36).substr(2, 9),
+        name: file.name,
+        type: file.name.endsWith('.pdf') ? 'pdf' : file.name.endsWith('.docx') ? 'docx' : 'txt',
+        size: (file.size / 1024).toFixed(1) + ' KB',
+        uploadDate: new Date().toLocaleDateString(),
+        status: 'processing',
+        vectorEmbedded: false
+      }))
+      
+      setBusinessDocuments(prev => [...prev, ...newDocs])
+      
+      // Simulate processing completion
+      setTimeout(() => {
+        setBusinessDocuments(prev => 
+          prev.map(doc => 
+            newDocs.find(newDoc => newDoc.id === doc.id)
+              ? { ...doc, status: 'ready', vectorEmbedded: true }
+              : doc
+          )
+        )
+        setOrchestratorConfig(prev => ({
+          ...prev,
+          documentsCount: prev.documentsCount + newDocs.length,
+          knowledgeSources: [...prev.knowledgeSources, ...newDocs.map(doc => doc.id)],
+          lastUpdated: new Date().toISOString()
+        }))
+      }, 2000)
+      
+      setIsUploadingDoc(false)
+    }, 1000)
+  }
+
+  const removeBusinessDocument = (docId: string) => {
+    setBusinessDocuments(prev => prev.filter(doc => doc.id !== docId))
+    setOrchestratorConfig(prev => ({
+      ...prev,
+      documentsCount: prev.documentsCount - 1,
+      knowledgeSources: prev.knowledgeSources.filter(id => id !== docId),
+      lastUpdated: new Date().toISOString()
+    }))
+  }
+
+  const saveOrchestratorConfig = () => {
+    setOrchestratorConfig(prev => ({
+      ...prev,
+      lastUpdated: new Date().toISOString()
+    }))
+    // In real app, this would save to backend
+    console.log('Orchestrator config saved:', orchestratorConfig)
+  }
+
+  const toggleOrchestratorStatus = () => {
+    setOrchestratorConfig(prev => ({
+      ...prev,
+      isActive: !prev.isActive,
+      lastUpdated: new Date().toISOString()
+    }))
+  }
 
   // Agent Templates
   const agentTemplates: AgentTemplate[] = [
@@ -643,9 +813,10 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
       <div className="p-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <div className="flex items-center justify-between">
-            <TabsList className="grid w-full grid-cols-3 lg:w-[450px] bg-zinc-100">
+            <TabsList className="grid w-full grid-cols-4 lg:w-[600px] bg-zinc-100">
               <TabsTrigger value="overview">System Overview</TabsTrigger>
               <TabsTrigger value="agents">AI Agent Management</TabsTrigger>
+              <TabsTrigger value="orchestrator">Overall LLM Agent</TabsTrigger>
               <TabsTrigger value="training">Training History</TabsTrigger>
             </TabsList>
 
@@ -1160,6 +1331,338 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                 </Card>
               ))}
             </div>
+          </TabsContent>
+
+          <TabsContent value="orchestrator" className="space-y-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-2xl font-bold text-foreground">Overall LLM Agent</h2>
+                <p className="text-muted-foreground">Configure and manage the orchestrator that routes contacts to specialized agents</p>
+              </div>
+              <div className="flex gap-2">
+                <Button 
+                  variant={orchestratorConfig.isActive ? "destructive" : "default"}
+                  onClick={toggleOrchestratorStatus}
+                >
+                  <Brain className="h-4 w-4 mr-2" />
+                  {orchestratorConfig.isActive ? 'Deactivate' : 'Activate'} Orchestrator
+                </Button>
+              </div>
+            </div>
+
+            {/* Orchestrator Configuration Section */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Settings className="h-5 w-5" />
+                  Orchestrator Configuration
+                </CardTitle>
+                <CardDescription>
+                  Configure the overall agent that handles intent detection and routing
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="orchestrator-name">Agent Name</Label>
+                      <Input
+                        id="orchestrator-name"
+                        value={orchestratorConfig.agentName}
+                        onChange={(e) => setOrchestratorConfig({
+                          ...orchestratorConfig,
+                          agentName: e.target.value
+                        })}
+                        placeholder="OmniHive Orchestrator"
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label>Status</Label>
+                      <div className="flex items-center gap-2">
+                        <Badge variant={orchestratorConfig.isActive ? "default" : "secondary"}>
+                          {orchestratorConfig.isActive ? 'Active' : 'Inactive'}
+                        </Badge>
+                        <span className="text-sm text-muted-foreground">
+                          Last updated: {new Date(orchestratorConfig.lastUpdated).toLocaleString()}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label>Training Status</Label>
+                      <div className="border rounded-lg p-3 space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm">Documents Loaded:</span>
+                          <Badge variant="outline">{orchestratorConfig.documentsCount}</Badge>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm">Vector Database:</span>
+                          <Badge variant={businessDocuments.some(doc => doc.vectorEmbedded) ? "default" : "secondary"}>
+                            {businessDocuments.some(doc => doc.vectorEmbedded) ? 'Ready' : 'Empty'}
+                          </Badge>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="instruction-set">Global Instruction Set</Label>
+                  <Textarea
+                    id="instruction-set"
+                    rows={4}
+                    value={orchestratorConfig.instructionSet}
+                    onChange={(e) => setOrchestratorConfig({
+                      ...orchestratorConfig,
+                      instructionSet: e.target.value
+                    })}
+                    placeholder="Define global rules and policies for the orchestrator..."
+                  />
+                  <p className="text-sm text-muted-foreground">
+                    These instructions will guide how the orchestrator analyzes contacts and makes routing decisions.
+                  </p>
+                </div>
+
+                <div className="flex justify-end">
+                  <Button onClick={saveOrchestratorConfig}>
+                    <Save className="h-4 w-4 mr-2" />
+                    Save Configuration
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Document Management Section */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <FileText className="h-5 w-5" />
+                  Business Documents
+                </CardTitle>
+                <CardDescription>
+                  Upload and manage business-wide documents for the orchestrator's knowledge base
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6">
+                  <div className="text-center space-y-2">
+                    <Upload className="h-8 w-8 mx-auto text-muted-foreground" />
+                    <div>
+                      <p className="text-sm font-medium">Upload Business Documents</p>
+                      <p className="text-xs text-muted-foreground">
+                        Supports PDF, DOCX, and TXT files
+                      </p>
+                    </div>
+                    <Input
+                      type="file"
+                      multiple
+                      accept=".pdf,.docx,.txt"
+                      onChange={(e) => {
+                        const files = Array.from(e.target.files || [])
+                        if (files.length > 0) {
+                          handleBusinessDocumentUpload(files)
+                        }
+                      }}
+                      className="hidden"
+                      id="document-upload"
+                    />
+                    <Button 
+                      variant="outline" 
+                      onClick={() => document.getElementById('document-upload')?.click()}
+                      disabled={isUploadingDoc}
+                    >
+                      {isUploadingDoc ? (
+                        <>
+                          <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                          Processing...
+                        </>
+                      ) : (
+                        <>
+                          <Upload className="h-4 w-4 mr-2" />
+                          Choose Files
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </div>
+
+                {businessDocuments.length > 0 && (
+                  <div className="space-y-3">
+                    <h4 className="font-medium">Uploaded Documents ({businessDocuments.length})</h4>
+                    <div className="grid gap-3">
+                      {businessDocuments.map((doc) => (
+                        <div key={doc.id} className="flex items-center justify-between p-3 border rounded-lg">
+                          <div className="flex items-center gap-3">
+                            <FileText className="h-5 w-5 text-muted-foreground" />
+                            <div>
+                              <p className="font-medium">{doc.name}</p>
+                              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                <span>{doc.size}</span>
+                                <span>•</span>
+                                <span>Uploaded {doc.uploadDate}</span>
+                                <span>•</span>
+                                <Badge 
+                                  variant={doc.status === 'ready' ? 'default' : doc.status === 'processing' ? 'secondary' : 'destructive'}
+                                  className="text-xs"
+                                >
+                                  {doc.status === 'ready' ? 'Ready' : doc.status === 'processing' ? 'Processing' : 'Error'}
+                                </Badge>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            {doc.vectorEmbedded && (
+                              <Badge variant="outline" className="text-xs">
+                                <Database className="h-3 w-3 mr-1" />
+                                Embedded
+                              </Badge>
+                            )}
+                            <Button 
+                              variant="ghost" 
+                              size="sm"
+                              onClick={() => removeBusinessDocument(doc.id)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Routing Analytics Dashboard */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <BarChart3 className="h-5 w-5" />
+                  Routing Analytics
+                </CardTitle>
+                <CardDescription>
+                  Monitor how contacts are being routed and analyzed by the orchestrator
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {/* Quick Stats */}
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                  <div className="border rounded-lg p-4 text-center">
+                    <div className="text-2xl font-bold text-primary">{routingAnalytics.totalContacts}</div>
+                    <div className="text-sm text-muted-foreground">Total Contacts</div>
+                  </div>
+                  <div className="border rounded-lg p-4 text-center">
+                    <div className="text-2xl font-bold text-chart-4">
+                      {routingAnalytics.routedToAgents.reduce((sum, agent) => sum + agent.count, 0)}
+                    </div>
+                    <div className="text-sm text-muted-foreground">Successfully Routed</div>
+                  </div>
+                  <div className="border rounded-lg p-4 text-center">
+                    <div className="text-2xl font-bold text-amber-500">{routingAnalytics.fallbackCases.count}</div>
+                    <div className="text-sm text-muted-foreground">Fallback Cases</div>
+                  </div>
+                  <div className="border rounded-lg p-4 text-center">
+                    <div className="text-2xl font-bold text-chart-2">
+                      {((routingAnalytics.totalContacts - routingAnalytics.fallbackCases.count) / routingAnalytics.totalContacts * 100).toFixed(1)}%
+                    </div>
+                    <div className="text-sm text-muted-foreground">Success Rate</div>
+                  </div>
+                </div>
+
+                {/* Agent Routing Distribution */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <div>
+                    <h4 className="font-medium mb-3">Routing by Agent</h4>
+                    <div className="space-y-3">
+                      {routingAnalytics.routedToAgents.map((agent, index) => (
+                        <div key={index} className="flex items-center justify-between">
+                          <span className="text-sm">{agent.agentName}</span>
+                          <div className="flex items-center gap-2">
+                            <div className="w-24 bg-muted rounded-full h-2">
+                              <div 
+                                className="bg-primary rounded-full h-2" 
+                                style={{ width: `${agent.percentage}%` }}
+                              />
+                            </div>
+                            <span className="text-sm font-medium w-12 text-right">{agent.count}</span>
+                          </div>
+                        </div>
+                      ))}
+                      <div className="flex items-center justify-between border-t pt-2">
+                        <span className="text-sm text-amber-600">Fallback Cases</span>
+                        <div className="flex items-center gap-2">
+                          <div className="w-24 bg-muted rounded-full h-2">
+                            <div 
+                              className="bg-amber-500 rounded-full h-2" 
+                              style={{ width: `${routingAnalytics.fallbackCases.percentage}%` }}
+                            />
+                          </div>
+                          <span className="text-sm font-medium w-12 text-right">{routingAnalytics.fallbackCases.count}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h4 className="font-medium mb-3">Intent Distribution</h4>
+                    <div className="space-y-3">
+                      {routingAnalytics.intentDistribution.map((intent, index) => (
+                        <div key={index} className="flex items-center justify-between">
+                          <span className="text-sm">{intent.intent}</span>
+                          <div className="flex items-center gap-2">
+                            <div className="w-24 bg-muted rounded-full h-2">
+                              <div 
+                                className="bg-chart-4 rounded-full h-2" 
+                                style={{ width: `${intent.percentage}%` }}
+                              />
+                            </div>
+                            <span className="text-sm font-medium w-12 text-right">{intent.count}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Recent Activity Simulation */}
+                <div>
+                  <h4 className="font-medium mb-3">Recent Routing Activity</h4>
+                  <div className="border rounded-lg p-4 space-y-3">
+                    <div className="flex items-center justify-between text-sm">
+                      <div className="flex items-center gap-2">
+                        <Route className="h-4 w-4 text-chart-4" />
+                        <span>Contact #12847 → <strong>Billing Support</strong></span>
+                      </div>
+                      <span className="text-muted-foreground">2 minutes ago</span>
+                    </div>
+                    <div className="flex items-center justify-between text-sm">
+                      <div className="flex items-center gap-2">
+                        <Route className="h-4 w-4 text-chart-4" />
+                        <span>Contact #12846 → <strong>Technical Support</strong></span>
+                      </div>
+                      <span className="text-muted-foreground">5 minutes ago</span>
+                    </div>
+                    <div className="flex items-center justify-between text-sm">
+                      <div className="flex items-center gap-2">
+                        <AlertCircle className="h-4 w-4 text-amber-500" />
+                        <span>Contact #12845 → <strong>Fallback (General)</strong></span>
+                      </div>
+                      <span className="text-muted-foreground">8 minutes ago</span>
+                    </div>
+                    <div className="flex items-center justify-between text-sm">
+                      <div className="flex items-center gap-2">
+                        <Route className="h-4 w-4 text-chart-4" />
+                        <span>Contact #12844 → <strong>Account Management</strong></span>
+                      </div>
+                      <span className="text-muted-foreground">12 minutes ago</span>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
 
           <TabsContent value="training" className="space-y-6">
