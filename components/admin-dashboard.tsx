@@ -633,7 +633,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                   Create AI Agent
                 </Button>
               </DialogTrigger>
-              <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+              <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                   <DialogTitle className="flex items-center gap-2">
                     <Zap className="h-5 w-5 text-primary" />
@@ -971,7 +971,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                           />
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="space-y-6">
                           <div className="space-y-2">
                             <Label>Must Do Actions *</Label>
                             {validationErrors.mustDo && (
@@ -996,12 +996,16 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                           <div className="space-y-2">
                             <Label>Must Avoid Actions</Label>
                             <div className="border rounded-md p-3 space-y-2 max-h-32 overflow-y-auto">
-                              {agentConfig.instructions.mustAvoidActions.map((action, index) => (
-                                <div key={index} className="flex items-center gap-2">
-                                  <AlertCircle className="h-4 w-4 text-destructive" />
-                                  <span className="text-sm">{action}</span>
-                                </div>
-                              ))}
+                              {agentConfig.instructions.mustAvoidActions.length === 0 ? (
+                                <p className="text-sm text-muted-foreground italic">No must-avoid actions defined yet</p>
+                              ) : (
+                                agentConfig.instructions.mustAvoidActions.map((action, index) => (
+                                  <div key={index} className="flex items-center gap-2">
+                                    <AlertCircle className="h-4 w-4 text-destructive" />
+                                    <span className="text-sm">{action}</span>
+                                  </div>
+                                ))
+                              )}
                             </div>
                           </div>
                         </div>
@@ -1009,12 +1013,16 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                         <div className="space-y-2">
                           <Label>Escalation Rules</Label>
                           <div className="border rounded-md p-3 space-y-2 max-h-24 overflow-y-auto">
-                            {agentConfig.instructions.escalationRules.map((rule, index) => (
-                              <div key={index} className="flex items-center gap-2">
-                                <ChevronRight className="h-4 w-4 text-amber-500" />
-                                <span className="text-sm">{rule}</span>
-                              </div>
-                            ))}
+                            {agentConfig.instructions.escalationRules.length === 0 ? (
+                              <p className="text-sm text-muted-foreground italic">No escalation rules defined yet</p>
+                            ) : (
+                              agentConfig.instructions.escalationRules.map((rule, index) => (
+                                <div key={index} className="flex items-center gap-2">
+                                  <ChevronRight className="h-4 w-4 text-amber-500" />
+                                  <span className="text-sm">{rule}</span>
+                                </div>
+                              ))
+                            )}
                           </div>
                         </div>
                       </div>
