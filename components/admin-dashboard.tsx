@@ -122,9 +122,10 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
   const [activeTab, setActiveTab] = useState("overview")
   const [isCreateWizardOpen, setIsCreateWizardOpen] = useState(false)
   const [wizardStep, setWizardStep] = useState(1)
+  const [editingAgentId, setEditingAgentId] = useState<string | null>(null)
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({})
   const [agentConfig, setAgentConfig] = useState<EnhancedAgentConfig>({
-    useTemplate: true,
+    useTemplate: false,
     selectedTemplate: '',
     agentName: '',
     topicCategory: '',
@@ -310,8 +311,8 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
     }
   ];
 
-  // Mock data for AI agents
-  const aiAgents = [
+  // AI agents list
+  const [aiAgents, setAiAgents] = useState([
     {
       id: "agent-001",
       intentName: "Refunds & Returns",
@@ -352,7 +353,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
       trainingAccuracy: 89,
       usageCount: 423,
     },
-  ]
+  ])
 
   const systemStats = {
     totalAgents: aiAgents.length,
@@ -364,10 +365,36 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
   const handleCreateAgent = () => {
     // Handle agent creation logic here
     console.log("Creating new AI agent:", agentConfig)
+    if (editingAgentId) {
+      setAiAgents(aiAgents.map(a => a.id === editingAgentId
+        ? {
+            ...a,
+            intentName: agentConfig.agentName || 'Untitled Agent',
+            description: agentConfig.description || '',
+            lastUpdated: new Date().toISOString().slice(0, 10),
+          }
+        : a))
+    } else {
+      // Append to agent list
+      setAiAgents([
+        ...aiAgents,
+        {
+          id: `agent-${Date.now()}`,
+          intentName: agentConfig.agentName || 'Untitled Agent',
+          description: agentConfig.description || '',
+          status: 'inactive',
+          lastUpdated: new Date().toISOString().slice(0, 10),
+          knowledgeBaseSize: `${agentConfig.documents.length > 0 ? agentConfig.documents.length : 0} doc(s)`,
+          trainingAccuracy: 0,
+          usageCount: 0,
+        },
+      ])
+    }
     setIsCreateWizardOpen(false)
     setWizardStep(1)
+    setEditingAgentId(null)
     setAgentConfig({
-      useTemplate: true,
+      useTemplate: false,
       selectedTemplate: '',
       agentName: '',
       topicCategory: '',
@@ -386,17 +413,34 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
     })
   }
 
+  const startEditAgent = (agentId: string) => {
+    const agent = aiAgents.find(a => a.id === agentId)
+    if (!agent) return
+    setEditingAgentId(agentId)
+    setAgentConfig({
+      ...agentConfig,
+      agentName: agent.intentName,
+      topicCategory: '',
+      description: agent.description,
+      documents: [],
+      instructions: { ...agentConfig.instructions },
+    })
+    setWizardStep(1)
+    setIsCreateWizardOpen(true)
+  }
+
+  const toggleAgentStatus = (agentId: string) => {
+    setAiAgents(aiAgents.map(a => a.id === agentId
+      ? { ...a, status: a.status === 'active' ? 'inactive' : 'active', lastUpdated: new Date().toISOString().slice(0,10) }
+      : a))
+  }
+
   // Validation functions for each step
   const validateStep = (step: number): boolean => {
     const errors: Record<string, string> = {}
     
     switch (step) {
       case 1:
-        if (agentConfig.useTemplate && !agentConfig.selectedTemplate) {
-          errors.template = 'Please select a template to continue'
-        }
-        break
-      case 2:
         if (!agentConfig.agentName.trim()) {
           errors.agentName = 'Agent name is required'
         }
@@ -404,23 +448,18 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
           errors.description = 'Description is required'
         }
         break
-      case 3:
+      case 2:
         if (agentConfig.documents.length === 0) {
           errors.documents = 'At least one document is required'
         }
         break
-      case 4:
+      case 3:
         if (!agentConfig.instructions.generalApproach.trim()) {
-          errors.instructions = 'General approach is required'
-        }
-        if (agentConfig.instructions.mustDoActions.length === 0) {
-          errors.mustDo = 'At least one must-do action is required'
+          errors.instructions = 'Instructions and Guidelines is required'
         }
         break
-      case 5:
-        if (!agentConfig.readyToActivate) {
-          errors.testing = 'Please run tests before activation'
-        }
+      case 4:
+        // No testing required; allow save
         break
     }
     
@@ -531,7 +570,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
   }
 
   const nextStep = () => {
-    if (validateStep(wizardStep) && wizardStep < 5) {
+    if (validateStep(wizardStep) && wizardStep < 4) {
       setWizardStep(wizardStep + 1)
       setValidationErrors({})
     }
@@ -633,7 +672,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                   Create AI Agent
                 </Button>
               </DialogTrigger>
-              <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
+              <DialogContent className="!max-w-[93.6rem] sm:!max-w-[93.6rem] max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                   <DialogTitle className="flex items-center gap-2">
                     <Zap className="h-5 w-5 text-primary" />
@@ -646,7 +685,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                   {/* Progress Indicator */}
                   <div className="flex items-center justify-center mt-4">
                     <div className="flex items-center space-x-2">
-                      {[1, 2, 3, 4, 5].map((step) => (
+                      {[1, 2, 3, 4].map((step) => (
                         <div key={step} className="flex items-center">
                           <div
                             className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
@@ -659,7 +698,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                           >
                             {step < wizardStep ? <Check className="h-4 w-4" /> : step}
                           </div>
-                          {step < 5 && (
+                          {step < 4 && (
                             <div
                               className={`w-8 h-0.5 ${
                                 step < wizardStep ? 'bg-chart-4' : 'bg-muted'
@@ -672,177 +711,85 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                   </div>
                   
                   <div className="text-center text-sm text-muted-foreground mt-2">
-                    Step {wizardStep} of 5: {
-                      wizardStep === 1 ? 'Quick Start' :
-                      wizardStep === 2 ? 'Configure' :
-                      wizardStep === 3 ? 'Documents' :
-                      wizardStep === 4 ? 'Instructions' :
+                    Step {wizardStep} of 4: {
+                      wizardStep === 1 ? 'Start from Scratch' :
+                      wizardStep === 2 ? 'Documents' :
+                      wizardStep === 3 ? 'Instructions' :
                       'Test & Activate'
                     }
                   </div>
                 </DialogHeader>
 
                 <div className="py-6">
-                  {/* Step 1: Quick Start */}
+                  {/* Step 1: Quick Start (Start from Scratch only) */}
                   {wizardStep === 1 && (
                     <div className="space-y-6">
                       <div className="text-center">
-                        <h3 className="text-lg font-semibold mb-2">How would you like to start?</h3>
-                        <p className="text-muted-foreground">Choose a template to get started faster, or build from scratch</p>
+                        <h3 className="text-lg font-semibold mb-2">Start from Scratch</h3>
+                        <p className="text-muted-foreground">Build a completely custom agent with full control over all configurations.</p>
                       </div>
 
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <Card 
-                          className={`cursor-pointer transition-all ${agentConfig.useTemplate ? 'ring-2 ring-primary' : 'hover:shadow-md'}`}
-                          onClick={() => setAgentConfig({...agentConfig, useTemplate: true})}
-                        >
-                          <CardContent className="p-6 text-center">
-                            <Star className="h-12 w-12 text-primary mx-auto mb-4" />
-                            <h4 className="font-semibold mb-2">Start from Template</h4>
-                            <p className="text-sm text-muted-foreground">
-                              Use pre-built templates with proven coaching patterns and best practices
-                            </p>
-                          </CardContent>
-                        </Card>
-
-                        <Card 
-                          className={`cursor-pointer transition-all ${!agentConfig.useTemplate ? 'ring-2 ring-primary' : 'hover:shadow-md'}`}
-                          onClick={() => setAgentConfig({...agentConfig, useTemplate: false})}
-                        >
-                          <CardContent className="p-6 text-center">
-                            <Settings className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                            <h4 className="font-semibold mb-2">Start from Scratch</h4>
-                            <p className="text-sm text-muted-foreground">
-                              Build a completely custom agent with full control over all configurations
-                            </p>
-                          </CardContent>
-                        </Card>
-                      </div>
-
-                      {agentConfig.useTemplate && (
-                        <div className="space-y-4">
-                          <h4 className="font-medium">Choose a Template</h4>
-                          {validationErrors.template && (
-                            <div className="text-sm text-destructive bg-destructive/10 p-3 rounded-md">
-                              {validationErrors.template}
+                      <Card>
+                        <CardContent className="p-6">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="space-y-2">
+                              <Label htmlFor="agentName">Agent Name *</Label>
+                              <Input
+                                id="agentName"
+                                placeholder="e.g., Billing Support Assistant"
+                                value={agentConfig.agentName}
+                                onChange={(e) => {
+                                  setAgentConfig({...agentConfig, agentName: e.target.value})
+                                  if (validationErrors.agentName && e.target.value.trim()) {
+                                    setValidationErrors({ ...validationErrors, agentName: '' })
+                                  }
+                                }}
+                                className={validationErrors.agentName ? 'border-destructive' : ''}
+                              />
+                              {validationErrors.agentName && (
+                                <p className="text-sm text-destructive">{validationErrors.agentName}</p>
+                              )}
                             </div>
-                          )}
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                            {agentTemplates.map((template) => (
-                              <Card 
-                                key={template.id}
-                                className={`cursor-pointer transition-all ${agentConfig.selectedTemplate === template.id ? 'ring-2 ring-primary' : 'hover:shadow-md'}`}
-                                onClick={() => selectTemplate(template.id)}
-                              >
-                                <CardContent className="p-4">
-                                  <div className="flex items-start gap-3">
-                                    <template.icon className="h-6 w-6 text-primary mt-1" />
-                                    <div className="flex-1">
-                                      <h5 className="font-medium">{template.name}</h5>
-                                      <p className="text-sm text-muted-foreground mt-1">{template.description}</p>
-                                      <div className="flex flex-wrap gap-1 mt-2">
-                                        {template.suggestedFocusAreas.slice(0, 2).map((area, index) => (
-                                          <Badge key={index} variant="secondary" className="text-xs">{area}</Badge>
-                                        ))}
-                                      </div>
-                                    </div>
-                                  </div>
-                                </CardContent>
-                              </Card>
-                            ))}
+
+                            <div className="space-y-2">
+                              <Label htmlFor="topicCategory">Topic Category</Label>
+                              <Input
+                                id="topicCategory"
+                                placeholder="e.g., Financial Services"
+                                value={agentConfig.topicCategory}
+                                onChange={(e) => setAgentConfig({...agentConfig, topicCategory: e.target.value})}
+                              />
+                            </div>
+
+                            <div className="space-y-2 md:col-span-2">
+                              <Label htmlFor="description">Description *</Label>
+                              <Textarea
+                                id="description"
+                                placeholder="Brief description of what this agent handles"
+                                rows={3}
+                                value={agentConfig.description}
+                                onChange={(e) => {
+                                  setAgentConfig({...agentConfig, description: e.target.value})
+                                  if (validationErrors.description && e.target.value.trim()) {
+                                    setValidationErrors({ ...validationErrors, description: '' })
+                                  }
+                                }}
+                                className={validationErrors.description ? 'border-destructive' : ''}
+                              />
+                              {validationErrors.description && (
+                                <p className="text-sm text-destructive">{validationErrors.description}</p>
+                              )}
+                            </div>
                           </div>
-                        </div>
-                      )}
+                        </CardContent>
+                      </Card>
                     </div>
                   )}
 
-                  {/* Step 2: Basic Configuration */}
+                  {/* Step 2: Documents */}
+
+                  {/* Step 2: Documents */}
                   {wizardStep === 2 && (
-                    <div className="space-y-6">
-                      <div>
-                        <h3 className="text-lg font-semibold mb-2">Agent Configuration</h3>
-                        <p className="text-muted-foreground">Set up the basic details for your AI agent</p>
-                      </div>
-
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="space-y-4">
-                          <div className="space-y-2">
-                            <Label htmlFor="agentName">Agent Name *</Label>
-                            <Input
-                              id="agentName"
-                              placeholder="e.g., Billing Support Assistant"
-                              value={agentConfig.agentName}
-                              onChange={(e) => {
-                                setAgentConfig({...agentConfig, agentName: e.target.value})
-                                if (validationErrors.agentName && e.target.value.trim()) {
-                                  setValidationErrors({ ...validationErrors, agentName: '' })
-                                }
-                              }}
-                              className={validationErrors.agentName ? 'border-destructive' : ''}
-                            />
-                            {validationErrors.agentName && (
-                              <p className="text-sm text-destructive">{validationErrors.agentName}</p>
-                            )}
-                          </div>
-
-                          <div className="space-y-2">
-                            <Label htmlFor="topicCategory">Topic Category</Label>
-                            <Input
-                              id="topicCategory"
-                              placeholder="e.g., Financial Services"
-                              value={agentConfig.topicCategory}
-                              onChange={(e) => setAgentConfig({...agentConfig, topicCategory: e.target.value})}
-                            />
-                          </div>
-
-                          <div className="space-y-2">
-                            <Label htmlFor="description">Description *</Label>
-                            <Textarea
-                              id="description"
-                              placeholder="Brief description of what this agent handles"
-                              rows={3}
-                              value={agentConfig.description}
-                              onChange={(e) => {
-                                setAgentConfig({...agentConfig, description: e.target.value})
-                                if (validationErrors.description && e.target.value.trim()) {
-                                  setValidationErrors({ ...validationErrors, description: '' })
-                                }
-                              }}
-                              className={validationErrors.description ? 'border-destructive' : ''}
-                            />
-                            {validationErrors.description && (
-                              <p className="text-sm text-destructive">{validationErrors.description}</p>
-                            )}
-                          </div>
-                        </div>
-
-                        {agentConfig.selectedTemplate && (
-                          <div className="space-y-4">
-                            <div>
-                              <h4 className="font-medium mb-3">Template Suggestions</h4>
-                              <div className="space-y-3">
-                                <div>
-                                  <Label className="text-sm text-muted-foreground">Suggested Focus Areas</Label>
-                                  <div className="flex flex-wrap gap-1 mt-1">
-                                    {agentTemplates.find(t => t.id === agentConfig.selectedTemplate)?.suggestedFocusAreas.map((area, index) => (
-                                      <Badge key={index} variant="outline" className="text-xs">{area}</Badge>
-                                    ))}
-                                  </div>
-                                </div>
-                                <div>
-                                  <Label className="text-sm text-muted-foreground">Coaching Style</Label>
-                                  <p className="text-sm mt-1">{agentTemplates.find(t => t.id === agentConfig.selectedTemplate)?.suggestedCoachingStyle}</p>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Step 3: Documents */}
-                  {wizardStep === 3 && (
                     <div className="space-y-6">
                       <div>
                         <h3 className="text-lg font-semibold mb-2">Knowledge Base Documents</h3>
@@ -938,8 +885,8 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                     </div>
                   )}
 
-                  {/* Step 4: Instructions */}
-                  {wizardStep === 4 && (
+                  {/* Step 3: Instructions */}
+                  {wizardStep === 3 && (
                     <div className="space-y-6">
                       <div>
                         <h3 className="text-lg font-semibold mb-2">Coaching Instructions</h3>
@@ -953,9 +900,9 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                           </div>
                         )}
                         <div className="space-y-2">
-                          <Label>General Approach *</Label>
+                          <Label>Instructions and Guidelines *</Label>
                           <Textarea
-                            placeholder="Describe the overall coaching approach..."
+                            placeholder="Provide clear guidance for how the agent should respond. Include tone, structure, must/avoid behaviors, compliance notes, escalation thresholds, and example phrasing."
                             rows={3}
                             value={agentConfig.instructions.generalApproach}
                             onChange={(e) => {
@@ -970,162 +917,56 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                             className={validationErrors.instructions ? 'border-destructive' : ''}
                           />
                         </div>
-
-                        <div className="space-y-6">
-                          <div className="space-y-2">
-                            <Label>Must Do Actions *</Label>
-                            {validationErrors.mustDo && (
-                              <p className="text-sm text-destructive">{validationErrors.mustDo}</p>
-                            )}
-                            <div className={`border rounded-md p-3 space-y-2 max-h-32 overflow-y-auto ${
-                              validationErrors.mustDo ? 'border-destructive' : ''
-                            }`}>
-                              {agentConfig.instructions.mustDoActions.length === 0 ? (
-                                <p className="text-sm text-muted-foreground italic">No must-do actions defined yet</p>
-                              ) : (
-                                agentConfig.instructions.mustDoActions.map((action, index) => (
-                                  <div key={index} className="flex items-center gap-2">
-                                    <CheckCircle className="h-4 w-4 text-chart-4" />
-                                    <span className="text-sm">{action}</span>
-                                  </div>
-                                ))
-                              )}
-                            </div>
-                          </div>
-
-                          <div className="space-y-2">
-                            <Label>Must Avoid Actions</Label>
-                            <div className="border rounded-md p-3 space-y-2 max-h-32 overflow-y-auto">
-                              {agentConfig.instructions.mustAvoidActions.length === 0 ? (
-                                <p className="text-sm text-muted-foreground italic">No must-avoid actions defined yet</p>
-                              ) : (
-                                agentConfig.instructions.mustAvoidActions.map((action, index) => (
-                                  <div key={index} className="flex items-center gap-2">
-                                    <AlertCircle className="h-4 w-4 text-destructive" />
-                                    <span className="text-sm">{action}</span>
-                                  </div>
-                                ))
-                              )}
-                            </div>
-                          </div>
-                        </div>
-
                         <div className="space-y-2">
-                          <Label>Escalation Rules</Label>
-                          <div className="border rounded-md p-3 space-y-2 max-h-24 overflow-y-auto">
-                            {agentConfig.instructions.escalationRules.length === 0 ? (
-                              <p className="text-sm text-muted-foreground italic">No escalation rules defined yet</p>
-                            ) : (
-                              agentConfig.instructions.escalationRules.map((rule, index) => (
-                                <div key={index} className="flex items-center gap-2">
-                                  <ChevronRight className="h-4 w-4 text-amber-500" />
-                                  <span className="text-sm">{rule}</span>
-                                </div>
-                              ))
-                            )}
+                          <div className="rounded-md border bg-muted/20 p-3">
+                            <p className="text-sm font-medium mb-1">Sample instructions and guidelines</p>
+                            <ul className="list-disc pl-5 space-y-1 text-sm text-muted-foreground">
+                              <li>Tone: empathetic, professional, concise. Avoid jargon unless explained.</li>
+                              <li>Structure: greet, confirm context, propose solution, confirm resolution, close.</li>
+                              <li>Must do: verify identity before account details; summarize next steps.</li>
+                              <li>Must avoid: promising refunds without approval; sharing other customers' data.</li>
+                              <li>Compliance: follow PCI/GDPR; never store full card numbers.</li>
+                              <li>Escalation: transfer if security concern or out-of-policy request.</li>
+                              <li>Example phrase: "I understand how frustrating this is; here’s what I can do right now…"</li>
+                            </ul>
                           </div>
                         </div>
                       </div>
                     </div>
                   )}
 
-                  {/* Step 5: Test & Activate */}
-                  {wizardStep === 5 && (
+                  {/* Step 4: Review & Save */}
+                  {wizardStep === 4 && (
                     <div className="space-y-6">
                       <div>
-                        <h3 className="text-lg font-semibold mb-2">Test & Activate</h3>
-                        <p className="text-muted-foreground">Test your agent before making it live</p>
+                        <h3 className="text-lg font-semibold mb-2">Review & Save</h3>
+                        <p className="text-muted-foreground">Review details and save the agent</p>
                       </div>
-
-                      {validationErrors.testing && (
-                        <div className="text-sm text-destructive bg-destructive/10 p-3 rounded-md">
-                          {validationErrors.testing}
-                        </div>
-                      )}
-
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {/* Agent Preview */}
-                        <Card>
-                          <CardHeader>
-                            <CardTitle className="text-base">Agent Preview</CardTitle>
-                          </CardHeader>
-                          <CardContent>
-                            <div className="space-y-3">
-                              <div>
-                                <Label className="text-sm font-medium">Name:</Label>
-                                <p className="text-sm">{agentConfig.agentName || 'Untitled Agent'}</p>
-                              </div>
-                              <div>
-                                <Label className="text-sm font-medium">Category:</Label>
-                                <p className="text-sm">{agentConfig.topicCategory || 'General'}</p>
-                              </div>
-                              <div>
-                                <Label className="text-sm font-medium">Documents:</Label>
-                                <p className="text-sm">{agentConfig.documents.length} document(s) uploaded</p>
-                              </div>
-                              <div>
-                                <Label className="text-sm font-medium">Approach:</Label>
-                                <p className="text-sm line-clamp-3">
-                                  {agentConfig.instructions.generalApproach || 'No approach defined'}
-                                </p>
-                              </div>
+                      <Card>
+                        <CardHeader>
+                          <CardTitle className="text-base">Agent Preview</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                              <Label className="text-sm font-medium">Name</Label>
+                              <p className="text-sm">{agentConfig.agentName || 'Untitled Agent'}</p>
                             </div>
-                          </CardContent>
-                        </Card>
-
-                        {/* Test Panel */}
-                        <Card>
-                          <CardHeader>
-                            <CardTitle className="text-base">Test Results</CardTitle>
-                          </CardHeader>
-                          <CardContent>
-                            {agentConfig.testResults.length === 0 ? (
-                              <div className="text-center py-8">
-                                <Play className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                                <h4 className="font-semibold mb-2">Ready to Test</h4>
-                                <p className="text-sm text-muted-foreground mb-4">
-                                  Run test scenarios to validate your agent configuration.
-                                </p>
-                                <Button onClick={runAgentTest} variant="outline">
-                                  <Play className="h-4 w-4 mr-2" />
-                                  Run Tests
-                                </Button>
-                              </div>
-                            ) : (
-                              <div className="space-y-3">
-                                <div className="flex items-center justify-between mb-3">
-                                  <span className="text-sm font-medium">Test Scenarios</span>
-                                  <Badge variant={agentConfig.readyToActivate ? "default" : "destructive"}>
-                                    {agentConfig.testResults.filter(r => r.passed).length}/{agentConfig.testResults.length} Passed
-                                  </Badge>
-                                </div>
-                                {agentConfig.testResults.map((result, index) => (
-                                  <div key={index} className="flex items-center gap-2 p-2 border rounded">
-                                    {result.passed ? (
-                                      <CheckCircle className="h-4 w-4 text-chart-4" />
-                                    ) : (
-                                      <AlertCircle className="h-4 w-4 text-destructive" />
-                                    )}
-                                    <div className="flex-1">
-                                      <p className="text-sm font-medium">{result.scenario}</p>
-                                      <p className="text-xs text-muted-foreground">Score: {result.score}/100</p>
-                                    </div>
-                                  </div>
-                                ))}
-                                <Button 
-                                  onClick={runAgentTest} 
-                                  variant="outline" 
-                                  size="sm" 
-                                  className="w-full mt-3"
-                                >
-                                  <RefreshCw className="h-4 w-4 mr-2" />
-                                  Re-run Tests
-                                </Button>
-                              </div>
-                            )}
-                          </CardContent>
-                        </Card>
-                      </div>
+                            <div>
+                              <Label className="text-sm font-medium">Category</Label>
+                              <p className="text-sm">{agentConfig.topicCategory || 'General'}</p>
+                            </div>
+                            <div>
+                              <Label className="text-sm font-medium">Documents</Label>
+                              <p className="text-sm">{agentConfig.documents.length} document(s) uploaded</p>
+                            </div>
+                            <div className="md:col-span-2">
+                              <Label className="text-sm font-medium">Instructions</Label>
+                              <p className="text-sm whitespace-pre-wrap">{agentConfig.instructions.generalApproach || 'No instructions provided'}</p>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
                       
                       {agentConfig.readyToActivate && (
                         <Card className="border-chart-4">
@@ -1159,7 +1000,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                   </div>
                   
                   <div className="flex gap-2">
-                    {wizardStep < 5 ? (
+                    {wizardStep < 4 ? (
                       <Button 
                         onClick={nextStep}
                       >
@@ -1169,10 +1010,10 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                     ) : (
                       <Button 
                         onClick={handleCreateAgent}
-                        disabled={!agentConfig.readyToActivate}
+                        disabled={!agentConfig.agentName.trim() || !agentConfig.description.trim()}
                       >
                         <Save className="h-4 w-4 mr-2" />
-                        {agentConfig.readyToActivate ? 'Create & Activate Agent' : 'Complete Tests First'}
+                        Save Agent
                       </Button>
                     )}
                   </div>
@@ -1298,11 +1139,6 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                       </div>
 
                       <div className="flex items-center gap-4">
-                        <div className="text-center">
-                          <div className="text-lg font-bold text-foreground">{agent.trainingAccuracy}%</div>
-                          <p className="text-xs text-muted-foreground">Accuracy</p>
-                        </div>
-
                         <Badge
                           variant={
                             agent.status === "active"
@@ -1319,13 +1155,12 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                         </Badge>
 
                         <div className="flex gap-2">
-                          <Button variant="outline" size="sm">
+                          <Button variant="outline" size="sm" onClick={() => startEditAgent(agent.id)}>
                             <Edit className="h-4 w-4 mr-2" />
                             Edit
                           </Button>
-                          <Button variant="outline" size="sm">
-                            <RefreshCw className="h-4 w-4 mr-2" />
-                            Retrain
+                          <Button variant="outline" size="sm" onClick={() => toggleAgentStatus(agent.id)}>
+                            {agent.status === 'active' ? 'Deactivate' : 'Activate'}
                           </Button>
                           <Button
                             variant="outline"
