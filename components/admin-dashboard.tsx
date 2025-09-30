@@ -1,15 +1,21 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState, useEffect } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { useState, useEffect } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Dialog,
   DialogContent,
@@ -18,7 +24,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
+} from "@/components/ui/dialog";
 import {
   Bot,
   Plus,
@@ -53,10 +59,10 @@ import {
   Play,
   Save,
   Check,
-} from "lucide-react"
+} from "lucide-react";
 
 interface AdminDashboardProps {
-  onLogout: () => void
+  onLogout: () => void;
 }
 
 // Enhanced interfaces for the Smart Agent Creation Wizard
@@ -89,7 +95,7 @@ interface UploadedDocument {
   id: string;
   name: string;
   size: string;
-  type: 'policy' | 'procedure' | 'script' | 'faq' | 'example';
+  type: "policy" | "procedure" | "script" | "faq" | "example";
   qualityScore: number;
   relevanceScore: number;
   analysisResults: {
@@ -105,18 +111,18 @@ interface EnhancedAgentConfig {
   // Step 1: Quick Start
   useTemplate: boolean;
   selectedTemplate: string;
-  
+
   // Step 2: Basic Config
   agentName: string;
   topicCategory: string;
   description: string;
-  
+
   // Step 3: Documents
   documents: UploadedDocument[];
-  
+
   // Step 4: Instructions
   instructions: InstructionTemplate;
-  
+
   // Step 5: Test & Activate
   testResults: any[];
   readyToActivate: boolean;
@@ -126,10 +132,10 @@ interface EnhancedAgentConfig {
 interface BusinessDocument {
   id: string;
   name: string;
-  type: 'pdf' | 'docx' | 'txt';
+  type: "pdf" | "docx" | "txt";
   size: string;
   uploadDate: string;
-  status: 'processing' | 'ready' | 'error';
+  status: "processing" | "ready" | "error";
   vectorEmbedded: boolean;
 }
 
@@ -167,302 +173,425 @@ interface RoutingAnalytics {
 }
 
 export function AdminDashboard({ onLogout }: AdminDashboardProps) {
-  const [activeTab, setActiveTab] = useState("overview")
-  const [isCreateWizardOpen, setIsCreateWizardOpen] = useState(false)
-  const [wizardStep, setWizardStep] = useState(1)
-  const [editingAgentId, setEditingAgentId] = useState<string | null>(null)
-  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({})
+  const [activeTab, setActiveTab] = useState("overview");
+  const [isCreateWizardOpen, setIsCreateWizardOpen] = useState(false);
+  const [wizardStep, setWizardStep] = useState(1);
+  const [editingAgentId, setEditingAgentId] = useState<string | null>(null);
+  const [validationErrors, setValidationErrors] = useState<
+    Record<string, string>
+  >({});
   const [agentConfig, setAgentConfig] = useState<EnhancedAgentConfig>({
     useTemplate: false,
-    selectedTemplate: '',
-    agentName: '',
-    topicCategory: '',
-    description: '',
+    selectedTemplate: "",
+    agentName: "",
+    topicCategory: "",
+    description: "",
     documents: [],
     instructions: {
-      generalApproach: '',
+      generalApproach: "",
       mustDoActions: [],
       mustAvoidActions: [],
       keyPhrases: { greeting: [], empathy: [], resolution: [], closing: [] },
       escalationRules: [],
-      complianceRequirements: []
+      complianceRequirements: [],
     },
     testResults: [],
-    readyToActivate: false
-  })
+    readyToActivate: false,
+  });
 
   // Overall LLM Agent (Orchestrator) state
-  const [businessDocuments, setBusinessDocuments] = useState<BusinessDocument[]>([])
-  const [orchestratorConfig, setOrchestratorConfig] = useState<OrchestratorConfig>({
-    agentName: 'OmniHive Orchestrator',
-    instructionSet: 'Always comply with refund policies first. Route contacts to the most appropriate specialized agent based on intent detection.',
-    knowledgeSources: [],
-    isActive: false,
-    lastUpdated: new Date().toISOString(),
-    documentsCount: 0
-  })
-  const [isUploadingDoc, setIsUploadingDoc] = useState(false)
+  const [businessDocuments, setBusinessDocuments] = useState<
+    BusinessDocument[]
+  >([]);
+  const [orchestratorConfig, setOrchestratorConfig] =
+    useState<OrchestratorConfig>({
+      agentName: "OmniHive Orchestrator",
+      instructionSet:
+        "Always comply with refund policies first. Route contacts to the most appropriate specialized agent based on intent detection.",
+      knowledgeSources: [],
+      isActive: false,
+      lastUpdated: new Date().toISOString(),
+      documentsCount: 0,
+    });
+  const [isUploadingDoc, setIsUploadingDoc] = useState(false);
 
   // Sample routing analytics data (in a real app, this would come from API)
   const routingAnalytics: RoutingAnalytics = {
     totalContacts: 1247,
     routedToAgents: [
-      { agentName: 'Billing Support', count: 423, percentage: 33.9 },
-      { agentName: 'Technical Support', count: 312, percentage: 25.0 },
-      { agentName: 'Account Management', count: 198, percentage: 15.9 },
-      { agentName: 'Sales Support', count: 156, percentage: 12.5 }
+      { agentName: "Billing Support", count: 423, percentage: 33.9 },
+      { agentName: "Technical Support", count: 312, percentage: 25.0 },
+      { agentName: "Account Management", count: 198, percentage: 15.9 },
+      { agentName: "Sales Support", count: 156, percentage: 12.5 },
     ],
     fallbackCases: { count: 158, percentage: 12.7 },
     intentDistribution: [
-      { intent: 'Billing Inquiry', count: 423, percentage: 33.9 },
-      { intent: 'Technical Issue', count: 312, percentage: 25.0 },
-      { intent: 'Account Changes', count: 198, percentage: 15.9 },
-      { intent: 'Sales Question', count: 156, percentage: 12.5 },
-      { intent: 'General Support', count: 158, percentage: 12.7 }
+      { intent: "Billing Inquiry", count: 423, percentage: 33.9 },
+      { intent: "Technical Issue", count: 312, percentage: 25.0 },
+      { intent: "Account Changes", count: 198, percentage: 15.9 },
+      { intent: "Sales Question", count: 156, percentage: 12.5 },
+      { intent: "General Support", count: 158, percentage: 12.7 },
     ],
     dailyTrends: [
-      { date: '2024-01-01', totalContacts: 89, routedSuccessfully: 78, fallbacks: 11 },
-      { date: '2024-01-02', totalContacts: 92, routedSuccessfully: 81, fallbacks: 11 },
-      { date: '2024-01-03', totalContacts: 87, routedSuccessfully: 76, fallbacks: 11 },
-      { date: '2024-01-04', totalContacts: 95, routedSuccessfully: 83, fallbacks: 12 },
-      { date: '2024-01-05', totalContacts: 98, routedSuccessfully: 86, fallbacks: 12 },
-      { date: '2024-01-06', totalContacts: 103, routedSuccessfully: 91, fallbacks: 12 },
-      { date: '2024-01-07', totalContacts: 91, routedSuccessfully: 80, fallbacks: 11 }
-    ]
-  }
+      {
+        date: "2024-01-01",
+        totalContacts: 89,
+        routedSuccessfully: 78,
+        fallbacks: 11,
+      },
+      {
+        date: "2024-01-02",
+        totalContacts: 92,
+        routedSuccessfully: 81,
+        fallbacks: 11,
+      },
+      {
+        date: "2024-01-03",
+        totalContacts: 87,
+        routedSuccessfully: 76,
+        fallbacks: 11,
+      },
+      {
+        date: "2024-01-04",
+        totalContacts: 95,
+        routedSuccessfully: 83,
+        fallbacks: 12,
+      },
+      {
+        date: "2024-01-05",
+        totalContacts: 98,
+        routedSuccessfully: 86,
+        fallbacks: 12,
+      },
+      {
+        date: "2024-01-06",
+        totalContacts: 103,
+        routedSuccessfully: 91,
+        fallbacks: 12,
+      },
+      {
+        date: "2024-01-07",
+        totalContacts: 91,
+        routedSuccessfully: 80,
+        fallbacks: 11,
+      },
+    ],
+  };
 
   // Helper functions for orchestrator
   const handleBusinessDocumentUpload = (files: File[]) => {
-    setIsUploadingDoc(true)
-    
+    setIsUploadingDoc(true);
+
     // Simulate document processing
     setTimeout(() => {
-      const newDocs: BusinessDocument[] = files.map(file => ({
+      const newDocs: BusinessDocument[] = files.map((file) => ({
         id: Math.random().toString(36).substr(2, 9),
         name: file.name,
-        type: file.name.endsWith('.pdf') ? 'pdf' : file.name.endsWith('.docx') ? 'docx' : 'txt',
-        size: (file.size / 1024).toFixed(1) + ' KB',
+        type: file.name.endsWith(".pdf")
+          ? "pdf"
+          : file.name.endsWith(".docx")
+            ? "docx"
+            : "txt",
+        size: (file.size / 1024).toFixed(1) + " KB",
         uploadDate: new Date().toLocaleDateString(),
-        status: 'processing',
-        vectorEmbedded: false
-      }))
-      
-      setBusinessDocuments(prev => [...prev, ...newDocs])
-      
+        status: "processing",
+        vectorEmbedded: false,
+      }));
+
+      setBusinessDocuments((prev) => [...prev, ...newDocs]);
+
       // Simulate processing completion
       setTimeout(() => {
-        setBusinessDocuments(prev => 
-          prev.map(doc => 
-            newDocs.find(newDoc => newDoc.id === doc.id)
-              ? { ...doc, status: 'ready', vectorEmbedded: true }
-              : doc
-          )
-        )
-        setOrchestratorConfig(prev => ({
+        setBusinessDocuments((prev) =>
+          prev.map((doc) =>
+            newDocs.find((newDoc) => newDoc.id === doc.id)
+              ? { ...doc, status: "ready", vectorEmbedded: true }
+              : doc,
+          ),
+        );
+        setOrchestratorConfig((prev) => ({
           ...prev,
           documentsCount: prev.documentsCount + newDocs.length,
-          knowledgeSources: [...prev.knowledgeSources, ...newDocs.map(doc => doc.id)],
-          lastUpdated: new Date().toISOString()
-        }))
-      }, 2000)
-      
-      setIsUploadingDoc(false)
-    }, 1000)
-  }
+          knowledgeSources: [
+            ...prev.knowledgeSources,
+            ...newDocs.map((doc) => doc.id),
+          ],
+          lastUpdated: new Date().toISOString(),
+        }));
+      }, 2000);
+
+      setIsUploadingDoc(false);
+    }, 1000);
+  };
 
   const removeBusinessDocument = (docId: string) => {
-    setBusinessDocuments(prev => prev.filter(doc => doc.id !== docId))
-    setOrchestratorConfig(prev => ({
+    setBusinessDocuments((prev) => prev.filter((doc) => doc.id !== docId));
+    setOrchestratorConfig((prev) => ({
       ...prev,
       documentsCount: prev.documentsCount - 1,
-      knowledgeSources: prev.knowledgeSources.filter(id => id !== docId),
-      lastUpdated: new Date().toISOString()
-    }))
-  }
+      knowledgeSources: prev.knowledgeSources.filter((id) => id !== docId),
+      lastUpdated: new Date().toISOString(),
+    }));
+  };
 
   const saveOrchestratorConfig = () => {
-    setOrchestratorConfig(prev => ({
+    setOrchestratorConfig((prev) => ({
       ...prev,
-      lastUpdated: new Date().toISOString()
-    }))
+      lastUpdated: new Date().toISOString(),
+    }));
     // In real app, this would save to backend
-    console.log('Orchestrator config saved:', orchestratorConfig)
-  }
+    console.log("Orchestrator config saved:", orchestratorConfig);
+  };
 
   const toggleOrchestratorStatus = () => {
-    setOrchestratorConfig(prev => ({
+    setOrchestratorConfig((prev) => ({
       ...prev,
       isActive: !prev.isActive,
-      lastUpdated: new Date().toISOString()
-    }))
-  }
+      lastUpdated: new Date().toISOString(),
+    }));
+  };
 
   // Agent Templates
   const agentTemplates: AgentTemplate[] = [
     {
-      id: 'billing',
-      name: 'Billing & Payments',
-      category: 'Financial Services',
-      description: 'Handle billing inquiries, payment issues, and subscription management',
+      id: "billing",
+      name: "Billing & Payments",
+      category: "Financial Services",
+      description:
+        "Handle billing inquiries, payment issues, and subscription management",
       icon: CreditCard,
-      suggestedFocusAreas: ['Payment processing', 'Billing disputes', 'Subscription changes', 'Refund policies'],
-      suggestedCoachingStyle: 'Empathetic but firm, policy-focused',
+      suggestedFocusAreas: [
+        "Payment processing",
+        "Billing disputes",
+        "Subscription changes",
+        "Refund policies",
+      ],
+      suggestedCoachingStyle: "Empathetic but firm, policy-focused",
       instructionTemplate: {
-        generalApproach: 'Agents should prioritize accuracy and empathy when handling billing inquiries. Always verify customer identity first and explain charges clearly.',
+        generalApproach:
+          "Agents should prioritize accuracy and empathy when handling billing inquiries. Always verify customer identity first and explain charges clearly.",
         mustDoActions: [
-          'Verify customer identity before discussing account details',
-          'Explain all charges clearly and provide itemized breakdown',
-          'Offer payment plans proactively for large balances',
-          'Document all changes made to customer accounts',
-          'Provide clear follow-up timeline for any pending actions'
+          "Verify customer identity before discussing account details",
+          "Explain all charges clearly and provide itemized breakdown",
+          "Offer payment plans proactively for large balances",
+          "Document all changes made to customer accounts",
+          "Provide clear follow-up timeline for any pending actions",
         ],
         mustAvoidActions: [
-          'Never promise refunds without proper authorization',
-          'Do not discuss other customers\' billing information',
-          'Avoid using technical payment processing jargon',
-          'Do not waive fees without supervisor approval'
+          "Never promise refunds without proper authorization",
+          "Do not discuss other customers' billing information",
+          "Avoid using technical payment processing jargon",
+          "Do not waive fees without supervisor approval",
         ],
         keyPhrases: {
-          greeting: ['I\'d be happy to help with your billing inquiry', 'Let me review your account details'],
-          empathy: ['I understand your concern about these charges', 'I can see why this would be confusing'],
-          resolution: ['Here\'s what I can do to resolve this', 'Let me process this adjustment for you'],
-          closing: ['Is there anything else about your billing I can clarify?', 'Your account has been updated successfully']
+          greeting: [
+            "I'd be happy to help with your billing inquiry",
+            "Let me review your account details",
+          ],
+          empathy: [
+            "I understand your concern about these charges",
+            "I can see why this would be confusing",
+          ],
+          resolution: [
+            "Here's what I can do to resolve this",
+            "Let me process this adjustment for you",
+          ],
+          closing: [
+            "Is there anything else about your billing I can clarify?",
+            "Your account has been updated successfully",
+          ],
         },
         escalationRules: [
-          'Disputes over $500 require supervisor approval',
-          'Fraud claims must be escalated immediately',
-          'Legal concerns mentioned by customer'
+          "Disputes over $500 require supervisor approval",
+          "Fraud claims must be escalated immediately",
+          "Legal concerns mentioned by customer",
         ],
         complianceRequirements: [
-          'PCI compliance for payment data handling',
-          'Document all fee waivers and credits applied',
-          'Maintain audit trail for account changes'
-        ]
-      }
+          "PCI compliance for payment data handling",
+          "Document all fee waivers and credits applied",
+          "Maintain audit trail for account changes",
+        ],
+      },
     },
     {
-      id: 'technical',
-      name: 'Technical Support',
-      category: 'Product Support',
-      description: 'Provide technical assistance and troubleshooting guidance',
+      id: "technical",
+      name: "Technical Support",
+      category: "Product Support",
+      description: "Provide technical assistance and troubleshooting guidance",
       icon: Wrench,
-      suggestedFocusAreas: ['Troubleshooting', 'Product features', 'Integration support', 'Bug reporting'],
-      suggestedCoachingStyle: 'Patient and methodical, solution-oriented',
+      suggestedFocusAreas: [
+        "Troubleshooting",
+        "Product features",
+        "Integration support",
+        "Bug reporting",
+      ],
+      suggestedCoachingStyle: "Patient and methodical, solution-oriented",
       instructionTemplate: {
-        generalApproach: 'Focus on systematic troubleshooting and clear step-by-step guidance. Always confirm customer understanding before proceeding.',
+        generalApproach:
+          "Focus on systematic troubleshooting and clear step-by-step guidance. Always confirm customer understanding before proceeding.",
         mustDoActions: [
-          'Gather detailed information about the issue',
-          'Follow systematic troubleshooting steps',
-          'Provide clear, step-by-step instructions',
-          'Confirm each step is completed before proceeding',
-          'Document resolution for knowledge base'
+          "Gather detailed information about the issue",
+          "Follow systematic troubleshooting steps",
+          "Provide clear, step-by-step instructions",
+          "Confirm each step is completed before proceeding",
+          "Document resolution for knowledge base",
         ],
         mustAvoidActions: [
-          'Do not skip diagnostic steps',
-          'Avoid technical jargon without explanation',
-          'Never assume customer technical expertise',
-          'Do not provide workarounds for security features'
+          "Do not skip diagnostic steps",
+          "Avoid technical jargon without explanation",
+          "Never assume customer technical expertise",
+          "Do not provide workarounds for security features",
         ],
         keyPhrases: {
-          greeting: ['I\'ll help you resolve this technical issue', 'Let\'s work through this step by step'],
-          empathy: ['Technical issues can be frustrating', 'I understand this is affecting your workflow'],
-          resolution: ['Let\'s try this solution', 'This should resolve the issue'],
-          closing: ['Is everything working as expected now?', 'Feel free to contact us if you need further assistance']
+          greeting: [
+            "I'll help you resolve this technical issue",
+            "Let's work through this step by step",
+          ],
+          empathy: [
+            "Technical issues can be frustrating",
+            "I understand this is affecting your workflow",
+          ],
+          resolution: [
+            "Let's try this solution",
+            "This should resolve the issue",
+          ],
+          closing: [
+            "Is everything working as expected now?",
+            "Feel free to contact us if you need further assistance",
+          ],
         },
         escalationRules: [
-          'Hardware failures require level 2 support',
-          'Security vulnerabilities need immediate escalation',
-          'Product bugs affecting multiple customers'
+          "Hardware failures require level 2 support",
+          "Security vulnerabilities need immediate escalation",
+          "Product bugs affecting multiple customers",
         ],
         complianceRequirements: [
-          'Follow security protocols for account access',
-          'Document all troubleshooting steps taken',
-          'Maintain customer data confidentiality'
-        ]
-      }
+          "Follow security protocols for account access",
+          "Document all troubleshooting steps taken",
+          "Maintain customer data confidentiality",
+        ],
+      },
     },
     {
-      id: 'sales',
-      name: 'Sales & Product Info',
-      category: 'Sales Support',
-      description: 'Assist with product information and sales inquiries',
+      id: "sales",
+      name: "Sales & Product Info",
+      category: "Sales Support",
+      description: "Assist with product information and sales inquiries",
       icon: ShoppingCart,
-      suggestedFocusAreas: ['Product features', 'Pricing information', 'Upselling', 'Demo scheduling'],
-      suggestedCoachingStyle: 'Consultative and informative, value-focused',
+      suggestedFocusAreas: [
+        "Product features",
+        "Pricing information",
+        "Upselling",
+        "Demo scheduling",
+      ],
+      suggestedCoachingStyle: "Consultative and informative, value-focused",
       instructionTemplate: {
-        generalApproach: 'Focus on understanding customer needs and matching them with appropriate solutions. Always prioritize value over features.',
+        generalApproach:
+          "Focus on understanding customer needs and matching them with appropriate solutions. Always prioritize value over features.",
         mustDoActions: [
-          'Understand customer use case and requirements',
-          'Present solutions that match customer needs',
-          'Provide accurate pricing and feature information',
-          'Offer demos or trials when appropriate',
-          'Follow up on qualified leads'
+          "Understand customer use case and requirements",
+          "Present solutions that match customer needs",
+          "Provide accurate pricing and feature information",
+          "Offer demos or trials when appropriate",
+          "Follow up on qualified leads",
         ],
         mustAvoidActions: [
-          'Do not oversell features customer doesn\'t need',
-          'Avoid pressure tactics or urgency without cause',
-          'Never promise features not yet available',
-          'Do not discount without authorization'
+          "Do not oversell features customer doesn't need",
+          "Avoid pressure tactics or urgency without cause",
+          "Never promise features not yet available",
+          "Do not discount without authorization",
         ],
         keyPhrases: {
-          greeting: ['I\'d love to help you find the right solution', 'Let me understand your requirements'],
-          empathy: ['I understand you want to make the right choice', 'Finding the right fit is important'],
-          resolution: ['Based on your needs, I\'d recommend', 'This solution would address your requirements'],
-          closing: ['Would you like to see a demo?', 'I\'ll send you the information we discussed']
+          greeting: [
+            "I'd love to help you find the right solution",
+            "Let me understand your requirements",
+          ],
+          empathy: [
+            "I understand you want to make the right choice",
+            "Finding the right fit is important",
+          ],
+          resolution: [
+            "Based on your needs, I'd recommend",
+            "This solution would address your requirements",
+          ],
+          closing: [
+            "Would you like to see a demo?",
+            "I'll send you the information we discussed",
+          ],
         },
         escalationRules: [
-          'Enterprise deals over $10,000 require sales manager',
-          'Custom pricing requests need approval',
-          'Competitive displacement situations'
+          "Enterprise deals over $10,000 require sales manager",
+          "Custom pricing requests need approval",
+          "Competitive displacement situations",
         ],
         complianceRequirements: [
-          'Maintain accurate lead tracking',
-          'Follow GDPR guidelines for prospect data',
-          'Document all pricing quotes provided'
-        ]
-      }
+          "Maintain accurate lead tracking",
+          "Follow GDPR guidelines for prospect data",
+          "Document all pricing quotes provided",
+        ],
+      },
     },
     {
-      id: 'account',
-      name: 'Account Management',
-      category: 'Customer Success',
-      description: 'Handle account changes, upgrades, and general account inquiries',
+      id: "account",
+      name: "Account Management",
+      category: "Customer Success",
+      description:
+        "Handle account changes, upgrades, and general account inquiries",
       icon: Users,
-      suggestedFocusAreas: ['Account updates', 'Service changes', 'User management', 'Renewals'],
-      suggestedCoachingStyle: 'Professional and efficient, relationship-focused',
+      suggestedFocusAreas: [
+        "Account updates",
+        "Service changes",
+        "User management",
+        "Renewals",
+      ],
+      suggestedCoachingStyle:
+        "Professional and efficient, relationship-focused",
       instructionTemplate: {
-        generalApproach: 'Prioritize customer satisfaction and long-term relationship building. Be proactive about identifying expansion opportunities.',
+        generalApproach:
+          "Prioritize customer satisfaction and long-term relationship building. Be proactive about identifying expansion opportunities.",
         mustDoActions: [
-          'Verify account ownership before making changes',
-          'Explain impact of any account modifications',
-          'Identify opportunities for account growth',
-          'Ensure smooth implementation of changes',
-          'Follow up to confirm satisfaction'
+          "Verify account ownership before making changes",
+          "Explain impact of any account modifications",
+          "Identify opportunities for account growth",
+          "Ensure smooth implementation of changes",
+          "Follow up to confirm satisfaction",
         ],
         mustAvoidActions: [
-          'Do not make account changes without proper verification',
-          'Avoid downgrading without understanding reasons',
-          'Never make promises about future product development',
-          'Do not bypass security protocols'
+          "Do not make account changes without proper verification",
+          "Avoid downgrading without understanding reasons",
+          "Never make promises about future product development",
+          "Do not bypass security protocols",
         ],
         keyPhrases: {
-          greeting: ['I\'ll help you with your account updates', 'Let me review your current configuration'],
-          empathy: ['I want to make sure this works for your team', 'Your account setup is important to us'],
-          resolution: ['I\'ll implement these changes for you', 'This will optimize your account setup'],
-          closing: ['Your account has been updated successfully', 'Let me know if you need any other adjustments']
+          greeting: [
+            "I'll help you with your account updates",
+            "Let me review your current configuration",
+          ],
+          empathy: [
+            "I want to make sure this works for your team",
+            "Your account setup is important to us",
+          ],
+          resolution: [
+            "I'll implement these changes for you",
+            "This will optimize your account setup",
+          ],
+          closing: [
+            "Your account has been updated successfully",
+            "Let me know if you need any other adjustments",
+          ],
         },
         escalationRules: [
-          'Account downgrades require retention specialist',
-          'Security concerns need immediate attention',
-          'Bulk user changes over 100 users'
+          "Account downgrades require retention specialist",
+          "Security concerns need immediate attention",
+          "Bulk user changes over 100 users",
         ],
         complianceRequirements: [
-          'Maintain detailed change logs',
-          'Follow data retention policies',
-          'Ensure proper authorization for account changes'
-        ]
-      }
-    }
+          "Maintain detailed change logs",
+          "Follow data retention policies",
+          "Ensure proper authorization for account changes",
+        ],
+      },
+    },
   ];
 
   // AI agents list
@@ -507,182 +636,211 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
       trainingAccuracy: 89,
       usageCount: 423,
     },
-  ])
+  ]);
 
   const systemStats = {
     totalAgents: aiAgents.length,
     activeAgents: aiAgents.filter((a) => a.status === "active").length,
-    totalInteractions: aiAgents.reduce((sum, agent) => sum + agent.usageCount, 0),
-    avgAccuracy: Math.round(aiAgents.reduce((sum, agent) => sum + agent.trainingAccuracy, 0) / aiAgents.length),
-  }
+    totalInteractions: aiAgents.reduce(
+      (sum, agent) => sum + agent.usageCount,
+      0,
+    ),
+    avgAccuracy: Math.round(
+      aiAgents.reduce((sum, agent) => sum + agent.trainingAccuracy, 0) /
+        aiAgents.length,
+    ),
+  };
 
   const handleCreateAgent = () => {
     // Handle agent creation logic here
-    console.log("Creating new AI agent:", agentConfig)
+    console.log("Creating new AI agent:", agentConfig);
     if (editingAgentId) {
-      setAiAgents(aiAgents.map(a => a.id === editingAgentId
-        ? {
-            ...a,
-            intentName: agentConfig.agentName || 'Untitled Agent',
-            description: agentConfig.description || '',
-            lastUpdated: new Date().toISOString().slice(0, 10),
-          }
-        : a))
+      setAiAgents(
+        aiAgents.map((a) =>
+          a.id === editingAgentId
+            ? {
+                ...a,
+                intentName: agentConfig.agentName || "Untitled Agent",
+                description: agentConfig.description || "",
+                lastUpdated: new Date().toISOString().slice(0, 10),
+              }
+            : a,
+        ),
+      );
     } else {
       // Append to agent list
       setAiAgents([
         ...aiAgents,
         {
           id: `agent-${Date.now()}`,
-          intentName: agentConfig.agentName || 'Untitled Agent',
-          description: agentConfig.description || '',
-          status: 'inactive',
+          intentName: agentConfig.agentName || "Untitled Agent",
+          description: agentConfig.description || "",
+          status: "inactive",
           lastUpdated: new Date().toISOString().slice(0, 10),
           knowledgeBaseSize: `${agentConfig.documents.length > 0 ? agentConfig.documents.length : 0} doc(s)`,
           trainingAccuracy: 0,
           usageCount: 0,
         },
-      ])
+      ]);
     }
-    setIsCreateWizardOpen(false)
-    setWizardStep(1)
-    setEditingAgentId(null)
+    setIsCreateWizardOpen(false);
+    setWizardStep(1);
+    setEditingAgentId(null);
     setAgentConfig({
       useTemplate: false,
-      selectedTemplate: '',
-      agentName: '',
-      topicCategory: '',
-      description: '',
+      selectedTemplate: "",
+      agentName: "",
+      topicCategory: "",
+      description: "",
       documents: [],
       instructions: {
-        generalApproach: '',
+        generalApproach: "",
         mustDoActions: [],
         mustAvoidActions: [],
         keyPhrases: { greeting: [], empathy: [], resolution: [], closing: [] },
         escalationRules: [],
-        complianceRequirements: []
+        complianceRequirements: [],
       },
       testResults: [],
-      readyToActivate: false
-    })
-  }
+      readyToActivate: false,
+    });
+  };
 
   const startEditAgent = (agentId: string) => {
-    const agent = aiAgents.find(a => a.id === agentId)
-    if (!agent) return
-    setEditingAgentId(agentId)
+    const agent = aiAgents.find((a) => a.id === agentId);
+    if (!agent) return;
+    setEditingAgentId(agentId);
     setAgentConfig({
       ...agentConfig,
       agentName: agent.intentName,
-      topicCategory: '',
+      topicCategory: "",
       description: agent.description,
       documents: [],
       instructions: { ...agentConfig.instructions },
-    })
-    setWizardStep(1)
-    setIsCreateWizardOpen(true)
-  }
+    });
+    setWizardStep(1);
+    setIsCreateWizardOpen(true);
+  };
 
   const toggleAgentStatus = (agentId: string) => {
-    setAiAgents(aiAgents.map(a => a.id === agentId
-      ? { ...a, status: a.status === 'active' ? 'inactive' : 'active', lastUpdated: new Date().toISOString().slice(0,10) }
-      : a))
-  }
+    setAiAgents(
+      aiAgents.map((a) =>
+        a.id === agentId
+          ? {
+              ...a,
+              status: a.status === "active" ? "inactive" : "active",
+              lastUpdated: new Date().toISOString().slice(0, 10),
+            }
+          : a,
+      ),
+    );
+  };
 
   // Validation functions for each step
   const validateStep = (step: number): boolean => {
-    const errors: Record<string, string> = {}
-    
+    const errors: Record<string, string> = {};
+
     switch (step) {
       case 1:
         if (!agentConfig.agentName.trim()) {
-          errors.agentName = 'Agent name is required'
+          errors.agentName = "Agent name is required";
         }
         if (!agentConfig.description.trim()) {
-          errors.description = 'Description is required'
+          errors.description = "Description is required";
         }
-        break
+        break;
       case 2:
         if (agentConfig.documents.length === 0) {
-          errors.documents = 'At least one document is required'
+          errors.documents = "At least one document is required";
         }
-        break
+        break;
       case 3:
         if (!agentConfig.instructions.generalApproach.trim()) {
-          errors.instructions = 'Instructions and Guidelines is required'
+          errors.instructions = "Instructions and Guidelines is required";
         }
-        break
+        break;
       case 4:
         // No testing required; allow save
-        break
+        break;
     }
-    
-    setValidationErrors(errors)
-    return Object.keys(errors).length === 0
-  }
+
+    setValidationErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
 
   const analyzeDocument = (file: File): UploadedDocument => {
     // Deterministic quality analysis based on file properties
-    const fileExtension = file.name.split('.').pop()?.toLowerCase()
-    const fileSizeKB = file.size / 1024
-    
+    const fileExtension = file.name.split(".").pop()?.toLowerCase();
+    const fileSizeKB = file.size / 1024;
+
     // Base quality score on file type and size
-    let qualityScore = 70
-    let docType: UploadedDocument['type'] = 'policy'
-    
+    let qualityScore = 70;
+    let docType: UploadedDocument["type"] = "policy";
+
     // File type analysis
     switch (fileExtension) {
-      case 'pdf':
-        qualityScore += 20
-        docType = 'policy'
-        break
-      case 'docx':
-        qualityScore += 15
-        docType = 'procedure'
-        break
-      case 'txt':
-        qualityScore += 10
-        docType = 'script'
-        break
-      case 'csv':
-        qualityScore += 5
-        docType = 'faq'
-        break
+      case "pdf":
+        qualityScore += 20;
+        docType = "policy";
+        break;
+      case "docx":
+        qualityScore += 15;
+        docType = "procedure";
+        break;
+      case "txt":
+        qualityScore += 10;
+        docType = "script";
+        break;
+      case "csv":
+        qualityScore += 5;
+        docType = "faq";
+        break;
     }
-    
+
     // File size consideration (optimal range 100KB - 5MB)
     if (fileSizeKB >= 100 && fileSizeKB <= 5120) {
-      qualityScore += 10
+      qualityScore += 10;
     } else if (fileSizeKB < 50) {
-      qualityScore -= 15
+      qualityScore -= 15;
     }
-    
+
     // Relevance based on filename keywords
-    const filename = file.name.toLowerCase()
-    let relevanceScore = 60
-    const relevantKeywords = ['policy', 'procedure', 'guide', 'script', 'faq', 'billing', 'support', 'customer']
-    relevantKeywords.forEach(keyword => {
-      if (filename.includes(keyword)) relevanceScore += 8
-    })
-    
-    relevanceScore = Math.min(100, relevanceScore)
-    qualityScore = Math.min(100, Math.max(30, qualityScore))
-    
-    const missingElements = []
-    const suggestions = []
-    
+    const filename = file.name.toLowerCase();
+    let relevanceScore = 60;
+    const relevantKeywords = [
+      "policy",
+      "procedure",
+      "guide",
+      "script",
+      "faq",
+      "billing",
+      "support",
+      "customer",
+    ];
+    relevantKeywords.forEach((keyword) => {
+      if (filename.includes(keyword)) relevanceScore += 8;
+    });
+
+    relevanceScore = Math.min(100, relevanceScore);
+    qualityScore = Math.min(100, Math.max(30, qualityScore));
+
+    const missingElements = [];
+    const suggestions = [];
+
     if (qualityScore < 80) {
-      suggestions.push('Consider using a more structured document format')
+      suggestions.push("Consider using a more structured document format");
     }
     if (relevanceScore < 70) {
-      suggestions.push('Ensure document content is relevant to the agent\'s purpose')
-      missingElements.push('Topic-specific content')
+      suggestions.push(
+        "Ensure document content is relevant to the agent's purpose",
+      );
+      missingElements.push("Topic-specific content");
     }
     if (fileSizeKB < 100) {
-      suggestions.push('Document may be too brief for comprehensive training')
-      missingElements.push('Detailed examples and procedures')
+      suggestions.push("Document may be too brief for comprehensive training");
+      missingElements.push("Detailed examples and procedures");
     }
-    
+
     return {
       id: Date.now().toString(),
       name: file.name,
@@ -693,91 +851,92 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
       analysisResults: {
         hasClearPolicies: qualityScore > 85,
         hasExamples: fileSizeKB > 200,
-        hasEscalationRules: filename.includes('escalation') || filename.includes('policy'),
-        missingElements
+        hasEscalationRules:
+          filename.includes("escalation") || filename.includes("policy"),
+        missingElements,
       },
-      suggestions
-    }
-  }
+      suggestions,
+    };
+  };
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(event.target.files || [])
-    
-    const newDocuments = files.map(analyzeDocument)
-    
+    const files = Array.from(event.target.files || []);
+
+    const newDocuments = files.map(analyzeDocument);
+
     setAgentConfig({
       ...agentConfig,
-      documents: [...agentConfig.documents, ...newDocuments]
-    })
-    
+      documents: [...agentConfig.documents, ...newDocuments],
+    });
+
     // Clear validation errors if documents are added
     if (validationErrors.documents) {
-      setValidationErrors({ ...validationErrors, documents: '' })
+      setValidationErrors({ ...validationErrors, documents: "" });
     }
-  }
+  };
 
   const removeDocument = (docId: string) => {
     setAgentConfig({
       ...agentConfig,
-      documents: agentConfig.documents.filter(doc => doc.id !== docId)
-    })
-  }
+      documents: agentConfig.documents.filter((doc) => doc.id !== docId),
+    });
+  };
 
   const nextStep = () => {
     if (validateStep(wizardStep) && wizardStep < 4) {
-      setWizardStep(wizardStep + 1)
-      setValidationErrors({})
+      setWizardStep(wizardStep + 1);
+      setValidationErrors({});
     }
-  }
+  };
 
   const prevStep = () => {
     if (wizardStep > 1) {
-      setWizardStep(wizardStep - 1)
+      setWizardStep(wizardStep - 1);
     }
-  }
+  };
 
   const selectTemplate = (templateId: string) => {
-    const template = agentTemplates.find(t => t.id === templateId)
+    const template = agentTemplates.find((t) => t.id === templateId);
     if (template) {
       setAgentConfig({
         ...agentConfig,
         selectedTemplate: templateId,
         topicCategory: template.category,
         description: template.description,
-        instructions: template.instructionTemplate
-      })
+        instructions: template.instructionTemplate,
+      });
       // Clear validation errors when template is selected
       if (validationErrors.template) {
-        setValidationErrors({ ...validationErrors, template: '' })
+        setValidationErrors({ ...validationErrors, template: "" });
       }
     }
-  }
+  };
 
   const runAgentTest = async () => {
     // Simulate running tests
     const testScenarios = [
-      'Customer requests refund',
-      'Technical support inquiry',
-      'Billing dispute escalation'
-    ]
-    
-    const results = testScenarios.map(scenario => ({
+      "Customer requests refund",
+      "Technical support inquiry",
+      "Billing dispute escalation",
+    ];
+
+    const results = testScenarios.map((scenario) => ({
       scenario,
       passed: Math.random() > 0.2, // 80% pass rate
       response: `Agent handled ${scenario.toLowerCase()} appropriately with coaching guidelines`,
-      score: Math.floor(Math.random() * 30) + 70
-    }))
-    
+      score: Math.floor(Math.random() * 30) + 70,
+    }));
+
     setAgentConfig({
       ...agentConfig,
       testResults: results,
-      readyToActivate: results.every(r => r.passed)
-    })
-    
+      readyToActivate: results.every((r) => r.passed),
+    });
+
     if (validationErrors.testing) {
-      setValidationErrors({ ...validationErrors, testing: '' })
+      setValidationErrors({ ...validationErrors, testing: "" });
     }
-  }
+  };
 
   return (
     <div className="space-y-6">
@@ -789,9 +948,14 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
               <div className="h-8 w-8 rounded bg-primary flex items-center justify-center">
                 <Target className="h-4 w-4 text-primary-foreground" />
               </div>
-              <h1 className="text-xl font-semibold text-foreground">OmniHive Coaching and Training</h1>
+              <h1 className="text-xl font-semibold text-foreground">
+                OmniHive Coaching and Training
+              </h1>
             </div>
-            <Badge variant="secondary" className="bg-purple-100 text-purple-800 font-medium">
+            <Badge
+              variant="secondary"
+              className="bg-purple-100 text-purple-800 font-medium"
+            >
               Admin View
             </Badge>
           </div>
@@ -811,16 +975,24 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
       </header>
 
       <div className="p-6">
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+        <Tabs
+          value={activeTab}
+          onValueChange={setActiveTab}
+          className="space-y-6"
+        >
           <div className="flex items-center justify-between">
             <TabsList className="grid w-full grid-cols-4 lg:w-[600px] bg-zinc-100">
               <TabsTrigger value="overview">System Overview</TabsTrigger>
-              <TabsTrigger value="agents">AI Agent Management</TabsTrigger>
               <TabsTrigger value="orchestrator">Overall LLM Agent</TabsTrigger>
+              <TabsTrigger value="agents">AI Agent Management</TabsTrigger>
+
               <TabsTrigger value="training">Training History</TabsTrigger>
             </TabsList>
 
-            <Dialog open={isCreateWizardOpen} onOpenChange={setIsCreateWizardOpen}>
+            <Dialog
+              open={isCreateWizardOpen}
+              onOpenChange={setIsCreateWizardOpen}
+            >
               <DialogTrigger asChild>
                 <Button>
                   <Plus className="h-4 w-4 mr-2" />
@@ -834,9 +1006,10 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                     Smart Agent Creation Wizard
                   </DialogTitle>
                   <DialogDescription>
-                    Create and configure a new AI coaching agent with guided templates and intelligent suggestions
+                    Create and configure a new AI coaching agent with guided
+                    templates and intelligent suggestions
                   </DialogDescription>
-                  
+
                   {/* Progress Indicator */}
                   <div className="flex items-center justify-center mt-4">
                     <div className="flex items-center space-x-2">
@@ -845,18 +1018,22 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                           <div
                             className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
                               step === wizardStep
-                                ? 'bg-primary text-primary-foreground'
+                                ? "bg-primary text-primary-foreground"
                                 : step < wizardStep
-                                ? 'bg-chart-4 text-white'
-                                : 'bg-muted text-muted-foreground'
+                                  ? "bg-chart-4 text-white"
+                                  : "bg-muted text-muted-foreground"
                             }`}
                           >
-                            {step < wizardStep ? <Check className="h-4 w-4" /> : step}
+                            {step < wizardStep ? (
+                              <Check className="h-4 w-4" />
+                            ) : (
+                              step
+                            )}
                           </div>
                           {step < 4 && (
                             <div
                               className={`w-8 h-0.5 ${
-                                step < wizardStep ? 'bg-chart-4' : 'bg-muted'
+                                step < wizardStep ? "bg-chart-4" : "bg-muted"
                               }`}
                             />
                           )}
@@ -864,14 +1041,16 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                       ))}
                     </div>
                   </div>
-                  
+
                   <div className="text-center text-sm text-muted-foreground mt-2">
-                    Step {wizardStep} of 4: {
-                      wizardStep === 1 ? 'Start from Scratch' :
-                      wizardStep === 2 ? 'Documents' :
-                      wizardStep === 3 ? 'Instructions' :
-                      'Test & Activate'
-                    }
+                    Step {wizardStep} of 4:{" "}
+                    {wizardStep === 1
+                      ? "Start from Scratch"
+                      : wizardStep === 2
+                        ? "Documents"
+                        : wizardStep === 3
+                          ? "Instructions"
+                          : "Test & Activate"}
                   </div>
                 </DialogHeader>
 
@@ -880,8 +1059,13 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                   {wizardStep === 1 && (
                     <div className="space-y-6">
                       <div className="text-center">
-                        <h3 className="text-lg font-semibold mb-2">Start from Scratch</h3>
-                        <p className="text-muted-foreground">Build a completely custom agent with full control over all configurations.</p>
+                        <h3 className="text-lg font-semibold mb-2">
+                          Start from Scratch
+                        </h3>
+                        <p className="text-muted-foreground">
+                          Build a completely custom agent with full control over
+                          all configurations.
+                        </p>
                       </div>
 
                       <Card>
@@ -894,25 +1078,47 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                                 placeholder="e.g., Billing Support Assistant"
                                 value={agentConfig.agentName}
                                 onChange={(e) => {
-                                  setAgentConfig({...agentConfig, agentName: e.target.value})
-                                  if (validationErrors.agentName && e.target.value.trim()) {
-                                    setValidationErrors({ ...validationErrors, agentName: '' })
+                                  setAgentConfig({
+                                    ...agentConfig,
+                                    agentName: e.target.value,
+                                  });
+                                  if (
+                                    validationErrors.agentName &&
+                                    e.target.value.trim()
+                                  ) {
+                                    setValidationErrors({
+                                      ...validationErrors,
+                                      agentName: "",
+                                    });
                                   }
                                 }}
-                                className={validationErrors.agentName ? 'border-destructive' : ''}
+                                className={
+                                  validationErrors.agentName
+                                    ? "border-destructive"
+                                    : ""
+                                }
                               />
                               {validationErrors.agentName && (
-                                <p className="text-sm text-destructive">{validationErrors.agentName}</p>
+                                <p className="text-sm text-destructive">
+                                  {validationErrors.agentName}
+                                </p>
                               )}
                             </div>
 
                             <div className="space-y-2">
-                              <Label htmlFor="topicCategory">Topic Category</Label>
+                              <Label htmlFor="topicCategory">
+                                Topic Category
+                              </Label>
                               <Input
                                 id="topicCategory"
                                 placeholder="e.g., Financial Services"
                                 value={agentConfig.topicCategory}
-                                onChange={(e) => setAgentConfig({...agentConfig, topicCategory: e.target.value})}
+                                onChange={(e) =>
+                                  setAgentConfig({
+                                    ...agentConfig,
+                                    topicCategory: e.target.value,
+                                  })
+                                }
                               />
                             </div>
 
@@ -924,15 +1130,30 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                                 rows={3}
                                 value={agentConfig.description}
                                 onChange={(e) => {
-                                  setAgentConfig({...agentConfig, description: e.target.value})
-                                  if (validationErrors.description && e.target.value.trim()) {
-                                    setValidationErrors({ ...validationErrors, description: '' })
+                                  setAgentConfig({
+                                    ...agentConfig,
+                                    description: e.target.value,
+                                  });
+                                  if (
+                                    validationErrors.description &&
+                                    e.target.value.trim()
+                                  ) {
+                                    setValidationErrors({
+                                      ...validationErrors,
+                                      description: "",
+                                    });
                                   }
                                 }}
-                                className={validationErrors.description ? 'border-destructive' : ''}
+                                className={
+                                  validationErrors.description
+                                    ? "border-destructive"
+                                    : ""
+                                }
                               />
                               {validationErrors.description && (
-                                <p className="text-sm text-destructive">{validationErrors.description}</p>
+                                <p className="text-sm text-destructive">
+                                  {validationErrors.description}
+                                </p>
                               )}
                             </div>
                           </div>
@@ -947,8 +1168,13 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                   {wizardStep === 2 && (
                     <div className="space-y-6">
                       <div>
-                        <h3 className="text-lg font-semibold mb-2">Knowledge Base Documents</h3>
-                        <p className="text-muted-foreground">Upload documents to train your agent with relevant knowledge</p>
+                        <h3 className="text-lg font-semibold mb-2">
+                          Knowledge Base Documents
+                        </h3>
+                        <p className="text-muted-foreground">
+                          Upload documents to train your agent with relevant
+                          knowledge
+                        </p>
                       </div>
 
                       <div className="space-y-4">
@@ -957,12 +1183,21 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                             {validationErrors.documents}
                           </div>
                         )}
-                        <div className={`border-2 border-dashed rounded-lg p-8 text-center ${
-                          validationErrors.documents ? 'border-destructive/50' : 'border-muted-foreground/25'
-                        }`}>
+                        <div
+                          className={`border-2 border-dashed rounded-lg p-8 text-center ${
+                            validationErrors.documents
+                              ? "border-destructive/50"
+                              : "border-muted-foreground/25"
+                          }`}
+                        >
                           <Upload className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                          <Label htmlFor="fileUpload" className="cursor-pointer">
-                            <span className="text-lg font-medium">Upload Documents</span>
+                          <Label
+                            htmlFor="fileUpload"
+                            className="cursor-pointer"
+                          >
+                            <span className="text-lg font-medium">
+                              Upload Documents
+                            </span>
                             <p className="text-sm text-muted-foreground mt-1">
                               Drag & drop files here, or click to browse
                             </p>
@@ -990,21 +1225,45 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                                     <div className="flex items-start gap-3">
                                       <FileText className="h-5 w-5 text-primary mt-1" />
                                       <div className="flex-1">
-                                        <h5 className="font-medium">{doc.name}</h5>
+                                        <h5 className="font-medium">
+                                          {doc.name}
+                                        </h5>
                                         <p className="text-sm text-muted-foreground">
-                                          {doc.type.charAt(0).toUpperCase() + doc.type.slice(1)} • {doc.size}
+                                          {doc.type.charAt(0).toUpperCase() +
+                                            doc.type.slice(1)}{" "}
+                                          • {doc.size}
                                         </p>
-                                        
+
                                         <div className="flex items-center gap-4 mt-2">
                                           <div className="flex items-center gap-2">
-                                            <span className="text-xs text-muted-foreground">Quality:</span>
-                                            <Badge variant={doc.qualityScore >= 90 ? "default" : doc.qualityScore >= 70 ? "secondary" : "destructive"}>
+                                            <span className="text-xs text-muted-foreground">
+                                              Quality:
+                                            </span>
+                                            <Badge
+                                              variant={
+                                                doc.qualityScore >= 90
+                                                  ? "default"
+                                                  : doc.qualityScore >= 70
+                                                    ? "secondary"
+                                                    : "destructive"
+                                              }
+                                            >
                                               {doc.qualityScore}/100
                                             </Badge>
                                           </div>
                                           <div className="flex items-center gap-2">
-                                            <span className="text-xs text-muted-foreground">Relevance:</span>
-                                            <Badge variant={doc.relevanceScore >= 90 ? "default" : doc.relevanceScore >= 70 ? "secondary" : "destructive"}>
+                                            <span className="text-xs text-muted-foreground">
+                                              Relevance:
+                                            </span>
+                                            <Badge
+                                              variant={
+                                                doc.relevanceScore >= 90
+                                                  ? "default"
+                                                  : doc.relevanceScore >= 70
+                                                    ? "secondary"
+                                                    : "destructive"
+                                              }
+                                            >
                                               {doc.relevanceScore}/100
                                             </Badge>
                                           </div>
@@ -1014,17 +1273,26 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                                           <div className="mt-3">
                                             <div className="flex items-center gap-2 mb-2">
                                               <Lightbulb className="h-4 w-4 text-amber-500" />
-                                              <span className="text-sm font-medium">Suggestions</span>
+                                              <span className="text-sm font-medium">
+                                                Suggestions
+                                              </span>
                                             </div>
-                                            {doc.suggestions.map((suggestion, index) => (
-                                              <p key={index} className="text-sm text-muted-foreground">• {suggestion}</p>
-                                            ))}
+                                            {doc.suggestions.map(
+                                              (suggestion, index) => (
+                                                <p
+                                                  key={index}
+                                                  className="text-sm text-muted-foreground"
+                                                >
+                                                  • {suggestion}
+                                                </p>
+                                              ),
+                                            )}
                                           </div>
                                         )}
                                       </div>
                                     </div>
-                                    <Button 
-                                      variant="ghost" 
+                                    <Button
+                                      variant="ghost"
                                       size="sm"
                                       onClick={() => removeDocument(doc.id)}
                                     >
@@ -1044,8 +1312,12 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                   {wizardStep === 3 && (
                     <div className="space-y-6">
                       <div>
-                        <h3 className="text-lg font-semibold mb-2">Coaching Instructions</h3>
-                        <p className="text-muted-foreground">Configure how your agent should coach and respond</p>
+                        <h3 className="text-lg font-semibold mb-2">
+                          Coaching Instructions
+                        </h3>
+                        <p className="text-muted-foreground">
+                          Configure how your agent should coach and respond
+                        </p>
                       </div>
 
                       <div className="space-y-6">
@@ -1063,26 +1335,62 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                             onChange={(e) => {
                               setAgentConfig({
                                 ...agentConfig,
-                                instructions: {...agentConfig.instructions, generalApproach: e.target.value}
-                              })
-                              if (validationErrors.instructions && e.target.value.trim()) {
-                                setValidationErrors({ ...validationErrors, instructions: '' })
+                                instructions: {
+                                  ...agentConfig.instructions,
+                                  generalApproach: e.target.value,
+                                },
+                              });
+                              if (
+                                validationErrors.instructions &&
+                                e.target.value.trim()
+                              ) {
+                                setValidationErrors({
+                                  ...validationErrors,
+                                  instructions: "",
+                                });
                               }
                             }}
-                            className={validationErrors.instructions ? 'border-destructive' : ''}
+                            className={
+                              validationErrors.instructions
+                                ? "border-destructive"
+                                : ""
+                            }
                           />
                         </div>
                         <div className="space-y-2">
                           <div className="rounded-md border bg-muted/20 p-3">
-                            <p className="text-sm font-medium mb-1">Sample instructions and guidelines</p>
+                            <p className="text-sm font-medium mb-1">
+                              Sample instructions and guidelines
+                            </p>
                             <ul className="list-disc pl-5 space-y-1 text-sm text-muted-foreground">
-                              <li>Tone: empathetic, professional, concise. Avoid jargon unless explained.</li>
-                              <li>Structure: greet, confirm context, propose solution, confirm resolution, close.</li>
-                              <li>Must do: verify identity before account details; summarize next steps.</li>
-                              <li>Must avoid: promising refunds without approval; sharing other customers' data.</li>
-                              <li>Compliance: follow PCI/GDPR; never store full card numbers.</li>
-                              <li>Escalation: transfer if security concern or out-of-policy request.</li>
-                              <li>Example phrase: "I understand how frustrating this is; here’s what I can do right now…"</li>
+                              <li>
+                                Tone: empathetic, professional, concise. Avoid
+                                jargon unless explained.
+                              </li>
+                              <li>
+                                Structure: greet, confirm context, propose
+                                solution, confirm resolution, close.
+                              </li>
+                              <li>
+                                Must do: verify identity before account details;
+                                summarize next steps.
+                              </li>
+                              <li>
+                                Must avoid: promising refunds without approval;
+                                sharing other customers' data.
+                              </li>
+                              <li>
+                                Compliance: follow PCI/GDPR; never store full
+                                card numbers.
+                              </li>
+                              <li>
+                                Escalation: transfer if security concern or
+                                out-of-policy request.
+                              </li>
+                              <li>
+                                Example phrase: "I understand how frustrating
+                                this is; here’s what I can do right now…"
+                              </li>
                             </ul>
                           </div>
                         </div>
@@ -1094,42 +1402,69 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                   {wizardStep === 4 && (
                     <div className="space-y-6">
                       <div>
-                        <h3 className="text-lg font-semibold mb-2">Review & Save</h3>
-                        <p className="text-muted-foreground">Review details and save the agent</p>
+                        <h3 className="text-lg font-semibold mb-2">
+                          Review & Save
+                        </h3>
+                        <p className="text-muted-foreground">
+                          Review details and save the agent
+                        </p>
                       </div>
                       <Card>
                         <CardHeader>
-                          <CardTitle className="text-base">Agent Preview</CardTitle>
+                          <CardTitle className="text-base">
+                            Agent Preview
+                          </CardTitle>
                         </CardHeader>
                         <CardContent>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                              <Label className="text-sm font-medium">Name</Label>
-                              <p className="text-sm">{agentConfig.agentName || 'Untitled Agent'}</p>
+                              <Label className="text-sm font-medium">
+                                Name
+                              </Label>
+                              <p className="text-sm">
+                                {agentConfig.agentName || "Untitled Agent"}
+                              </p>
                             </div>
                             <div>
-                              <Label className="text-sm font-medium">Category</Label>
-                              <p className="text-sm">{agentConfig.topicCategory || 'General'}</p>
+                              <Label className="text-sm font-medium">
+                                Category
+                              </Label>
+                              <p className="text-sm">
+                                {agentConfig.topicCategory || "General"}
+                              </p>
                             </div>
                             <div>
-                              <Label className="text-sm font-medium">Documents</Label>
-                              <p className="text-sm">{agentConfig.documents.length} document(s) uploaded</p>
+                              <Label className="text-sm font-medium">
+                                Documents
+                              </Label>
+                              <p className="text-sm">
+                                {agentConfig.documents.length} document(s)
+                                uploaded
+                              </p>
                             </div>
                             <div className="md:col-span-2">
-                              <Label className="text-sm font-medium">Instructions</Label>
-                              <p className="text-sm whitespace-pre-wrap">{agentConfig.instructions.generalApproach || 'No instructions provided'}</p>
+                              <Label className="text-sm font-medium">
+                                Instructions
+                              </Label>
+                              <p className="text-sm whitespace-pre-wrap">
+                                {agentConfig.instructions.generalApproach ||
+                                  "No instructions provided"}
+                              </p>
                             </div>
                           </div>
                         </CardContent>
                       </Card>
-                      
+
                       {agentConfig.readyToActivate && (
                         <Card className="border-chart-4">
                           <CardContent className="p-6 text-center">
                             <CheckCircle className="h-12 w-12 text-chart-4 mx-auto mb-4" />
-                            <h4 className="font-semibold mb-2 text-chart-4">Ready for Activation</h4>
+                            <h4 className="font-semibold mb-2 text-chart-4">
+                              Ready for Activation
+                            </h4>
                             <p className="text-muted-foreground mb-4">
-                              All tests passed! Your agent is ready to be activated and start coaching.
+                              All tests passed! Your agent is ready to be
+                              activated and start coaching.
                             </p>
                           </CardContent>
                         </Card>
@@ -1140,8 +1475,8 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
 
                 <DialogFooter className="flex justify-between">
                   <div className="flex gap-2">
-                    <Button 
-                      variant="outline" 
+                    <Button
+                      variant="outline"
                       onClick={() => setIsCreateWizardOpen(false)}
                     >
                       Cancel
@@ -1153,19 +1488,20 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                       </Button>
                     )}
                   </div>
-                  
+
                   <div className="flex gap-2">
                     {wizardStep < 4 ? (
-                      <Button 
-                        onClick={nextStep}
-                      >
+                      <Button onClick={nextStep}>
                         Next
                         <ChevronRight className="h-4 w-4 ml-2" />
                       </Button>
                     ) : (
-                      <Button 
+                      <Button
                         onClick={handleCreateAgent}
-                        disabled={!agentConfig.agentName.trim() || !agentConfig.description.trim()}
+                        disabled={
+                          !agentConfig.agentName.trim() ||
+                          !agentConfig.description.trim()
+                        }
                       >
                         <Save className="h-4 w-4 mr-2" />
                         Save Agent
@@ -1182,45 +1518,65 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Total AI Agents</CardTitle>
+                  <CardTitle className="text-sm font-medium">
+                    Total AI Agents
+                  </CardTitle>
                   <Bot className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{systemStats.totalAgents}</div>
-                  <p className="text-xs text-muted-foreground">{systemStats.activeAgents} active</p>
+                  <div className="text-2xl font-bold">
+                    {systemStats.totalAgents}
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    {systemStats.activeAgents} active
+                  </p>
                 </CardContent>
               </Card>
 
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Total Interactions</CardTitle>
+                  <CardTitle className="text-sm font-medium">
+                    Total Interactions
+                  </CardTitle>
                   <Activity className="h-4 w-4 text-chart-1" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{systemStats.totalInteractions.toLocaleString()}</div>
+                  <div className="text-2xl font-bold">
+                    {systemStats.totalInteractions.toLocaleString()}
+                  </div>
                   <p className="text-xs text-muted-foreground">This month</p>
                 </CardContent>
               </Card>
 
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Average Accuracy</CardTitle>
+                  <CardTitle className="text-sm font-medium">
+                    Average Accuracy
+                  </CardTitle>
                   <Brain className="h-4 w-4 text-chart-4" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{systemStats.avgAccuracy}%</div>
-                  <p className="text-xs text-muted-foreground">Across all agents</p>
+                  <div className="text-2xl font-bold">
+                    {systemStats.avgAccuracy}%
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Across all agents
+                  </p>
                 </CardContent>
               </Card>
 
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Knowledge Base Size</CardTitle>
+                  <CardTitle className="text-sm font-medium">
+                    Knowledge Base Size
+                  </CardTitle>
                   <Database className="h-4 w-4 text-chart-2" />
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">8.7 MB</div>
-                  <p className="text-xs text-muted-foreground">Total storage used</p>
+                  <p className="text-xs text-muted-foreground">
+                    Total storage used
+                  </p>
                 </CardContent>
               </Card>
             </div>
@@ -1229,7 +1585,9 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
             <Card>
               <CardHeader>
                 <CardTitle>Recent System Activity</CardTitle>
-                <CardDescription>Latest updates and training activities</CardDescription>
+                <CardDescription>
+                  Latest updates and training activities
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
@@ -1238,8 +1596,12 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                       <CheckCircle className="h-4 w-4 text-chart-4" />
                     </div>
                     <div className="flex-1">
-                      <p className="text-sm font-medium">Product Support agent training completed</p>
-                      <p className="text-xs text-muted-foreground">2 hours ago • Accuracy improved to 87%</p>
+                      <p className="text-sm font-medium">
+                        Product Support agent training completed
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        2 hours ago • Accuracy improved to 87%
+                      </p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
@@ -1247,8 +1609,12 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                       <Upload className="h-4 w-4 text-chart-1" />
                     </div>
                     <div className="flex-1">
-                      <p className="text-sm font-medium">New knowledge base uploaded for Billing Inquiries</p>
-                      <p className="text-xs text-muted-foreground">1 day ago • 1.2 MB added</p>
+                      <p className="text-sm font-medium">
+                        New knowledge base uploaded for Billing Inquiries
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        1 day ago • 1.2 MB added
+                      </p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
@@ -1256,8 +1622,12 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                       <Plus className="h-4 w-4 text-chart-2" />
                     </div>
                     <div className="flex-1">
-                      <p className="text-sm font-medium">Refunds & Returns agent created</p>
-                      <p className="text-xs text-muted-foreground">3 days ago • Initial training in progress</p>
+                      <p className="text-sm font-medium">
+                        Refunds & Returns agent created
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        3 days ago • Initial training in progress
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -1268,8 +1638,12 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
           <TabsContent value="agents" className="space-y-6">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-2xl font-bold text-foreground">AI Agent Management</h2>
-                <p className="text-muted-foreground">Manage your AI coaching agents and their configurations</p>
+                <h2 className="text-2xl font-bold text-foreground">
+                  AI Agent Management
+                </h2>
+                <p className="text-muted-foreground">
+                  Manage your AI coaching agents and their configurations
+                </p>
               </div>
             </div>
 
@@ -1283,11 +1657,17 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                           <Bot className="h-6 w-6 text-primary" />
                         </div>
                         <div>
-                          <h3 className="font-semibold text-foreground">{agent.intentName}</h3>
-                          <p className="text-sm text-muted-foreground">{agent.description}</p>
+                          <h3 className="font-semibold text-foreground">
+                            {agent.intentName}
+                          </h3>
+                          <p className="text-sm text-muted-foreground">
+                            {agent.description}
+                          </p>
                           <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
                             <span>Last updated: {agent.lastUpdated}</span>
-                            <span>Knowledge base: {agent.knowledgeBaseSize}</span>
+                            <span>
+                              Knowledge base: {agent.knowledgeBaseSize}
+                            </span>
                             <span>Usage: {agent.usageCount} interactions</span>
                           </div>
                         </div>
@@ -1303,19 +1683,36 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                                 : "outline"
                           }
                         >
-                          {agent.status === "active" && <CheckCircle className="h-3 w-3 mr-1" />}
-                          {agent.status === "training" && <Clock className="h-3 w-3 mr-1" />}
-                          {agent.status === "inactive" && <AlertCircle className="h-3 w-3 mr-1" />}
-                          {agent.status.charAt(0).toUpperCase() + agent.status.slice(1)}
+                          {agent.status === "active" && (
+                            <CheckCircle className="h-3 w-3 mr-1" />
+                          )}
+                          {agent.status === "training" && (
+                            <Clock className="h-3 w-3 mr-1" />
+                          )}
+                          {agent.status === "inactive" && (
+                            <AlertCircle className="h-3 w-3 mr-1" />
+                          )}
+                          {agent.status.charAt(0).toUpperCase() +
+                            agent.status.slice(1)}
                         </Badge>
 
                         <div className="flex gap-2">
-                          <Button variant="outline" size="sm" onClick={() => startEditAgent(agent.id)}>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => startEditAgent(agent.id)}
+                          >
                             <Edit className="h-4 w-4 mr-2" />
                             Edit
                           </Button>
-                          <Button variant="outline" size="sm" onClick={() => toggleAgentStatus(agent.id)}>
-                            {agent.status === 'active' ? 'Deactivate' : 'Activate'}
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => toggleAgentStatus(agent.id)}
+                          >
+                            {agent.status === "active"
+                              ? "Deactivate"
+                              : "Activate"}
                           </Button>
                           <Button
                             variant="outline"
@@ -1336,16 +1733,24 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
           <TabsContent value="orchestrator" className="space-y-6">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-2xl font-bold text-foreground">Overall LLM Agent</h2>
-                <p className="text-muted-foreground">Configure and manage the orchestrator that routes contacts to specialized agents</p>
+                <h2 className="text-2xl font-bold text-foreground">
+                  Overall LLM Agent
+                </h2>
+                <p className="text-muted-foreground">
+                  Configure and manage the orchestrator that routes contacts to
+                  specialized agents
+                </p>
               </div>
               <div className="flex gap-2">
-                <Button 
-                  variant={orchestratorConfig.isActive ? "destructive" : "default"}
+                <Button
+                  variant={
+                    orchestratorConfig.isActive ? "destructive" : "default"
+                  }
                   onClick={toggleOrchestratorStatus}
                 >
                   <Brain className="h-4 w-4 mr-2" />
-                  {orchestratorConfig.isActive ? 'Deactivate' : 'Activate'} Orchestrator
+                  {orchestratorConfig.isActive ? "Deactivate" : "Activate"}{" "}
+                  Orchestrator
                 </Button>
               </div>
             </div>
@@ -1358,7 +1763,8 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                   Orchestrator Configuration
                 </CardTitle>
                 <CardDescription>
-                  Configure the overall agent that handles intent detection and routing
+                  Configure the overall agent that handles intent detection and
+                  routing
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
@@ -1369,22 +1775,33 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                       <Input
                         id="orchestrator-name"
                         value={orchestratorConfig.agentName}
-                        onChange={(e) => setOrchestratorConfig({
-                          ...orchestratorConfig,
-                          agentName: e.target.value
-                        })}
+                        onChange={(e) =>
+                          setOrchestratorConfig({
+                            ...orchestratorConfig,
+                            agentName: e.target.value,
+                          })
+                        }
                         placeholder="OmniHive Orchestrator"
                       />
                     </div>
-                    
+
                     <div className="space-y-2">
                       <Label>Status</Label>
                       <div className="flex items-center gap-2">
-                        <Badge variant={orchestratorConfig.isActive ? "default" : "secondary"}>
-                          {orchestratorConfig.isActive ? 'Active' : 'Inactive'}
+                        <Badge
+                          variant={
+                            orchestratorConfig.isActive
+                              ? "default"
+                              : "secondary"
+                          }
+                        >
+                          {orchestratorConfig.isActive ? "Active" : "Inactive"}
                         </Badge>
                         <span className="text-sm text-muted-foreground">
-                          Last updated: {new Date(orchestratorConfig.lastUpdated).toLocaleString()}
+                          Last updated:{" "}
+                          {new Date(
+                            orchestratorConfig.lastUpdated,
+                          ).toLocaleString()}
                         </span>
                       </div>
                     </div>
@@ -1396,12 +1813,24 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                       <div className="border rounded-lg p-3 space-y-2">
                         <div className="flex items-center justify-between">
                           <span className="text-sm">Documents Loaded:</span>
-                          <Badge variant="outline">{orchestratorConfig.documentsCount}</Badge>
+                          <Badge variant="outline">
+                            {orchestratorConfig.documentsCount}
+                          </Badge>
                         </div>
                         <div className="flex items-center justify-between">
                           <span className="text-sm">Vector Database:</span>
-                          <Badge variant={businessDocuments.some(doc => doc.vectorEmbedded) ? "default" : "secondary"}>
-                            {businessDocuments.some(doc => doc.vectorEmbedded) ? 'Ready' : 'Empty'}
+                          <Badge
+                            variant={
+                              businessDocuments.some(
+                                (doc) => doc.vectorEmbedded,
+                              )
+                                ? "default"
+                                : "secondary"
+                            }
+                          >
+                            {businessDocuments.some((doc) => doc.vectorEmbedded)
+                              ? "Ready"
+                              : "Empty"}
                           </Badge>
                         </div>
                       </div>
@@ -1410,19 +1839,24 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="instruction-set">Global Instruction Set</Label>
+                  <Label htmlFor="instruction-set">
+                    Global Instruction Set
+                  </Label>
                   <Textarea
                     id="instruction-set"
                     rows={4}
                     value={orchestratorConfig.instructionSet}
-                    onChange={(e) => setOrchestratorConfig({
-                      ...orchestratorConfig,
-                      instructionSet: e.target.value
-                    })}
+                    onChange={(e) =>
+                      setOrchestratorConfig({
+                        ...orchestratorConfig,
+                        instructionSet: e.target.value,
+                      })
+                    }
                     placeholder="Define global rules and policies for the orchestrator..."
                   />
                   <p className="text-sm text-muted-foreground">
-                    These instructions will guide how the orchestrator analyzes contacts and makes routing decisions.
+                    These instructions will guide how the orchestrator analyzes
+                    contacts and makes routing decisions.
                   </p>
                 </div>
 
@@ -1443,7 +1877,8 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                   Business Documents
                 </CardTitle>
                 <CardDescription>
-                  Upload and manage business-wide documents for the orchestrator's knowledge base
+                  Upload and manage business-wide documents for the
+                  orchestrator's knowledge base
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -1451,7 +1886,9 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                   <div className="text-center space-y-2">
                     <Upload className="h-8 w-8 mx-auto text-muted-foreground" />
                     <div>
-                      <p className="text-sm font-medium">Upload Business Documents</p>
+                      <p className="text-sm font-medium">
+                        Upload Business Documents
+                      </p>
                       <p className="text-xs text-muted-foreground">
                         Supports PDF, DOCX, and TXT files
                       </p>
@@ -1461,17 +1898,19 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                       multiple
                       accept=".pdf,.docx,.txt"
                       onChange={(e) => {
-                        const files = Array.from(e.target.files || [])
+                        const files = Array.from(e.target.files || []);
                         if (files.length > 0) {
-                          handleBusinessDocumentUpload(files)
+                          handleBusinessDocumentUpload(files);
                         }
                       }}
                       className="hidden"
                       id="document-upload"
                     />
-                    <Button 
-                      variant="outline" 
-                      onClick={() => document.getElementById('document-upload')?.click()}
+                    <Button
+                      variant="outline"
+                      onClick={() =>
+                        document.getElementById("document-upload")?.click()
+                      }
                       disabled={isUploadingDoc}
                     >
                       {isUploadingDoc ? (
@@ -1491,10 +1930,15 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
 
                 {businessDocuments.length > 0 && (
                   <div className="space-y-3">
-                    <h4 className="font-medium">Uploaded Documents ({businessDocuments.length})</h4>
+                    <h4 className="font-medium">
+                      Uploaded Documents ({businessDocuments.length})
+                    </h4>
                     <div className="grid gap-3">
                       {businessDocuments.map((doc) => (
-                        <div key={doc.id} className="flex items-center justify-between p-3 border rounded-lg">
+                        <div
+                          key={doc.id}
+                          className="flex items-center justify-between p-3 border rounded-lg"
+                        >
                           <div className="flex items-center gap-3">
                             <FileText className="h-5 w-5 text-muted-foreground" />
                             <div>
@@ -1504,11 +1948,21 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                                 <span>•</span>
                                 <span>Uploaded {doc.uploadDate}</span>
                                 <span>•</span>
-                                <Badge 
-                                  variant={doc.status === 'ready' ? 'default' : doc.status === 'processing' ? 'secondary' : 'destructive'}
+                                <Badge
+                                  variant={
+                                    doc.status === "ready"
+                                      ? "default"
+                                      : doc.status === "processing"
+                                        ? "secondary"
+                                        : "destructive"
+                                  }
                                   className="text-xs"
                                 >
-                                  {doc.status === 'ready' ? 'Ready' : doc.status === 'processing' ? 'Processing' : 'Error'}
+                                  {doc.status === "ready"
+                                    ? "Ready"
+                                    : doc.status === "processing"
+                                      ? "Processing"
+                                      : "Error"}
                                 </Badge>
                               </div>
                             </div>
@@ -1520,8 +1974,8 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                                 Embedded
                               </Badge>
                             )}
-                            <Button 
-                              variant="ghost" 
+                            <Button
+                              variant="ghost"
                               size="sm"
                               onClick={() => removeBusinessDocument(doc.id)}
                             >
@@ -1544,31 +1998,53 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                   Routing Analytics
                 </CardTitle>
                 <CardDescription>
-                  Monitor how contacts are being routed and analyzed by the orchestrator
+                  Monitor how contacts are being routed and analyzed by the
+                  orchestrator
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 {/* Quick Stats */}
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                   <div className="border rounded-lg p-4 text-center">
-                    <div className="text-2xl font-bold text-primary">{routingAnalytics.totalContacts}</div>
-                    <div className="text-sm text-muted-foreground">Total Contacts</div>
+                    <div className="text-2xl font-bold text-primary">
+                      {routingAnalytics.totalContacts}
+                    </div>
+                    <div className="text-sm text-muted-foreground">
+                      Total Contacts
+                    </div>
                   </div>
                   <div className="border rounded-lg p-4 text-center">
                     <div className="text-2xl font-bold text-chart-4">
-                      {routingAnalytics.routedToAgents.reduce((sum, agent) => sum + agent.count, 0)}
+                      {routingAnalytics.routedToAgents.reduce(
+                        (sum, agent) => sum + agent.count,
+                        0,
+                      )}
                     </div>
-                    <div className="text-sm text-muted-foreground">Successfully Routed</div>
+                    <div className="text-sm text-muted-foreground">
+                      Successfully Routed
+                    </div>
                   </div>
                   <div className="border rounded-lg p-4 text-center">
-                    <div className="text-2xl font-bold text-amber-500">{routingAnalytics.fallbackCases.count}</div>
-                    <div className="text-sm text-muted-foreground">Fallback Cases</div>
+                    <div className="text-2xl font-bold text-amber-500">
+                      {routingAnalytics.fallbackCases.count}
+                    </div>
+                    <div className="text-sm text-muted-foreground">
+                      Fallback Cases
+                    </div>
                   </div>
                   <div className="border rounded-lg p-4 text-center">
                     <div className="text-2xl font-bold text-chart-2">
-                      {((routingAnalytics.totalContacts - routingAnalytics.fallbackCases.count) / routingAnalytics.totalContacts * 100).toFixed(1)}%
+                      {(
+                        ((routingAnalytics.totalContacts -
+                          routingAnalytics.fallbackCases.count) /
+                          routingAnalytics.totalContacts) *
+                        100
+                      ).toFixed(1)}
+                      %
                     </div>
-                    <div className="text-sm text-muted-foreground">Success Rate</div>
+                    <div className="text-sm text-muted-foreground">
+                      Success Rate
+                    </div>
                   </div>
                 </div>
 
@@ -1578,29 +2054,40 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                     <h4 className="font-medium mb-3">Routing by Agent</h4>
                     <div className="space-y-3">
                       {routingAnalytics.routedToAgents.map((agent, index) => (
-                        <div key={index} className="flex items-center justify-between">
+                        <div
+                          key={index}
+                          className="flex items-center justify-between"
+                        >
                           <span className="text-sm">{agent.agentName}</span>
                           <div className="flex items-center gap-2">
                             <div className="w-24 bg-muted rounded-full h-2">
-                              <div 
-                                className="bg-primary rounded-full h-2" 
+                              <div
+                                className="bg-primary rounded-full h-2"
                                 style={{ width: `${agent.percentage}%` }}
                               />
                             </div>
-                            <span className="text-sm font-medium w-12 text-right">{agent.count}</span>
+                            <span className="text-sm font-medium w-12 text-right">
+                              {agent.count}
+                            </span>
                           </div>
                         </div>
                       ))}
                       <div className="flex items-center justify-between border-t pt-2">
-                        <span className="text-sm text-amber-600">Fallback Cases</span>
+                        <span className="text-sm text-amber-600">
+                          Fallback Cases
+                        </span>
                         <div className="flex items-center gap-2">
                           <div className="w-24 bg-muted rounded-full h-2">
-                            <div 
-                              className="bg-amber-500 rounded-full h-2" 
-                              style={{ width: `${routingAnalytics.fallbackCases.percentage}%` }}
+                            <div
+                              className="bg-amber-500 rounded-full h-2"
+                              style={{
+                                width: `${routingAnalytics.fallbackCases.percentage}%`,
+                              }}
                             />
                           </div>
-                          <span className="text-sm font-medium w-12 text-right">{routingAnalytics.fallbackCases.count}</span>
+                          <span className="text-sm font-medium w-12 text-right">
+                            {routingAnalytics.fallbackCases.count}
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -1609,20 +2096,27 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                   <div>
                     <h4 className="font-medium mb-3">Intent Distribution</h4>
                     <div className="space-y-3">
-                      {routingAnalytics.intentDistribution.map((intent, index) => (
-                        <div key={index} className="flex items-center justify-between">
-                          <span className="text-sm">{intent.intent}</span>
-                          <div className="flex items-center gap-2">
-                            <div className="w-24 bg-muted rounded-full h-2">
-                              <div 
-                                className="bg-chart-4 rounded-full h-2" 
-                                style={{ width: `${intent.percentage}%` }}
-                              />
+                      {routingAnalytics.intentDistribution.map(
+                        (intent, index) => (
+                          <div
+                            key={index}
+                            className="flex items-center justify-between"
+                          >
+                            <span className="text-sm">{intent.intent}</span>
+                            <div className="flex items-center gap-2">
+                              <div className="w-24 bg-muted rounded-full h-2">
+                                <div
+                                  className="bg-chart-4 rounded-full h-2"
+                                  style={{ width: `${intent.percentage}%` }}
+                                />
+                              </div>
+                              <span className="text-sm font-medium w-12 text-right">
+                                {intent.count}
+                              </span>
                             </div>
-                            <span className="text-sm font-medium w-12 text-right">{intent.count}</span>
                           </div>
-                        </div>
-                      ))}
+                        ),
+                      )}
                     </div>
                   </div>
                 </div>
@@ -1634,30 +2128,46 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                     <div className="flex items-center justify-between text-sm">
                       <div className="flex items-center gap-2">
                         <Route className="h-4 w-4 text-chart-4" />
-                        <span>Contact #12847 → <strong>Billing Support</strong></span>
+                        <span>
+                          Contact #12847 → <strong>Billing Support</strong>
+                        </span>
                       </div>
-                      <span className="text-muted-foreground">2 minutes ago</span>
+                      <span className="text-muted-foreground">
+                        2 minutes ago
+                      </span>
                     </div>
                     <div className="flex items-center justify-between text-sm">
                       <div className="flex items-center gap-2">
                         <Route className="h-4 w-4 text-chart-4" />
-                        <span>Contact #12846 → <strong>Technical Support</strong></span>
+                        <span>
+                          Contact #12846 → <strong>Technical Support</strong>
+                        </span>
                       </div>
-                      <span className="text-muted-foreground">5 minutes ago</span>
+                      <span className="text-muted-foreground">
+                        5 minutes ago
+                      </span>
                     </div>
                     <div className="flex items-center justify-between text-sm">
                       <div className="flex items-center gap-2">
                         <AlertCircle className="h-4 w-4 text-amber-500" />
-                        <span>Contact #12845 → <strong>Fallback (General)</strong></span>
+                        <span>
+                          Contact #12845 → <strong>Fallback (General)</strong>
+                        </span>
                       </div>
-                      <span className="text-muted-foreground">8 minutes ago</span>
+                      <span className="text-muted-foreground">
+                        8 minutes ago
+                      </span>
                     </div>
                     <div className="flex items-center justify-between text-sm">
                       <div className="flex items-center gap-2">
                         <Route className="h-4 w-4 text-chart-4" />
-                        <span>Contact #12844 → <strong>Account Management</strong></span>
+                        <span>
+                          Contact #12844 → <strong>Account Management</strong>
+                        </span>
                       </div>
-                      <span className="text-muted-foreground">12 minutes ago</span>
+                      <span className="text-muted-foreground">
+                        12 minutes ago
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -1668,8 +2178,12 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
           <TabsContent value="training" className="space-y-6">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-2xl font-bold text-foreground">Training History</h2>
-                <p className="text-muted-foreground">Track AI agent training sessions and performance improvements</p>
+                <h2 className="text-2xl font-bold text-foreground">
+                  Training History
+                </h2>
+                <p className="text-muted-foreground">
+                  Track AI agent training sessions and performance improvements
+                </p>
               </div>
               <Button variant="outline">
                 <Download className="h-4 w-4 mr-2" />
@@ -1683,7 +2197,9 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                   <div className="flex items-center justify-between">
                     <div>
                       <CardTitle>Product Support Agent</CardTitle>
-                      <CardDescription>Training completed 2 hours ago</CardDescription>
+                      <CardDescription>
+                        Training completed 2 hours ago
+                      </CardDescription>
                     </div>
                     <Badge variant="default">
                       <CheckCircle className="h-3 w-3 mr-1" />
@@ -1698,11 +2214,15 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                       <p className="text-2xl font-bold">2h 34m</p>
                     </div>
                     <div>
-                      <p className="text-sm font-medium">Accuracy Improvement</p>
+                      <p className="text-sm font-medium">
+                        Accuracy Improvement
+                      </p>
                       <p className="text-2xl font-bold text-chart-4">+3%</p>
                     </div>
                     <div>
-                      <p className="text-sm font-medium">Data Points Processed</p>
+                      <p className="text-sm font-medium">
+                        Data Points Processed
+                      </p>
                       <p className="text-2xl font-bold">1,247</p>
                     </div>
                   </div>
@@ -1714,7 +2234,9 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                   <div className="flex items-center justify-between">
                     <div>
                       <CardTitle>Billing Inquiries Agent</CardTitle>
-                      <CardDescription>Training completed 1 day ago</CardDescription>
+                      <CardDescription>
+                        Training completed 1 day ago
+                      </CardDescription>
                     </div>
                     <Badge variant="default">
                       <CheckCircle className="h-3 w-3 mr-1" />
@@ -1729,11 +2251,15 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                       <p className="text-2xl font-bold">1h 52m</p>
                     </div>
                     <div>
-                      <p className="text-sm font-medium">Accuracy Improvement</p>
+                      <p className="text-sm font-medium">
+                        Accuracy Improvement
+                      </p>
                       <p className="text-2xl font-bold text-chart-4">+5%</p>
                     </div>
                     <div>
-                      <p className="text-sm font-medium">Data Points Processed</p>
+                      <p className="text-sm font-medium">
+                        Data Points Processed
+                      </p>
                       <p className="text-2xl font-bold">892</p>
                     </div>
                   </div>
@@ -1745,7 +2271,9 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                   <div className="flex items-center justify-between">
                     <div>
                       <CardTitle>Refunds & Returns Agent</CardTitle>
-                      <CardDescription>Training failed 3 days ago</CardDescription>
+                      <CardDescription>
+                        Training failed 3 days ago
+                      </CardDescription>
                     </div>
                     <Badge variant="destructive">
                       <AlertCircle className="h-3 w-3 mr-1" />
@@ -1756,7 +2284,8 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                 <CardContent>
                   <div className="space-y-2">
                     <p className="text-sm text-muted-foreground">
-                      Training failed due to insufficient data quality. Please review and re-upload knowledge base.
+                      Training failed due to insufficient data quality. Please
+                      review and re-upload knowledge base.
                     </p>
                     <Button variant="outline" size="sm">
                       <RefreshCw className="h-4 w-4 mr-2" />
@@ -1770,5 +2299,5 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
         </Tabs>
       </div>
     </div>
-  )
+  );
 }
