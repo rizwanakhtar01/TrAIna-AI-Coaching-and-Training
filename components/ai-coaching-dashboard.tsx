@@ -1,11 +1,17 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Progress } from "@/components/ui/progress"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   TrendingUp,
   MessageSquare,
@@ -21,23 +27,23 @@ import {
   ArrowRight,
   Eye,
   LogOut,
-} from "lucide-react"
-import { ContactReviewsList } from "./contact-review-card"
-import { ChallengePatternsScreen } from "./challenge-patterns"
-import { SentimentTrendsScreen } from "./sentiment-trends"
-import { InteractiveCoachingScreen } from "./interactive-coaching"
+} from "lucide-react";
+import { ContactReviewsList } from "./contact-review-card";
+import { ChallengePatternsScreen } from "./challenge-patterns";
+import { SentimentTrendsScreen } from "./sentiment-trends";
+import { InteractiveCoachingScreen } from "./interactive-coaching";
 
 interface AiCoachingDashboardProps {
-  onLogout: () => void
+  onLogout: () => void;
 }
 
 export function AiCoachingDashboard({ onLogout }: AiCoachingDashboardProps) {
-  const [activeTab, setActiveTab] = useState("dashboard")
+  const [activeTab, setActiveTab] = useState("dashboard");
 
-  const navigateToReviews = () => setActiveTab("reviews")
-  const navigateToPatterns = () => setActiveTab("patterns")
-  const navigateToSentiment = () => setActiveTab("sentiment")
-  const navigateToCoaching = () => setActiveTab("coaching")
+  const navigateToReviews = () => setActiveTab("reviews");
+  const navigateToPatterns = () => setActiveTab("patterns");
+  const navigateToSentiment = () => setActiveTab("sentiment");
+  const navigateToCoaching = () => setActiveTab("coaching");
 
   return (
     <div className="space-y-6">
@@ -49,9 +55,14 @@ export function AiCoachingDashboard({ onLogout }: AiCoachingDashboardProps) {
               <div className="h-8 w-8 rounded bg-primary flex items-center justify-center">
                 <Target className="h-4 w-4 text-primary-foreground" />
               </div>
-              <h1 className="text-xl font-semibold text-foreground">OmniHive Coaching and Training</h1>
+              <h1 className="text-xl font-semibold text-foreground">
+                TrAIna Coaching and Training
+              </h1>
             </div>
-            <Badge variant="secondary" className="bg-accent/20 text-accent-foreground font-medium">
+            <Badge
+              variant="secondary"
+              className="bg-accent/20 text-accent-foreground font-medium"
+            >
               Agent View
             </Badge>
           </div>
@@ -59,7 +70,9 @@ export function AiCoachingDashboard({ onLogout }: AiCoachingDashboardProps) {
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <span>Rizwan - Agent</span>
               <div className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center">
-                <span className="text-xs font-medium text-primary-foreground">R</span>
+                <span className="text-xs font-medium text-primary-foreground">
+                  R
+                </span>
               </div>
             </div>
             <Button variant="ghost" size="sm" onClick={onLogout}>
@@ -71,10 +84,14 @@ export function AiCoachingDashboard({ onLogout }: AiCoachingDashboardProps) {
       </header>
 
       <div className="p-6">
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+        <Tabs
+          value={activeTab}
+          onValueChange={setActiveTab}
+          className="space-y-6"
+        >
           <TabsList className="grid w-full grid-cols-5 lg:w-[750px] bg-zinc-100">
             <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
-            
+
             <TabsTrigger value="reviews">Contact Reviews</TabsTrigger>
             <TabsTrigger value="patterns">Challenge Patterns</TabsTrigger>
             <TabsTrigger value="sentiment">Sentiment Trends</TabsTrigger>
@@ -84,13 +101,20 @@ export function AiCoachingDashboard({ onLogout }: AiCoachingDashboardProps) {
           <TabsContent value="dashboard" className="space-y-6">
             {/* Quick Stats */}
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-              <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={navigateToReviews}>
+              <Card
+                className="cursor-pointer hover:shadow-md transition-shadow"
+                onClick={navigateToReviews}
+              >
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Today's Score</CardTitle>
+                  <CardTitle className="text-sm font-medium">
+                    Today's Score
+                  </CardTitle>
                   <Star className="h-4 w-4 text-chart-4" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold text-foreground">8.7/10</div>
+                  <div className="text-2xl font-bold text-foreground">
+                    8.7/10
+                  </div>
                   <p className="text-xs text-muted-foreground">
                     <TrendingUp className="inline h-3 w-3 mr-1" />
                     +0.3 from yesterday
@@ -102,9 +126,14 @@ export function AiCoachingDashboard({ onLogout }: AiCoachingDashboardProps) {
                 </CardContent>
               </Card>
 
-              <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={navigateToReviews}>
+              <Card
+                className="cursor-pointer hover:shadow-md transition-shadow"
+                onClick={navigateToReviews}
+              >
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Interactions</CardTitle>
+                  <CardTitle className="text-sm font-medium">
+                    Interactions
+                  </CardTitle>
                   <MessageSquare className="h-4 w-4 text-chart-1" />
                 </CardHeader>
                 <CardContent>
@@ -120,9 +149,14 @@ export function AiCoachingDashboard({ onLogout }: AiCoachingDashboardProps) {
                 </CardContent>
               </Card>
 
-              <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={navigateToSentiment}>
+              <Card
+                className="cursor-pointer hover:shadow-md transition-shadow"
+                onClick={navigateToSentiment}
+              >
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Customer Satisfaction</CardTitle>
+                  <CardTitle className="text-sm font-medium">
+                    Customer Satisfaction
+                  </CardTitle>
                   <Heart className="h-4 w-4 text-destructive" />
                 </CardHeader>
                 <CardContent>
@@ -138,14 +172,21 @@ export function AiCoachingDashboard({ onLogout }: AiCoachingDashboardProps) {
                 </CardContent>
               </Card>
 
-              <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={navigateToPatterns}>
+              <Card
+                className="cursor-pointer hover:shadow-md transition-shadow"
+                onClick={navigateToPatterns}
+              >
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Coaching Points</CardTitle>
+                  <CardTitle className="text-sm font-medium">
+                    Coaching Points
+                  </CardTitle>
                   <Target className="h-4 w-4 text-accent" />
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold text-foreground">2</div>
-                  <p className="text-sm text-muted-foreground">Areas to improve</p>
+                  <p className="text-sm text-muted-foreground">
+                    Areas to improve
+                  </p>
                   <div className="flex items-center gap-1 mt-2 text-xs text-primary">
                     <Eye className="h-3 w-3" />
                     View patterns
@@ -163,9 +204,16 @@ export function AiCoachingDashboard({ onLogout }: AiCoachingDashboardProps) {
                       <MessageSquare className="h-5 w-5 text-primary" />
                       Latest Contact Review
                     </CardTitle>
-                    <CardDescription>Customer inquiry about subscription cancellation - 2 minutes ago</CardDescription>
+                    <CardDescription>
+                      Customer inquiry about subscription cancellation - 2
+                      minutes ago
+                    </CardDescription>
                   </div>
-                  <Button variant="outline" size="sm" onClick={navigateToReviews}>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={navigateToReviews}
+                  >
                     View All Reviews
                     <ArrowRight className="h-3 w-3 ml-1" />
                   </Button>
@@ -189,7 +237,8 @@ export function AiCoachingDashboard({ onLogout }: AiCoachingDashboardProps) {
                       Could improve
                     </div>
                     <p className="text-sm text-muted-foreground">
-                      Consider offering retention options before processing cancellation
+                      Consider offering retention options before processing
+                      cancellation
                     </p>
                   </div>
 
@@ -199,12 +248,18 @@ export function AiCoachingDashboard({ onLogout }: AiCoachingDashboardProps) {
                       Tip for next time
                     </div>
                     <p className="text-sm text-muted-foreground">
-                      Ask "Is there anything we can do to keep you as a customer?"
+                      Ask "Is there anything we can do to keep you as a
+                      customer?"
                     </p>
                   </div>
                 </div>
 
-                <Button variant="outline" size="sm" className="w-full bg-transparent" onClick={navigateToReviews}>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full bg-transparent"
+                  onClick={navigateToReviews}
+                >
                   View Full Transcript & Analysis
                 </Button>
               </CardContent>
@@ -219,7 +274,11 @@ export function AiCoachingDashboard({ onLogout }: AiCoachingDashboardProps) {
                       <BarChart3 className="h-5 w-5 text-primary" />
                       Weekly Progress
                     </CardTitle>
-                    <Button variant="ghost" size="sm" onClick={navigateToPatterns}>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={navigateToPatterns}
+                    >
                       View Coaching
                       <ArrowRight className="h-3 w-3 ml-1" />
                     </Button>
@@ -232,7 +291,9 @@ export function AiCoachingDashboard({ onLogout }: AiCoachingDashboardProps) {
                       <span className="font-medium">85%</span>
                     </div>
                     <Progress value={85} className="h-2" />
-                    <p className="text-xs text-muted-foreground">+15% improvement this week</p>
+                    <p className="text-xs text-muted-foreground">
+                      +15% improvement this week
+                    </p>
                   </div>
 
                   <div className="space-y-2">
@@ -241,7 +302,9 @@ export function AiCoachingDashboard({ onLogout }: AiCoachingDashboardProps) {
                       <span className="font-medium">78%</span>
                     </div>
                     <Progress value={78} className="h-2" />
-                    <p className="text-xs text-muted-foreground">+8% improvement this week</p>
+                    <p className="text-xs text-muted-foreground">
+                      +8% improvement this week
+                    </p>
                   </div>
 
                   <div className="space-y-2">
@@ -250,7 +313,9 @@ export function AiCoachingDashboard({ onLogout }: AiCoachingDashboardProps) {
                       <span className="font-medium">92%</span>
                     </div>
                     <Progress value={92} className="h-2" />
-                    <p className="text-xs text-muted-foreground">Consistent performance</p>
+                    <p className="text-xs text-muted-foreground">
+                      Consistent performance
+                    </p>
                   </div>
                 </CardContent>
               </Card>
@@ -262,7 +327,11 @@ export function AiCoachingDashboard({ onLogout }: AiCoachingDashboardProps) {
                       <Users className="h-5 w-5 text-primary" />
                       Team Comparison
                     </CardTitle>
-                    <Button variant="ghost" size="sm" onClick={navigateToSentiment}>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={navigateToSentiment}
+                    >
                       View Trends
                       <ArrowRight className="h-3 w-3 ml-1" />
                     </Button>
@@ -270,28 +339,41 @@ export function AiCoachingDashboard({ onLogout }: AiCoachingDashboardProps) {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="text-center">
-                    <div className="text-3xl font-bold text-foreground">Top 25%</div>
-                    <p className="text-sm text-muted-foreground">Your ranking this week</p>
+                    <div className="text-3xl font-bold text-foreground">
+                      Top 25%
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      Your ranking this week
+                    </p>
                   </div>
 
                   <div className="space-y-3">
                     <div className="flex justify-between items-center">
                       <span className="text-sm">Customer Satisfaction</span>
-                      <Badge variant="secondary" className="bg-chart-4/20 text-chart-4 font-medium">
+                      <Badge
+                        variant="secondary"
+                        className="bg-chart-4/20 text-chart-4 font-medium"
+                      >
                         Above Average
                       </Badge>
                     </div>
 
                     <div className="flex justify-between items-center">
                       <span className="text-sm">Resolution Time</span>
-                      <Badge variant="secondary" className="bg-chart-1/20 text-slate-800 font-medium">
+                      <Badge
+                        variant="secondary"
+                        className="bg-chart-1/20 text-slate-800 font-medium"
+                      >
                         Excellent
                       </Badge>
                     </div>
 
                     <div className="flex justify-between items-center">
                       <span className="text-sm">First Call Resolution</span>
-                      <Badge variant="secondary" className="bg-chart-4/20 text-chart-4 font-medium">
+                      <Badge
+                        variant="secondary"
+                        className="bg-chart-4/20 text-chart-4 font-medium"
+                      >
                         Above Average
                       </Badge>
                     </div>
@@ -301,45 +383,66 @@ export function AiCoachingDashboard({ onLogout }: AiCoachingDashboardProps) {
             </div>
 
             <div className="grid gap-4 md:grid-cols-3">
-              <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={navigateToReviews}>
+              <Card
+                className="cursor-pointer hover:shadow-md transition-shadow"
+                onClick={navigateToReviews}
+              >
                 <CardContent className="p-4">
                   <div className="flex items-center gap-3">
                     <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
                       <MessageSquare className="h-5 w-5 text-primary" />
                     </div>
                     <div className="flex-1">
-                      <h4 className="font-medium text-foreground">Recent Reviews</h4>
-                      <p className="text-sm text-muted-foreground">3 new reviews today</p>
+                      <h4 className="font-medium text-foreground">
+                        Recent Reviews
+                      </h4>
+                      <p className="text-sm text-muted-foreground">
+                        3 new reviews today
+                      </p>
                     </div>
                     <ArrowRight className="h-4 w-4 text-muted-foreground" />
                   </div>
                 </CardContent>
               </Card>
 
-              <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={navigateToPatterns}>
+              <Card
+                className="cursor-pointer hover:shadow-md transition-shadow"
+                onClick={navigateToPatterns}
+              >
                 <CardContent className="p-4">
                   <div className="flex items-center gap-3">
                     <div className="h-10 w-10 rounded-lg bg-accent/10 flex items-center justify-center">
                       <Target className="h-5 w-5 text-accent" />
                     </div>
                     <div className="flex-1">
-                      <h4 className="font-medium text-foreground">Coaching Areas</h4>
-                      <p className="text-sm text-muted-foreground">2 patterns improving</p>
+                      <h4 className="font-medium text-foreground">
+                        Coaching Areas
+                      </h4>
+                      <p className="text-sm text-muted-foreground">
+                        2 patterns improving
+                      </p>
                     </div>
                     <ArrowRight className="h-4 w-4 text-muted-foreground" />
                   </div>
                 </CardContent>
               </Card>
 
-              <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={navigateToSentiment}>
+              <Card
+                className="cursor-pointer hover:shadow-md transition-shadow"
+                onClick={navigateToSentiment}
+              >
                 <CardContent className="p-4">
                   <div className="flex items-center gap-3">
                     <div className="h-10 w-10 rounded-lg bg-chart-4/10 flex items-center justify-center">
                       <Heart className="h-5 w-5 text-chart-4" />
                     </div>
                     <div className="flex-1">
-                      <h4 className="font-medium text-foreground">Sentiment Analysis</h4>
-                      <p className="text-sm text-muted-foreground">65% positive this week</p>
+                      <h4 className="font-medium text-foreground">
+                        Sentiment Analysis
+                      </h4>
+                      <p className="text-sm text-muted-foreground">
+                        65% positive this week
+                      </p>
                     </div>
                     <ArrowRight className="h-4 w-4 text-muted-foreground" />
                   </div>
@@ -370,5 +473,5 @@ export function AiCoachingDashboard({ onLogout }: AiCoachingDashboardProps) {
         </Tabs>
       </div>
     </div>
-  )
+  );
 }
