@@ -7,7 +7,7 @@
   /* Modern Calm Tech Blue palette for a clean, professional SaaS look */
   --background: oklch(1 0 0); /* #ffffff */
   --foreground: oklch(0.42 0.18 255); /* #1E40AF - Accent Dark Blue for text */
-  --card: oklch(0.98 0.02 240); /* #F0F9FF - Light Background */
+  --card: oklch(0.96 0.02 240); /* #e8f2fb - Light Background */
   --card-foreground: oklch(0.42 0.18 255); /* #1E40AF - Accent Dark Blue */
   --popover: oklch(1 0 0); /* #ffffff */
   --popover-foreground: oklch(0.42 0.18 255); /* #1E40AF */
@@ -26,11 +26,11 @@
   --ring: oklch(0.62 0.20 255); /* #3B82F6 - Primary Blue */
   --chart-1: oklch(0.62 0.20 255); /* #3B82F6 - Primary blue */
   --chart-2: oklch(0.72 0.17 255); /* #60A5FA - Secondary blue */
-  --chart-3: oklch(0.98 0.02 240); /* #F0F9FF - Light background */
+  --chart-3: oklch(0.96 0.02 240); /* #e8f2fb - Light background */
   --chart-4: oklch(0.7 0.1 180); /* Success green */
   --chart-5: oklch(0.65 0.15 30); /* Warning orange */
   --radius: 0.5rem;
-  --sidebar: oklch(0.98 0.02 240); /* #F0F9FF - Light Background */
+  --sidebar: oklch(0.96 0.02 240); /* #e8f2fb - Light Background */
   --sidebar-foreground: oklch(0.42 0.18 255); /* #1E40AF */
   --sidebar-primary: oklch(0.62 0.20 255); /* #3B82F6 - Primary Blue */
   --sidebar-primary-foreground: oklch(1 0 0); /* #ffffff */
