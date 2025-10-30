@@ -55,6 +55,8 @@ Preferred communication style: Simple, everyday language.
 
 ### Styling & Design
 - **Tailwind CSS**: Utility-first CSS framework for rapid UI development
+- **Modern Calm Tech Blue Theme**: Professional SaaS color palette with Primary Blue (#3B82F6), Secondary Blue (#60A5FA), Light Background (#F0F9FF), and Accent (#1E40AF)
+- **OKLCH Color Space**: Advanced color system for consistent, perceptually uniform colors across light and dark modes
 - **class-variance-authority**: Type-safe variant management for component styling
 - **clsx**: Utility for constructing className strings conditionally
 
