@@ -151,7 +151,7 @@ function FloatingCoachingWidget({
           className="fixed top-0 right-0 h-screen border-l w-[300px] md:w-[400px] lg:w-[500px] z-50 overflow-hidden"
         >
           <Card className="h-full bg-white/95 backdrop-blur-sm rounded-none shadow-xl overflow-hidden flex flex-col">
-            <CardHeader className="pb-3 border-b border-gray-100">
+            <CardHeader className={`pb-3 ${isLoggedIn ? 'border-b border-gray-100' : ''}`}>
               <div className="flex items-center justify-between">
                 {isLoggedIn && (
                   <div className="flex items-center gap-2">
@@ -278,12 +278,6 @@ function FloatingCoachingWidget({
                       )}
                     </Button>
                   </form>
-
-                  <div className="pt-4 border-t border-gray-200">
-                    <p className="text-xs text-center text-gray-500">
-                      Demo credentials: coach@omnihive.com / coach123
-                    </p>
-                  </div>
                 </div>
               ) : (
                 <>
