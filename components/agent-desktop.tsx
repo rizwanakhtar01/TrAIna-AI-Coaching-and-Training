@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Sparkles } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,9 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   ArrowLeft,
   MessageCircle,
@@ -19,6 +22,9 @@ import {
   Eye,
   BarChart3,
   Star,
+  Lock,
+  Mail,
+  Loader2,
 } from "lucide-react";
 
 interface AgentDesktopProps {
@@ -36,6 +42,47 @@ function FloatingCoachingWidget({
   onSeeDetails,
 }: FloatingWidgetProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
+
+  useEffect(() => {
+    const savedLoginState = localStorage.getItem("traina_logged_in");
+    if (savedLoginState === "true") {
+      setIsLoggedIn(true);
+    }
+  }, []);
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setIsLoading(true);
+
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+
+    if (email === "coach@omnihive.com" && password === "coach123") {
+      setIsLoggedIn(true);
+      if (rememberMe) {
+        localStorage.setItem("traina_logged_in", "true");
+      }
+      setEmail("");
+      setPassword("");
+    } else {
+      setError("Invalid credentials. Please try again.");
+    }
+    setIsLoading(false);
+  };
+
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+    localStorage.removeItem("traina_logged_in");
+    setEmail("");
+    setPassword("");
+    setRememberMe(false);
+  };
 
   const yesterdayPerformance = {
     struggledAreas: [
