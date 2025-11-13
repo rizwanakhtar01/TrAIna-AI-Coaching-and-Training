@@ -153,24 +153,28 @@ function FloatingCoachingWidget({
           <Card className="h-full bg-white/95 backdrop-blur-sm rounded-none shadow-xl overflow-hidden flex flex-col">
             <CardHeader className="pb-3 border-b border-gray-100">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <MessageCircle className="h-5 w-5 text-blue-600" />
-                  <CardTitle className="text-lg font-semibold text-gray-900">
-                    Hey {agentName}, Good day! 👋
-                  </CardTitle>
-                </div>
+                {isLoggedIn && (
+                  <div className="flex items-center gap-2">
+                    <MessageCircle className="h-5 w-5 text-blue-600" />
+                    <CardTitle className="text-lg font-semibold text-gray-900">
+                      Hey {agentName}, Good day! 👋
+                    </CardTitle>
+                  </div>
+                )}
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={() => setIsCollapsed(true)}
-                  className="h-7 w-7 p-0"
+                  className="h-7 w-7 p-0 ml-auto"
                 >
                   <X className="h-4 w-4" />
                 </Button>
               </div>
-              <CardDescription className="text-base font-medium text-blue-600">
-                I’m your AI Coach. Let’s reflect on yesterday and get ready for today 🚀
-              </CardDescription>
+              {isLoggedIn && (
+                <CardDescription className="text-base font-medium text-blue-600">
+                  I'm your AI Coach. Let's reflect on yesterday and get ready for today 🚀
+                </CardDescription>
+              )}
             </CardHeader>
 
             <CardContent className="p-4 space-y-4 flex-1 overflow-y-auto">
@@ -188,7 +192,7 @@ function FloatingCoachingWidget({
                     </p>
                   </div>
 
-                  <form onSubmit={handleLogin} className="space-y-4">
+                  <form onSubmit={handleLogin} className="space-y-4 px-6">
                     <div className="space-y-2">
                       <Label htmlFor="email" className="text-sm font-medium">
                         Email / Username
