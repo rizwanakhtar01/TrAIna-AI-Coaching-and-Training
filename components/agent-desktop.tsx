@@ -174,6 +174,115 @@ function FloatingCoachingWidget({
             </CardHeader>
 
             <CardContent className="p-4 space-y-4 flex-1 overflow-y-auto">
+              {!isLoggedIn ? (
+                <div className="space-y-4 py-4">
+                  <div className="text-center space-y-2 mb-6">
+                    <div className="mx-auto w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                      <Lock className="h-6 w-6 text-blue-600" />
+                    </div>
+                    <h3 className="font-semibold text-gray-900 text-lg">
+                      Sign in to TrAIna
+                    </h3>
+                    <p className="text-sm text-gray-600">
+                      Access your personalized coaching insights
+                    </p>
+                  </div>
+
+                  <form onSubmit={handleLogin} className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="email" className="text-sm font-medium">
+                        Email / Username
+                      </Label>
+                      <div className="relative">
+                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                        <Input
+                          id="email"
+                          type="text"
+                          placeholder="coach@omnihive.com"
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          className="pl-10 rounded-lg border-gray-300"
+                          required
+                          disabled={isLoading}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="password" className="text-sm font-medium">
+                        Password
+                      </Label>
+                      <div className="relative">
+                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                        <Input
+                          id="password"
+                          type="password"
+                          placeholder="Enter your password"
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          className="pl-10 rounded-lg border-gray-300"
+                          required
+                          disabled={isLoading}
+                        />
+                      </div>
+                    </div>
+
+                    {error && (
+                      <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+                        <p className="text-sm text-red-600">{error}</p>
+                      </div>
+                    )}
+
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-2">
+                        <Checkbox
+                          id="remember"
+                          checked={rememberMe}
+                          onCheckedChange={(checked) =>
+                            setRememberMe(checked as boolean)
+                          }
+                          disabled={isLoading}
+                        />
+                        <Label
+                          htmlFor="remember"
+                          className="text-sm text-gray-600 cursor-pointer"
+                        >
+                          Remember me
+                        </Label>
+                      </div>
+                      <button
+                        type="button"
+                        className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                        disabled={isLoading}
+                      >
+                        Forgot Password?
+                      </button>
+                    </div>
+
+                    <Button
+                      type="submit"
+                      className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-lg"
+                      disabled={isLoading}
+                    >
+                      {isLoading ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Logging in...
+                        </>
+                      ) : (
+                        "Login"
+                      )}
+                    </Button>
+                  </form>
+
+                  <div className="pt-4 border-t border-gray-200">
+                    <p className="text-xs text-center text-gray-500">
+                      Demo credentials: coach@omnihive.com / coach123
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <>
               {/* Areas where agent struggled */}
               <div className="space-y-2">
                 <h4 className="font-semibold text-gray-800 text-sm flex items-center gap-2">
@@ -279,6 +388,17 @@ function FloatingCoachingWidget({
               >
                 See Details
               </Button>
+
+              {/* Logout button */}
+              <Button
+                onClick={handleLogout}
+                variant="outline"
+                className="w-full"
+              >
+                Logout
+              </Button>
+                </>
+              )}
             </CardContent>
           </Card>
         </motion.div>
