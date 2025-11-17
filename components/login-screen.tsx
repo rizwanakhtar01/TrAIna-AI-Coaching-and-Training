@@ -33,12 +33,12 @@ export function LoginScreen({ onLogin, onAgentDesktop }: LoginScreenProps) {
 
     // Simple role-based authentication
     const credentials = {
-      "agent@omnihive.com": { password: "1234", role: "agent" as const },
-      "supervisor@omnihive.com": {
+      "agent@traina.com": { password: "1234", role: "agent" as const },
+      "supervisor@traina.com": {
         password: "1234",
         role: "supervisor" as const,
       },
-      "admin@omnihive.com": { password: "1234", role: "admin" as const },
+      "admin@traina.com": { password: "1234", role: "admin" as const },
     };
 
     const user = credentials[email as keyof typeof credentials];
