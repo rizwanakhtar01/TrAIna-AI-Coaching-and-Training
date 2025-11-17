@@ -56,7 +56,7 @@ export function AiCoachingDashboard({ onLogout }: AiCoachingDashboardProps) {
                 <Target className="h-4 w-4 text-primary-foreground" />
               </div>
               <h1 className="text-xl font-semibold text-foreground">
-                TrAIna Coaching and Training
+                TrAIna - AI Coaching and Training
               </h1>
             </div>
             <Badge
