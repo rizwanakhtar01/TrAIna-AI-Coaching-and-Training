@@ -63,7 +63,7 @@ function FloatingCoachingWidget({
 
     await new Promise((resolve) => setTimeout(resolve, 1500));
 
-    if (email === "coach@omnihive.com" && password === "coach123") {
+    if (email === "rhomas@traina.com" && password === "1234") {
       setIsLoggedIn(true);
       if (rememberMe) {
         localStorage.setItem("traina_logged_in", "true");
@@ -151,7 +151,9 @@ function FloatingCoachingWidget({
           className="fixed top-0 right-0 h-screen border-l w-[300px] md:w-[400px] lg:w-[500px] z-50 overflow-hidden"
         >
           <Card className="h-full bg-white/95 backdrop-blur-sm rounded-none shadow-xl overflow-hidden flex flex-col">
-            <CardHeader className={`pb-3 ${isLoggedIn ? 'border-b border-gray-100' : ''}`}>
+            <CardHeader
+              className={`pb-3 ${isLoggedIn ? "border-b border-gray-100" : ""}`}
+            >
               <div className="flex items-center justify-between">
                 {isLoggedIn && (
                   <div className="flex items-center gap-2">
@@ -172,7 +174,8 @@ function FloatingCoachingWidget({
               </div>
               {isLoggedIn && (
                 <CardDescription className="text-base font-medium text-blue-600">
-                  I'm your AI Coach. Let's reflect on yesterday and get ready for today 🚀
+                  I'm your AI Coach. Let's reflect on yesterday and get ready
+                  for today 🚀
                 </CardDescription>
               )}
             </CardHeader>
@@ -281,120 +284,124 @@ function FloatingCoachingWidget({
                 </div>
               ) : (
                 <>
-              {/* Areas where agent struggled */}
-              <div className="space-y-2">
-                <h4 className="font-semibold text-gray-800 text-sm flex items-center gap-2">
-                  <BarChart3 className="h-4 w-4 text-red-500" />
-                  Yesterday’s Wins
-                </h4>
-                <ul className="space-y-1">
-                  {yesterdayPerformance.struggledAreas.map((area, index) => (
-                    <li
-                      key={index}
-                      className="text-sm text-gray-600 pl-4 border-l-2 border-red-200"
-                    >
-                      • {area}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              {/* Challenging Areas */}
-              <div className="space-y-2">
-                <h4 className="font-semibold text-gray-800 text-sm flex items-center gap-2">
-                  <BarChart3 className="h-4 w-4 text-red-500" />
-                  Challenging Areas
-                </h4>
-                <ul className="space-y-1">
-                  {yesterdayPerformance.challengingAreas.map((area, index) => (
-                    <li
-                      key={index}
-                      className="text-sm text-gray-600 pl-4 border-l-2 border-red-200"
-                    >
-                      • {area}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              {/* Contact references */}
-              <div className="space-y-2">
-                <h4 className="font-semibold text-gray-800 text-sm flex items-center gap-2">
-                  <Eye className="h-4 w-4 text-orange-500" />
-                  Recent Contacts to Learn From
-                </h4>
-                <div className="space-y-2">
-                  {yesterdayPerformance.contactReferences.map(
-                    (contact, index) => (
-                      <div
-                        key={index}
-                        className="p-2 bg-orange-50 rounded-md border border-orange-200"
-                      >
-                        <div className="flex items-center justify-between">
-                          <Badge
-                            variant="outline"
-                            className="text-xs font-mono"
+                  {/* Areas where agent struggled */}
+                  <div className="space-y-2">
+                    <h4 className="font-semibold text-gray-800 text-sm flex items-center gap-2">
+                      <BarChart3 className="h-4 w-4 text-red-500" />
+                      Yesterday’s Wins
+                    </h4>
+                    <ul className="space-y-1">
+                      {yesterdayPerformance.struggledAreas.map(
+                        (area, index) => (
+                          <li
+                            key={index}
+                            className="text-sm text-gray-600 pl-4 border-l-2 border-red-200"
                           >
-                            {contact.id}
-                          </Badge>
-                          <span className="text-xs text-gray-500">
-                            {contact.time}
-                          </span>
-                        </div>
-                        <p className="text-xs text-gray-600 mt-1">
-                          {contact.issue}
-                        </p>
-                      </div>
-                    ),
-                  )}
-                </div>
-              </div>
+                            • {area}
+                          </li>
+                        ),
+                      )}
+                    </ul>
+                  </div>
 
-              {/* Areas to focus on today */}
-              <div className="space-y-2">
-                <h4 className="font-semibold text-gray-800 text-sm flex items-center gap-2">
-                  <Star className="h-4 w-4 text-blue-500" />
-                  Today's Focus Areas
-                </h4>
-                <ul className="space-y-1">
-                  {yesterdayPerformance.focusAreas.map((area, index) => (
-                    <li
-                      key={index}
-                      className="text-sm text-gray-600 pl-4 border-l-2 border-blue-200"
-                    >
-                      • {area}
-                    </li>
-                  ))}
-                </ul>
-              </div>
+                  {/* Challenging Areas */}
+                  <div className="space-y-2">
+                    <h4 className="font-semibold text-gray-800 text-sm flex items-center gap-2">
+                      <BarChart3 className="h-4 w-4 text-red-500" />
+                      Challenging Areas
+                    </h4>
+                    <ul className="space-y-1">
+                      {yesterdayPerformance.challengingAreas.map(
+                        (area, index) => (
+                          <li
+                            key={index}
+                            className="text-sm text-gray-600 pl-4 border-l-2 border-red-200"
+                          >
+                            • {area}
+                          </li>
+                        ),
+                      )}
+                    </ul>
+                  </div>
 
-              {/* AI Tip */}
-              <div className="p-3 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-md border border-blue-200">
-                <h4 className="font-semibold text-gray-800 text-sm mb-2 flex items-center gap-2">
-                  <MessageCircle className="h-4 w-4 text-blue-600" />
-                  Pro Tip for Today
-                </h4>
-                <p className="text-sm text-gray-700 italic">
-                  {yesterdayPerformance.aiTip}
-                </p>
-              </div>
+                  {/* Contact references */}
+                  <div className="space-y-2">
+                    <h4 className="font-semibold text-gray-800 text-sm flex items-center gap-2">
+                      <Eye className="h-4 w-4 text-orange-500" />
+                      Recent Contacts to Learn From
+                    </h4>
+                    <div className="space-y-2">
+                      {yesterdayPerformance.contactReferences.map(
+                        (contact, index) => (
+                          <div
+                            key={index}
+                            className="p-2 bg-orange-50 rounded-md border border-orange-200"
+                          >
+                            <div className="flex items-center justify-between">
+                              <Badge
+                                variant="outline"
+                                className="text-xs font-mono"
+                              >
+                                {contact.id}
+                              </Badge>
+                              <span className="text-xs text-gray-500">
+                                {contact.time}
+                              </span>
+                            </div>
+                            <p className="text-xs text-gray-600 mt-1">
+                              {contact.issue}
+                            </p>
+                          </div>
+                        ),
+                      )}
+                    </div>
+                  </div>
 
-              {/* CTA Button */}
-              <Button
-                onClick={onSeeDetails}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white"
-              >
-                See Details
-              </Button>
+                  {/* Areas to focus on today */}
+                  <div className="space-y-2">
+                    <h4 className="font-semibold text-gray-800 text-sm flex items-center gap-2">
+                      <Star className="h-4 w-4 text-blue-500" />
+                      Today's Focus Areas
+                    </h4>
+                    <ul className="space-y-1">
+                      {yesterdayPerformance.focusAreas.map((area, index) => (
+                        <li
+                          key={index}
+                          className="text-sm text-gray-600 pl-4 border-l-2 border-blue-200"
+                        >
+                          • {area}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
 
-              {/* Logout button */}
-              <Button
-                onClick={handleLogout}
-                variant="outline"
-                className="w-full"
-              >
-                Logout
-              </Button>
+                  {/* AI Tip */}
+                  <div className="p-3 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-md border border-blue-200">
+                    <h4 className="font-semibold text-gray-800 text-sm mb-2 flex items-center gap-2">
+                      <MessageCircle className="h-4 w-4 text-blue-600" />
+                      Pro Tip for Today
+                    </h4>
+                    <p className="text-sm text-gray-700 italic">
+                      {yesterdayPerformance.aiTip}
+                    </p>
+                  </div>
+
+                  {/* CTA Button */}
+                  <Button
+                    onClick={onSeeDetails}
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                  >
+                    See Details
+                  </Button>
+
+                  {/* Logout button */}
+                  <Button
+                    onClick={handleLogout}
+                    variant="outline"
+                    className="w-full"
+                  >
+                    Logout
+                  </Button>
                 </>
               )}
             </CardContent>
