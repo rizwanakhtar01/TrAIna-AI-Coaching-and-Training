@@ -63,7 +63,7 @@ function FloatingCoachingWidget({
 
     await new Promise((resolve) => setTimeout(resolve, 1500));
 
-    if (email === "rhomas@traina.com" && password === "1234") {
+    if (email === "thomson@traina.com" && password === "1234") {
       setIsLoggedIn(true);
       if (rememberMe) {
         localStorage.setItem("traina_logged_in", "true");
