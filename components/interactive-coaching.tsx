@@ -619,7 +619,8 @@ export function InteractiveCoachingScreen() {
 
   if (currentStep === "banner") {
     return (
-      <div className="space-y-6">
+      <>
+        <div className="space-y-6">
         <Card className="border-accent bg-gradient-to-r from-accent/5 to-primary/5">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
@@ -733,7 +734,47 @@ export function InteractiveCoachingScreen() {
             </div>
           </CardContent>
         </Card>
-      </div>
+        </div>
+
+        <Dialog open={isDocumentOpen} onOpenChange={setIsDocumentOpen}>
+          <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="flex items-center justify-between">
+                <span className="flex items-center gap-2">
+                  <FileText className="h-5 w-5 text-primary" />
+                  {selectedDocument}
+                </span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    if (selectedDocument) {
+                      const docType = coachingAreas
+                        .flatMap(area => area.documents)
+                        .find(doc => doc.name === selectedDocument)?.type || 'PDF'
+                      downloadDocument(selectedDocument, docType)
+                    }
+                  }}
+                  className="ml-2"
+                >
+                  <Download className="h-4 w-4 mr-2" />
+                  Download
+                </Button>
+              </DialogTitle>
+              <DialogDescription>
+                Training material - Click download to save a copy
+              </DialogDescription>
+            </DialogHeader>
+            <div className="mt-4">
+              <div className="prose prose-sm max-w-none">
+                <pre className="whitespace-pre-wrap text-sm font-sans bg-muted p-4 rounded-lg">
+                  {selectedDocument && (documentContent[selectedDocument] || "Document content not available")}
+                </pre>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+      </>
     )
   }
 
@@ -741,8 +782,9 @@ export function InteractiveCoachingScreen() {
     const recommendations = getAIRecommendations()
 
     return (
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
+      <>
+        <div className="space-y-6">
+          <div className="flex items-center justify-between">
           <Button variant="ghost" onClick={backToBanner}>
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back
@@ -894,6 +936,46 @@ export function InteractiveCoachingScreen() {
           </CardContent>
         </Card>
       </div>
+
+      <Dialog open={isDocumentOpen} onOpenChange={setIsDocumentOpen}>
+          <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="flex items-center justify-between">
+                <span className="flex items-center gap-2">
+                  <FileText className="h-5 w-5 text-primary" />
+                  {selectedDocument}
+                </span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    if (selectedDocument) {
+                      const docType = coachingAreas
+                        .flatMap(area => area.documents)
+                        .find(doc => doc.name === selectedDocument)?.type || 'PDF'
+                      downloadDocument(selectedDocument, docType)
+                    }
+                  }}
+                  className="ml-2"
+                >
+                  <Download className="h-4 w-4 mr-2" />
+                  Download
+                </Button>
+              </DialogTitle>
+              <DialogDescription>
+                Training material - Click download to save a copy
+              </DialogDescription>
+            </DialogHeader>
+            <div className="mt-4">
+              <div className="prose prose-sm max-w-none">
+                <pre className="whitespace-pre-wrap text-sm font-sans bg-muted p-4 rounded-lg">
+                  {selectedDocument && (documentContent[selectedDocument] || "Document content not available")}
+                </pre>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+      </>
     )
   }
 
@@ -1470,47 +1552,5 @@ export function InteractiveCoachingScreen() {
     )
   }
 
-  return (
-    <>
-      <Dialog open={isDocumentOpen} onOpenChange={setIsDocumentOpen}>
-        <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="flex items-center justify-between">
-              <span className="flex items-center gap-2">
-                <FileText className="h-5 w-5 text-primary" />
-                {selectedDocument}
-              </span>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => {
-                  if (selectedDocument) {
-                    const docType = coachingAreas
-                      .flatMap(area => area.documents)
-                      .find(doc => doc.name === selectedDocument)?.type || 'PDF'
-                    downloadDocument(selectedDocument, docType)
-                  }
-                }}
-                className="ml-2"
-              >
-                <Download className="h-4 w-4 mr-2" />
-                Download
-              </Button>
-            </DialogTitle>
-            <DialogDescription>
-              Training material - Click download to save a copy
-            </DialogDescription>
-          </DialogHeader>
-          <div className="mt-4">
-            <div className="prose prose-sm max-w-none">
-              <pre className="whitespace-pre-wrap text-sm font-sans bg-muted p-4 rounded-lg">
-                {selectedDocument && (documentContent[selectedDocument] || "Document content not available")}
-              </pre>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
-      {null}
-    </>
-  )
+  return null
 }
