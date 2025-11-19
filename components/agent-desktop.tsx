@@ -388,7 +388,7 @@ function FloatingCoachingWidget({
 
                   {/* CTA Button */}
                   <Button
-                    onClick={() => window.open('/agent-dashboard', '_blank', 'width=1280,height=800')}
+                    onClick={() => window.open('/agent-dashboard', '_blank')}
                     className="w-full bg-blue-600 hover:bg-blue-700 text-white"
                   >
                     See Details

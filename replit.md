@@ -9,7 +9,7 @@ The application features a modern dashboard interface with multiple specialized 
 ### Key Features
 - **Agent Desktop**: Customer service workspace with embedded TrAIna AI Coach widget providing real-time performance feedback
 - **TrAIna Widget**: Floating coaching assistant with authentication, showing yesterday's wins, areas to improve, example contacts, and daily focus areas
-- **Multi-Window Dashboard**: "See Details" button opens full coaching dashboard in new browser window (1280x800) for parallel workflow
+- **Multi-Window Dashboard**: "See Details" button opens full coaching dashboard in new browser tab for parallel workflow
 - **Demo Routes**: `/demo-agent-desktop` for showcase, `/agent-dashboard` for standalone dashboard access
 - **localStorage Persistence**: "Remember Me" functionality for TrAIna login state
 
