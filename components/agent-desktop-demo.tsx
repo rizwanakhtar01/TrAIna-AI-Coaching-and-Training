@@ -266,6 +266,7 @@ export function AgentDesktopDemo() {
                       variant="default"
                       size="sm"
                       className="w-full"
+                      onClick={() => window.open('/agent-dashboard', '_blank', 'width=1280,height=800')}
                     >
                       View Full Coaching Dashboard
                     </Button>

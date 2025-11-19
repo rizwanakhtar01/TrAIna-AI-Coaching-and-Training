@@ -6,6 +6,13 @@ OmniHive AI Coaching is a comprehensive customer service training and coaching p
 
 The application features a modern dashboard interface with multiple specialized views including contact reviews, challenge pattern analysis, sentiment tracking, and interactive coaching sessions with role-playing scenarios and assessments.
 
+### Key Features
+- **Agent Desktop**: Customer service workspace with embedded TrAIna AI Coach widget providing real-time performance feedback
+- **TrAIna Widget**: Floating coaching assistant with authentication, showing yesterday's wins, areas to improve, example contacts, and daily focus areas
+- **Multi-Window Dashboard**: "See Details" button opens full coaching dashboard in new browser window (1280x800) for parallel workflow
+- **Demo Routes**: `/demo-agent-desktop` for showcase, `/agent-dashboard` for standalone dashboard access
+- **localStorage Persistence**: "Remember Me" functionality for TrAIna login state
+
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
@@ -35,6 +42,7 @@ Preferred communication style: Simple, everyday language.
 - **Tab-based Navigation**: Multi-view dashboard with seamless navigation between different coaching modules
 - **Responsive Design**: Mobile-first approach with responsive layouts
 - **Interactive Elements**: Collapsible sections, progress indicators, and interactive coaching scenarios
+- **Multi-Window Support**: TrAIna widget "See Details" button opens agent dashboard in new window for enhanced workflow flexibility
 
 ### Performance Optimizations
 - **Bundle Optimization**: Class variance authority for efficient CSS-in-JS styling
