@@ -158,10 +158,10 @@ function SentimentPieChart({ data, title }: { data: typeof currentWeekSentiment;
 function CategorySentimentChart() {
   return (
     <ResponsiveContainer width="100%" height={300}>
-      <BarChart data={sentimentByCategory} layout="horizontal">
+      <LineChart data={sentimentByCategory}>
         <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
-        <XAxis type="number" domain={[0, 100]} className="text-xs" />
-        <YAxis type="category" dataKey="category" width={120} className="text-xs" />
+        <XAxis dataKey="category" axisLine={false} tickLine={false} className="text-xs" />
+        <YAxis axisLine={false} tickLine={false} className="text-xs" domain={[0, 100]} />
         <Tooltip
           formatter={(value: number, name: string) => [`${value}%`, name]}
           contentStyle={{
@@ -170,10 +170,31 @@ function CategorySentimentChart() {
             borderRadius: "8px",
           }}
         />
-        <Bar dataKey="positive" stackId="a" fill="#22c55e" name="Positive" />
-        <Bar dataKey="neutral" stackId="a" fill="#64748b" name="Neutral" />
-        <Bar dataKey="negative" stackId="a" fill="#ef4444" name="Negative" />
-      </BarChart>
+        <Line
+          type="monotone"
+          dataKey="positive"
+          stroke="#22c55e"
+          strokeWidth={3}
+          dot={{ fill: "#22c55e", strokeWidth: 2, r: 4 }}
+          name="Positive %"
+        />
+        <Line
+          type="monotone"
+          dataKey="neutral"
+          stroke="#64748b"
+          strokeWidth={2}
+          dot={{ fill: "#64748b", strokeWidth: 2, r: 3 }}
+          name="Neutral %"
+        />
+        <Line
+          type="monotone"
+          dataKey="negative"
+          stroke="#ef4444"
+          strokeWidth={2}
+          dot={{ fill: "#ef4444", strokeWidth: 2, r: 3 }}
+          name="Negative %"
+        />
+      </LineChart>
     </ResponsiveContainer>
   )
 }

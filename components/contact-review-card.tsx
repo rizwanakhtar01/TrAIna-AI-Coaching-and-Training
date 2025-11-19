@@ -1,10 +1,14 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
+import { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 import {
   CheckCircle,
   AlertTriangle,
@@ -22,36 +26,42 @@ import {
   Play,
   Pause,
   Volume2,
-} from "lucide-react"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+} from "lucide-react";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface ContactReview {
-  id: string
-  timestamp: string
-  duration: string
-  channel: "chat" | "phone" | "email"
-  customerIssue: string
-  contactSummary: string
-  queue: string
+  id: string;
+  timestamp: string;
+  duration: string;
+  channel: "chat" | "phone" | "email";
+  customerIssue: string;
+  contactSummary: string;
+  queue: string;
   customer: {
-    name: string
-    email: string
-    phone?: string
-    contactTimestamp: string
-    previousContacts: number
-  }
-  overallScore: number
-  whatWentWell: string
-  couldImprove: string
-  tipForNextTime: string
+    name: string;
+    email: string;
+    phone?: string;
+    contactTimestamp: string;
+    previousContacts: number;
+  };
+  overallScore: number;
+  whatWentWell: string;
+  couldImprove: string;
+  tipForNextTime: string;
   transcript: {
-    speaker: "agent" | "customer"
-    message: string
-    timestamp: string
-    highlight?: "positive" | "negative" | "neutral"
-    aiNote?: string
-  }[]
+    speaker: "agent" | "customer";
+    message: string;
+    timestamp: string;
+    highlight?: "positive" | "negative" | "neutral";
+    aiNote?: string;
+  }[];
 }
 
 const sampleReviews: ContactReview[] = [
@@ -72,9 +82,12 @@ const sampleReviews: ContactReview[] = [
       previousContacts: 2,
     },
     overallScore: 8.2,
-    whatWentWell: "You clearly explained the refund process and timeline to the customer",
-    couldImprove: "Consider offering retention options before processing cancellation",
-    tipForNextTime: 'Ask "Is there anything we can do to keep you as a customer?" before proceeding',
+    whatWentWell:
+      "You clearly explained the refund process and timeline to the customer",
+    couldImprove:
+      "Consider offering retention options before processing cancellation",
+    tipForNextTime:
+      'Ask "Is there anything we can do to keep you as a customer?" before proceeding',
     transcript: [
       {
         speaker: "customer",
@@ -84,12 +97,17 @@ const sampleReviews: ContactReview[] = [
       },
       {
         speaker: "agent",
-        message: "I understand you'd like to cancel. Can I ask what's prompting this decision?",
+        message:
+          "I understand you'd like to cancel. Can I ask what's prompting this decision?",
         timestamp: "14:33",
         highlight: "positive",
         aiNote: "Good empathetic opening",
       },
-      { speaker: "customer", message: "I'm not using the service enough to justify the cost", timestamp: "14:33" },
+      {
+        speaker: "customer",
+        message: "I'm not using the service enough to justify the cost",
+        timestamp: "14:33",
+      },
       {
         speaker: "agent",
         message:
@@ -98,7 +116,11 @@ const sampleReviews: ContactReview[] = [
         highlight: "negative",
         aiNote: "Missed opportunity to offer retention options",
       },
-      { speaker: "customer", message: "Thank you for the quick help", timestamp: "14:35" },
+      {
+        speaker: "customer",
+        message: "Thank you for the quick help",
+        timestamp: "14:35",
+      },
     ],
   },
   {
@@ -120,18 +142,26 @@ const sampleReviews: ContactReview[] = [
     overallScore: 7.8,
     whatWentWell: "Clear explanation of refund policy and next steps",
     couldImprove: "Opening lacked empathy for customer frustration",
-    tipForNextTime: 'Start with "I understand how frustrating delayed refunds can be" to acknowledge their concern',
+    tipForNextTime:
+      'Start with "I understand how frustrating delayed refunds can be" to acknowledge their concern',
     transcript: [
-      { speaker: "agent", message: "Hello, how can I help you today?", timestamp: "14:15", highlight: "neutral" },
+      {
+        speaker: "agent",
+        message: "Hello, how can I help you today?",
+        timestamp: "14:15",
+        highlight: "neutral",
+      },
       {
         speaker: "customer",
-        message: "My refund hasn't arrived after 10 days. This is unacceptable!",
+        message:
+          "My refund hasn't arrived after 10 days. This is unacceptable!",
         timestamp: "14:15",
         highlight: "negative",
       },
       {
         speaker: "agent",
-        message: "Let me look into your account. Can you provide your order number?",
+        message:
+          "Let me look into your account. Can you provide your order number?",
         timestamp: "14:16",
         highlight: "negative",
         aiNote: "Should acknowledge frustration first",
@@ -165,7 +195,8 @@ const sampleReviews: ContactReview[] = [
     overallScore: 6.5,
     whatWentWell: "Remained calm and professional under pressure",
     couldImprove: "Should have escalated to technical team sooner",
-    tipForNextTime: "For repeat technical issues, escalate after the second failed troubleshooting attempt",
+    tipForNextTime:
+      "For repeat technical issues, escalate after the second failed troubleshooting attempt",
     transcript: [
       {
         speaker: "customer",
@@ -176,7 +207,8 @@ const sampleReviews: ContactReview[] = [
       },
       {
         speaker: "agent",
-        message: "I apologize for the continued inconvenience. Let me try a different approach to resolve this.",
+        message:
+          "I apologize for the continued inconvenience. Let me try a different approach to resolve this.",
         timestamp: "13:25",
         highlight: "positive",
         aiNote: "Good acknowledgment of frustration",
@@ -196,74 +228,75 @@ const sampleReviews: ContactReview[] = [
       },
       {
         speaker: "agent",
-        message: "Let me escalate this to our technical team immediately for a priority resolution.",
+        message:
+          "Let me escalate this to our technical team immediately for a priority resolution.",
         timestamp: "13:35",
         highlight: "positive",
         aiNote: "Good recovery and escalation",
       },
     ],
   },
-]
+];
 
 interface ContactReviewCardProps {
-  review: ContactReview
+  review: ContactReview;
 }
 
 function ContactReviewCard({ review }: ContactReviewCardProps) {
-  const [isExpanded, setIsExpanded] = useState(false)
-  const [isPlaying, setIsPlaying] = useState(false)
-  const [currentTime, setCurrentTime] = useState(0)
-  const [duration] = useState(225) // 3:45 in seconds
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration] = useState(225); // 3:45 in seconds
 
   const getChannelIcon = (channel: string) => {
     switch (channel) {
       case "phone":
-        return <Phone className="h-4 w-4" />
+        return <Phone className="h-4 w-4" />;
       case "email":
-        return <Mail className="h-4 w-4" />
+        return <Mail className="h-4 w-4" />;
       default:
-        return <MessageSquare className="h-4 w-4" />
+        return <MessageSquare className="h-4 w-4" />;
     }
-  }
+  };
 
   const getScoreColor = (score: number) => {
-    if (score >= 8) return "text-chart-4"
-    if (score >= 7) return "text-chart-5"
-    return "text-destructive"
-  }
+    if (score >= 8) return "text-chart-4";
+    if (score >= 7) return "text-chart-5";
+    return "text-destructive";
+  };
 
   const getHighlightColor = (highlight?: string) => {
     switch (highlight) {
       case "positive":
-        return "bg-chart-4/10 border-l-4 border-chart-4"
+        return "bg-chart-4/10 border-l-4 border-chart-4";
       case "negative":
-        return "bg-destructive/10 border-l-4 border-destructive"
+        return "bg-destructive/10 border-l-4 border-destructive";
       default:
-        return "bg-muted/50"
+        return "bg-muted/50";
     }
-  }
+  };
 
   const togglePlayback = () => {
-    setIsPlaying(!isPlaying)
+    setIsPlaying(!isPlaying);
     if (!isPlaying) {
       const interval = setInterval(() => {
         setCurrentTime((prev) => {
           if (prev >= duration) {
-            setIsPlaying(false)
-            clearInterval(interval)
-            return 0
+            setIsPlaying(false);
+            clearInterval(interval);
+            return 0;
           }
-          return prev + 1
-        })
-      }, 1000)
+          return prev + 1;
+        });
+      }, 1000);
     }
-  }
+  };
 
   const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60)
-    const secs = seconds % 60
-    return `${mins}:${secs.toString().padStart(2, "0")}`
-  }
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
+  };
 
   return (
     <Card className="w-full">
@@ -306,10 +339,14 @@ function ContactReviewCard({ review }: ContactReviewCardProps) {
             </Badge>
           </div>
           <div className="flex items-center gap-2">
-            <span className={`text-lg font-semibold ${getScoreColor(review.overallScore)}`}>
+            <span
+              className={`text-lg font-semibold ${getScoreColor(review.overallScore)}`}
+            >
               {review.overallScore}/10
             </span>
-            <span className="text-xs text-muted-foreground">{review.timestamp}</span>
+            <span className="text-xs text-muted-foreground">
+              {review.timestamp}
+            </span>
           </div>
         </div>
         {review.channel === "phone" && isPlaying && (
@@ -335,8 +372,12 @@ function ContactReviewCard({ review }: ContactReviewCardProps) {
         )}
         <CardTitle className="text-base">{review.customerIssue}</CardTitle>
         <div className="bg-muted/30 p-3 rounded-md border-l-4 border-primary/30">
-          <p className="text-sm text-foreground font-medium mb-1">Contact Summary</p>
-          <p className="text-sm text-muted-foreground">{review.contactSummary}</p>
+          <p className="text-sm text-foreground font-medium mb-1">
+            Contact Summary
+          </p>
+          <p className="text-sm text-muted-foreground">
+            {review.contactSummary}
+          </p>
         </div>
         <div className="bg-card border rounded-md p-3">
           <div className="flex items-center gap-2 mb-2">
@@ -355,13 +396,12 @@ function ContactReviewCard({ review }: ContactReviewCardProps) {
             {review.customer.phone && (
               <div>
                 <span className="text-muted-foreground">Phone:</span>
-                <span className="ml-2 font-medium">{review.customer.phone}</span>
+                <span className="ml-2 font-medium">
+                  {review.customer.phone}
+                </span>
               </div>
             )}
-            <div>
-              <span className="text-muted-foreground">Previous Contacts:</span>
-              <span className="ml-2 font-medium">{review.customer.previousContacts}</span>
-            </div>
+
             <div className="md:col-span-2">
               <span className="text-muted-foreground">Contact Time:</span>
               <span className="ml-2 font-medium flex items-center gap-1">
@@ -380,7 +420,9 @@ function ContactReviewCard({ review }: ContactReviewCardProps) {
               <CheckCircle className="h-4 w-4" />
               What went well
             </div>
-            <p className="text-sm text-muted-foreground">{review.whatWentWell}</p>
+            <p className="text-sm text-muted-foreground">
+              {review.whatWentWell}
+            </p>
           </div>
 
           <div className="space-y-2">
@@ -388,7 +430,9 @@ function ContactReviewCard({ review }: ContactReviewCardProps) {
               <AlertTriangle className="h-4 w-4" />
               Could improve
             </div>
-            <p className="text-sm text-muted-foreground">{review.couldImprove}</p>
+            <p className="text-sm text-muted-foreground">
+              {review.couldImprove}
+            </p>
           </div>
 
           <div className="space-y-2">
@@ -396,13 +440,19 @@ function ContactReviewCard({ review }: ContactReviewCardProps) {
               <Lightbulb className="h-4 w-4" />
               Tip for next time
             </div>
-            <p className="text-sm text-muted-foreground">{review.tipForNextTime}</p>
+            <p className="text-sm text-muted-foreground">
+              {review.tipForNextTime}
+            </p>
           </div>
         </div>
 
         <Collapsible open={isExpanded} onOpenChange={setIsExpanded}>
           <CollapsibleTrigger asChild>
-            <Button variant="outline" size="sm" className="w-full bg-transparent">
+            <Button
+              variant="outline"
+              size="sm"
+              className="w-full bg-transparent"
+            >
               {isExpanded ? (
                 <>
                   <ChevronUp className="h-4 w-4 mr-2" />
@@ -419,15 +469,26 @@ function ContactReviewCard({ review }: ContactReviewCardProps) {
 
           <CollapsibleContent className="space-y-3 mt-4">
             <div className="border rounded-lg p-4 bg-card">
-              <h4 className="font-medium mb-3 text-sm">Conversation Transcript</h4>
+              <h4 className="font-medium mb-3 text-sm">
+                Conversation Transcript
+              </h4>
               <div className="space-y-3 max-h-64 overflow-y-auto">
                 {review.transcript.map((message, index) => (
-                  <div key={index} className={`p-3 rounded-md ${getHighlightColor(message.highlight)}`}>
+                  <div
+                    key={index}
+                    className={`p-3 rounded-md ${getHighlightColor(message.highlight)}`}
+                  >
                     <div className="flex justify-between items-start mb-1">
-                      <span className="text-xs font-medium capitalize text-foreground">{message.speaker}</span>
-                      <span className="text-xs text-muted-foreground">{message.timestamp}</span>
+                      <span className="text-xs font-medium capitalize text-foreground">
+                        {message.speaker}
+                      </span>
+                      <span className="text-xs text-muted-foreground">
+                        {message.timestamp}
+                      </span>
                     </div>
-                    <p className="text-sm text-foreground mb-2">{message.message}</p>
+                    <p className="text-sm text-foreground mb-2">
+                      {message.message}
+                    </p>
                     {message.aiNote && (
                       <div className="text-xs text-accent bg-accent/10 p-2 rounded border-l-2 border-accent">
                         <strong>AI Note:</strong> {message.aiNote}
@@ -441,37 +502,42 @@ function ContactReviewCard({ review }: ContactReviewCardProps) {
         </Collapsible>
       </CardContent>
     </Card>
-  )
+  );
 }
 
 export function ContactReviewsList() {
-  const [searchTerm, setSearchTerm] = useState("")
-  const [filterChannel, setFilterChannel] = useState("all")
-  const [filterScore, setFilterScore] = useState("all")
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterChannel, setFilterChannel] = useState("all");
+  const [filterScore, setFilterScore] = useState("all");
 
   const filteredReviews = sampleReviews.filter((review) => {
     const matchesSearch =
       review.customerIssue.toLowerCase().includes(searchTerm.toLowerCase()) ||
       review.whatWentWell.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      review.couldImprove.toLowerCase().includes(searchTerm.toLowerCase())
+      review.couldImprove.toLowerCase().includes(searchTerm.toLowerCase());
 
-    const matchesChannel = filterChannel === "all" || review.channel === filterChannel
+    const matchesChannel =
+      filterChannel === "all" || review.channel === filterChannel;
 
     const matchesScore =
       filterScore === "all" ||
       (filterScore === "high" && review.overallScore >= 8) ||
-      (filterScore === "medium" && review.overallScore >= 6 && review.overallScore < 8) ||
-      (filterScore === "low" && review.overallScore < 6)
+      (filterScore === "medium" &&
+        review.overallScore >= 6 &&
+        review.overallScore < 8) ||
+      (filterScore === "low" && review.overallScore < 6);
 
-    return matchesSearch && matchesChannel && matchesScore
-  })
+    return matchesSearch && matchesChannel && matchesScore;
+  });
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
           <h3 className="text-lg font-semibold">Recent Contact Reviews</h3>
-          <p className="text-sm text-muted-foreground">AI-generated feedback from your customer interactions</p>
+          <p className="text-sm text-muted-foreground">
+            AI-generated feedback from your customer interactions
+          </p>
         </div>
         <Badge variant="secondary" className="bg-primary/10 text-primary">
           {filteredReviews.length} Reviews Today
@@ -522,13 +588,15 @@ export function ContactReviewsList() {
         {filteredReviews.length === 0 && (
           <Card>
             <CardContent className="p-8 text-center">
-              <p className="text-muted-foreground">No reviews match your current filters.</p>
+              <p className="text-muted-foreground">
+                No reviews match your current filters.
+              </p>
               <Button
                 variant="outline"
                 onClick={() => {
-                  setSearchTerm("")
-                  setFilterChannel("all")
-                  setFilterScore("all")
+                  setSearchTerm("");
+                  setFilterChannel("all");
+                  setFilterScore("all");
                 }}
                 className="mt-2"
               >
@@ -539,5 +607,5 @@ export function ContactReviewsList() {
         )}
       </div>
     </div>
-  )
+  );
 }
