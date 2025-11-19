@@ -10,6 +10,13 @@ import { Textarea } from "@/components/ui/textarea"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import {
   Play,
   MessageCircle,
   Brain,
@@ -34,9 +41,365 @@ import {
   PhoneCall,
   BarChart3,
   Loader2,
+  X,
 } from "lucide-react"
 
 type CoachingStep = "banner" | "materials" | "roleplay" | "quiz" | "summary" | "mockcall" | "mockanalysis" | "analyzing"
+
+const documentContent: Record<string, string> = {
+  "Escalation Guidelines": `# Escalation Guidelines
+
+## When to Escalate
+
+Escalate a customer issue when:
+- Technical complexity exceeds your authority level
+- Customer requests supervisor/manager intervention
+- Issue requires specialized department involvement
+- Customer is extremely dissatisfied despite best efforts
+
+## Escalation Process
+
+### Step 1: Prepare the Escalation
+- Document all troubleshooting steps taken
+- Gather customer account details
+- Note customer sentiment and urgency level
+- Prepare a brief summary of the issue
+
+### Step 2: Inform the Customer
+Use empathetic language:
+"I want to make sure this gets resolved for you. Let me connect you with a specialist who can help with this specific situation."
+
+### Step 3: Transfer Properly
+- Use warm transfer when possible
+- Brief the receiving agent fully
+- Stay on the line until handoff is complete
+- Thank the customer for their patience
+
+## Best Practices
+- Never escalate as first resort
+- Always attempt resolution first
+- Document everything in the system
+- Follow up after escalation when appropriate`,
+
+  "Problem-Solving Framework": `# Problem-Solving Framework
+
+## The 5-Step Approach
+
+### 1. Listen Actively
+- Let customer explain fully
+- Take detailed notes
+- Ask clarifying questions
+- Acknowledge their frustration
+
+### 2. Identify the Core Issue
+- Separate symptoms from root cause
+- Ask probing questions
+- Review account history
+- Check for patterns
+
+### 3. Explore Solutions
+- Review available options
+- Consider customer preferences
+- Check policy guidelines
+- Think creatively within boundaries
+
+### 4. Implement Resolution
+- Explain solution clearly
+- Set expectations on timeline
+- Confirm customer understanding
+- Take immediate action
+
+### 5. Follow Up
+- Verify resolution worked
+- Document outcome
+- Learn from the experience
+- Share insights with team
+
+## Common Pitfalls to Avoid
+- Jumping to solutions too quickly
+- Not documenting properly
+- Making promises you can't keep
+- Ignoring customer emotions`,
+
+  "Common Issues Playbook": `# Common Issues Playbook
+
+## Billing Disputes
+**Symptoms**: Customer questions charges
+**Resolution**: Review transaction history, explain charges clearly, offer payment plan if appropriate
+
+## Technical Problems
+**Symptoms**: Service not working properly
+**Resolution**: Follow standard troubleshooting, escalate if beyond scope
+
+## Account Access Issues
+**Symptoms**: Can't log in or reset password
+**Resolution**: Verify identity, guide through reset process, check for account locks
+
+## Product Returns
+**Symptoms**: Customer wants to return item
+**Resolution**: Check return policy eligibility, initiate return process, explain refund timeline
+
+## Service Cancellations
+**Symptoms**: Customer wants to cancel
+**Resolution**: Understand reason, offer alternatives, process if requested, confirm cancellation`,
+
+  "Refund Policy Guide": `# Refund Policy Guide
+
+## Standard Refund Policy
+
+### Eligibility Requirements
+- Purchase within 30 days
+- Product in original condition
+- Proof of purchase required
+- Original packaging preferred
+
+### Processing Time
+- 3-5 business days after approval
+- Refund to original payment method
+- Email confirmation sent
+
+## Exceptions
+- Digital products: No refunds after download
+- Custom orders: Case-by-case basis
+- Damaged items: Full refund regardless of timeframe
+
+## How to Process
+1. Verify purchase date and receipt
+2. Check product condition
+3. Confirm refund method
+4. Process in system
+5. Send confirmation email`,
+
+  "Return Process Checklist": `# Return Process Checklist
+
+## Pre-Return Verification
+□ Confirm purchase date
+□ Check return window eligibility
+□ Verify product condition requirements
+□ Review refund/exchange preference
+
+## Documentation Required
+□ Order number or receipt
+□ Customer contact information
+□ Reason for return
+□ Photos if damaged/defective
+
+## Processing Steps
+□ Create return authorization
+□ Generate return shipping label
+□ Email instructions to customer
+□ Update order status
+□ Set reminder for return tracking
+
+## Post-Return
+□ Inspect returned item
+□ Process refund/exchange
+□ Send confirmation email
+□ Update customer record`,
+
+  "Exception Handling Rules": `# Exception Handling Rules
+
+## When to Make Exceptions
+
+Exceptions may be granted for:
+- Long-term loyal customers
+- Extenuating circumstances
+- Company error situations
+- Items outside window by <7 days
+
+## Approval Requirements
+- <$50: Agent discretion
+- $50-$200: Supervisor approval
+- >$200: Manager approval
+
+## Documentation
+ALL exceptions must include:
+- Customer ID and order number
+- Reason for exception
+- Approval authority
+- Expected customer impact`,
+
+  "Billing System Guide": `# Billing System Guide
+
+## Understanding the Billing Cycle
+
+### Monthly Billing
+- Bills generated on the 1st of each month
+- Charges from previous month included
+- Payment due within 15 days
+
+### Pro-rated Charges
+- New services charged from activation date
+- Cancellations credited from termination date
+- No partial month refunds on cancelled services
+
+## Common Billing Questions
+
+### Duplicate Charges
+1. Check transaction history
+2. Verify charge dates
+3. Contact payment processor if confirmed duplicate
+4. Process refund within 3-5 business days
+
+### Payment Failed
+1. Verify payment method on file
+2. Check for insufficient funds
+3. Update payment information
+4. Retry payment processing`,
+
+  "Payment Methods Overview": `# Payment Methods Overview
+
+## Accepted Payment Methods
+
+### Credit/Debit Cards
+- Visa, MasterCard, American Express, Discover
+- Cards must be valid and not expired
+- Billing address verification required
+
+### Digital Wallets
+- PayPal
+- Apple Pay
+- Google Pay
+
+### Bank Transfer
+- Available for business accounts
+- 3-5 business days processing time
+- No transaction fees
+
+## Updating Payment Information
+1. Log into account settings
+2. Navigate to Payment Methods
+3. Add new or update existing method
+4. Set as default if desired`,
+
+  "Dispute Resolution Process": `# Dispute Resolution Process
+
+## Steps to Handle Billing Disputes
+
+### 1. Listen and Document
+- Let customer explain the dispute fully
+- Document all details
+- Note dates, amounts, and transaction IDs
+
+### 2. Investigate
+- Review account history
+- Check transaction logs
+- Verify billing accuracy
+
+### 3. Resolve
+- If error found: Issue immediate correction
+- If charge valid: Explain clearly with evidence
+- Offer payment plan if appropriate
+
+### 4. Follow Up
+- Confirm resolution within 24 hours
+- Document outcome in customer record
+- Escalate if customer remains unsatisfied`,
+
+  "Product Feature Guide": `# Product Feature Guide
+
+## Core Features
+
+### User Dashboard
+- Real-time analytics and reporting
+- Customizable widgets
+- Export data capabilities
+
+### Account Management
+- User profile settings
+- Team collaboration tools
+- Access control and permissions
+
+### Integration Capabilities
+- API access for developers
+- Third-party app connections
+- Webhook notifications
+
+### Support Resources
+- In-app knowledge base
+- Live chat support
+- Video tutorials
+
+## Advanced Features
+
+### Automation Tools
+- Scheduled tasks
+- Workflow automation
+- Custom triggers and actions
+
+### Reporting & Analytics
+- Custom report builder
+- Data visualization
+- Scheduled email reports`,
+
+  "Troubleshooting Steps": `# Troubleshooting Steps
+
+## Common Issues & Solutions
+
+### Login Problems
+**Issue**: Cannot log in to account
+**Steps**:
+1. Verify username/email is correct
+2. Check caps lock is off
+3. Try password reset
+4. Clear browser cache and cookies
+5. Try different browser
+6. Contact support if issue persists
+
+### Slow Performance
+**Issue**: System running slowly
+**Steps**:
+1. Check internet connection speed
+2. Close unnecessary browser tabs
+3. Clear browser cache
+4. Disable browser extensions
+5. Try incognito/private mode
+6. Check system status page
+
+### Feature Not Working
+**Issue**: Specific feature unavailable
+**Steps**:
+1. Verify user has proper permissions
+2. Check if feature is enabled for account
+3. Try logging out and back in
+4. Clear cache and refresh page
+5. Check for scheduled maintenance
+6. Report bug if issue continues`,
+
+  "Setup Instructions": `# Setup Instructions
+
+## Initial Account Setup
+
+### Step 1: Create Account
+1. Go to signup page
+2. Enter email address
+3. Create secure password
+4. Verify email address
+
+### Step 2: Complete Profile
+1. Add company information
+2. Upload logo (optional)
+3. Set timezone preferences
+4. Configure notification settings
+
+### Step 3: Configure Settings
+1. Set up payment method
+2. Invite team members
+3. Customize workspace
+4. Connect integrations
+
+### Step 4: Start Using
+1. Complete onboarding tutorial
+2. Import existing data (if applicable)
+3. Explore feature guides
+4. Contact support with questions
+
+## Best Practices
+- Use strong, unique passwords
+- Enable two-factor authentication
+- Regularly review security settings
+- Keep contact information updated`,
+}
 
 const coachingAreas = [
   {
@@ -173,6 +536,8 @@ export function InteractiveCoachingScreen() {
   const [isMockCallActive, setIsMockCallActive] = useState(false)
   const [mockCallDuration, setMockCallDuration] = useState(0)
   const [mockCallScore, setMockCallScore] = useState(0)
+  const [selectedDocument, setSelectedDocument] = useState<string | null>(null)
+  const [isDocumentOpen, setIsDocumentOpen] = useState(false)
 
   const startCoaching = () => setCurrentStep("materials")
   const startRoleplay = () => setCurrentStep("roleplay")
@@ -232,6 +597,24 @@ export function InteractiveCoachingScreen() {
     const mins = Math.floor(seconds / 60)
     const secs = seconds % 60
     return `${mins}:${secs.toString().padStart(2, "0")}`
+  }
+
+  const openDocument = (documentName: string) => {
+    setSelectedDocument(documentName)
+    setIsDocumentOpen(true)
+  }
+
+  const downloadDocument = (documentName: string, fileType: string) => {
+    const content = documentContent[documentName] || "Document content not available"
+    const blob = new Blob([content], { type: 'text/plain' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `${documentName}.${fileType.toLowerCase()}`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
   }
 
   if (currentStep === "banner") {
@@ -465,16 +848,28 @@ export function InteractiveCoachingScreen() {
                         </h4>
                         <div className="space-y-1">
                           {area.documents.map((doc, index) => (
-                            <div key={index} className="flex items-center justify-between text-xs">
-                              <div className="flex items-center gap-2">
-                                <FileText className="h-3 w-3 text-muted-foreground" />
-                                <span>{doc.name}</span>
+                            <div key={index} className="flex items-center justify-between text-xs group">
+                              <div 
+                                className="flex items-center gap-2 cursor-pointer hover:text-primary transition-colors"
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  openDocument(doc.name)
+                                }}
+                              >
+                                <FileText className="h-3 w-3 text-muted-foreground group-hover:text-primary" />
+                                <span className="underline decoration-dotted underline-offset-2">{doc.name}</span>
                               </div>
                               <div className="flex items-center gap-2 text-muted-foreground">
                                 <span>{doc.type}</span>
                                 <span>•</span>
                                 <span>{doc.size}</span>
-                                <Download className="h-3 w-3" />
+                                <Download 
+                                  className="h-3 w-3 cursor-pointer hover:text-primary transition-colors" 
+                                  onClick={(e) => {
+                                    e.stopPropagation()
+                                    downloadDocument(doc.name, doc.type)
+                                  }}
+                                />
                               </div>
                             </div>
                           ))}
@@ -1075,5 +1470,47 @@ export function InteractiveCoachingScreen() {
     )
   }
 
-  return null
+  return (
+    <>
+      <Dialog open={isDocumentOpen} onOpenChange={setIsDocumentOpen}>
+        <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center justify-between">
+              <span className="flex items-center gap-2">
+                <FileText className="h-5 w-5 text-primary" />
+                {selectedDocument}
+              </span>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  if (selectedDocument) {
+                    const docType = coachingAreas
+                      .flatMap(area => area.documents)
+                      .find(doc => doc.name === selectedDocument)?.type || 'PDF'
+                    downloadDocument(selectedDocument, docType)
+                  }
+                }}
+                className="ml-2"
+              >
+                <Download className="h-4 w-4 mr-2" />
+                Download
+              </Button>
+            </DialogTitle>
+            <DialogDescription>
+              Training material - Click download to save a copy
+            </DialogDescription>
+          </DialogHeader>
+          <div className="mt-4">
+            <div className="prose prose-sm max-w-none">
+              <pre className="whitespace-pre-wrap text-sm font-sans bg-muted p-4 rounded-lg">
+                {selectedDocument && (documentContent[selectedDocument] || "Document content not available")}
+              </pre>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+      {null}
+    </>
+  )
 }

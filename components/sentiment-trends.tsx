@@ -1,8 +1,14 @@
-"use client"
+"use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Progress } from "@/components/ui/progress"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
 import {
   LineChart,
   Line,
@@ -16,8 +22,16 @@ import {
   Cell,
   BarChart,
   Bar,
-} from "recharts"
-import { TrendingUp, Smile, MessageSquare, AlertTriangle, CheckCircle, Calendar, Users } from "lucide-react"
+} from "recharts";
+import {
+  TrendingUp,
+  Smile,
+  MessageSquare,
+  AlertTriangle,
+  CheckCircle,
+  Calendar,
+  Users,
+} from "lucide-react";
 
 // Sample data for sentiment trends over the last 50 interactions
 const sentimentOverTime = [
@@ -28,26 +42,50 @@ const sentimentOverTime = [
   { date: "Fri", positive: 75, neutral: 15, negative: 10, total: 11 },
   { date: "Sat", positive: 78, neutral: 17, negative: 5, total: 6 },
   { date: "Sun", positive: 80, neutral: 15, negative: 5, total: 4 },
-]
+];
 
 const currentWeekSentiment = [
   { name: "Positive", value: 65, count: 33, color: "#22c55e" },
   { name: "Neutral", value: 20, count: 10, color: "#64748b" },
   { name: "Negative", value: 15, count: 7, color: "#ef4444" },
-]
+];
 
 const lastWeekSentiment = [
   { name: "Positive", value: 58, count: 29, color: "#22c55e" },
   { name: "Neutral", value: 25, count: 12, color: "#64748b" },
   { name: "Negative", value: 17, count: 9, color: "#ef4444" },
-]
+];
 
 const sentimentByCategory = [
-  { category: "Billing & Refunds", positive: 45, neutral: 30, negative: 25, total: 12 },
-  { category: "Technical Support", positive: 60, neutral: 25, negative: 15, total: 18 },
-  { category: "Account Management", positive: 75, neutral: 20, negative: 5, total: 8 },
-  { category: "Product Inquiries", positive: 80, neutral: 15, negative: 5, total: 12 },
-]
+  {
+    category: "Billing & Refunds",
+    positive: 45,
+    neutral: 30,
+    negative: 25,
+    total: 12,
+  },
+  {
+    category: "Technical Support",
+    positive: 60,
+    neutral: 25,
+    negative: 15,
+    total: 18,
+  },
+  {
+    category: "Account Management",
+    positive: 75,
+    neutral: 20,
+    negative: 5,
+    total: 8,
+  },
+  {
+    category: "Product Inquiries",
+    positive: 80,
+    neutral: 15,
+    negative: 5,
+    total: 12,
+  },
+];
 
 const sentimentInsights = [
   {
@@ -71,14 +109,19 @@ const sentimentInsights = [
     icon: CheckCircle,
     color: "text-chart-4",
   },
-]
+];
 
 function SentimentChart() {
   return (
     <ResponsiveContainer width="100%" height={300}>
       <LineChart data={sentimentOverTime}>
         <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
-        <XAxis dataKey="date" axisLine={false} tickLine={false} className="text-xs" />
+        <XAxis
+          dataKey="date"
+          axisLine={false}
+          tickLine={false}
+          className="text-xs"
+        />
         <YAxis axisLine={false} tickLine={false} className="text-xs" />
         <Tooltip
           contentStyle={{
@@ -113,16 +156,30 @@ function SentimentChart() {
         />
       </LineChart>
     </ResponsiveContainer>
-  )
+  );
 }
 
-function SentimentPieChart({ data, title }: { data: typeof currentWeekSentiment; title: string }) {
+function SentimentPieChart({
+  data,
+  title,
+}: {
+  data: typeof currentWeekSentiment;
+  title: string;
+}) {
   return (
     <div className="space-y-4">
       <h4 className="text-sm font-medium text-center">{title}</h4>
       <ResponsiveContainer width="100%" height={200}>
         <PieChart>
-          <Pie data={data} cx="50%" cy="50%" innerRadius={40} outerRadius={80} paddingAngle={2} dataKey="value">
+          <Pie
+            data={data}
+            cx="50%"
+            cy="50%"
+            innerRadius={40}
+            outerRadius={80}
+            paddingAngle={2}
+            dataKey="value"
+          >
             {data.map((entry, index) => (
               <Cell key={`cell-${index}`} fill={entry.color} />
             ))}
@@ -139,9 +196,15 @@ function SentimentPieChart({ data, title }: { data: typeof currentWeekSentiment;
       </ResponsiveContainer>
       <div className="space-y-2">
         {data.map((item, index) => (
-          <div key={index} className="flex items-center justify-between text-sm">
+          <div
+            key={index}
+            className="flex items-center justify-between text-sm"
+          >
             <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }} />
+              <div
+                className="w-3 h-3 rounded-full"
+                style={{ backgroundColor: item.color }}
+              />
               <span>{item.name}</span>
             </div>
             <div className="flex items-center gap-2">
@@ -152,7 +215,7 @@ function SentimentPieChart({ data, title }: { data: typeof currentWeekSentiment;
         ))}
       </div>
     </div>
-  )
+  );
 }
 
 function CategorySentimentChart() {
@@ -160,8 +223,18 @@ function CategorySentimentChart() {
     <ResponsiveContainer width="100%" height={300}>
       <LineChart data={sentimentByCategory}>
         <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
-        <XAxis dataKey="category" axisLine={false} tickLine={false} className="text-xs" />
-        <YAxis axisLine={false} tickLine={false} className="text-xs" domain={[0, 100]} />
+        <XAxis
+          dataKey="category"
+          axisLine={false}
+          tickLine={false}
+          className="text-xs"
+        />
+        <YAxis
+          axisLine={false}
+          tickLine={false}
+          className="text-xs"
+          domain={[0, 100]}
+        />
         <Tooltip
           formatter={(value: number, name: string) => [`${value}%`, name]}
           contentStyle={{
@@ -196,20 +269,24 @@ function CategorySentimentChart() {
         />
       </LineChart>
     </ResponsiveContainer>
-  )
+  );
 }
 
 export function SentimentTrendsScreen() {
-  const overallSentiment = 65 // Current positive sentiment percentage
-  const previousSentiment = 58 // Previous week positive sentiment
-  const sentimentChange = overallSentiment - previousSentiment
+  const overallSentiment = 65; // Current positive sentiment percentage
+  const previousSentiment = 58; // Previous week positive sentiment
+  const sentimentChange = overallSentiment - previousSentiment;
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-foreground">Sentiment Trends</h2>
-          <p className="text-muted-foreground">Customer sentiment analysis from your last 50 interactions</p>
+          <h2 className="text-2xl font-bold text-foreground">
+            Sentiment Trends
+          </h2>
+          <p className="text-muted-foreground">
+            Customer sentiment analysis from your last 50 interactions
+          </p>
         </div>
         <Badge variant="secondary" className="bg-primary/10 text-primary">
           50 Interactions Analyzed
@@ -220,36 +297,49 @@ export function SentimentTrendsScreen() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Overall Sentiment</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Overall Sentiment
+            </CardTitle>
             <Smile className="h-4 w-4 text-chart-4" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-foreground">{overallSentiment}%</div>
+            <div className="text-2xl font-bold text-foreground">
+              {overallSentiment}%
+            </div>
             <p className="text-xs text-muted-foreground">
-              <TrendingUp className="inline h-3 w-3 mr-1 text-chart-4" />+{sentimentChange}% from last week
+              <TrendingUp className="inline h-3 w-3 mr-1 text-chart-4" />+
+              {sentimentChange}% from last week
             </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Positive Interactions</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Positive Interactions
+            </CardTitle>
             <CheckCircle className="h-4 w-4 text-chart-4" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-foreground">33</div>
-            <p className="text-xs text-muted-foreground">Out of 50 total interactions</p>
+            <p className="text-xs text-muted-foreground">
+              Out of 50 total interactions
+            </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Improvement Areas</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Improvement Areas
+            </CardTitle>
             <AlertTriangle className="h-4 w-4 text-chart-5" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-foreground">2</div>
-            <p className="text-xs text-muted-foreground">Categories needing attention</p>
+            <p className="text-xs text-muted-foreground">
+              Categories needing attention
+            </p>
           </CardContent>
         </Card>
 
@@ -260,7 +350,9 @@ export function SentimentTrendsScreen() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-chart-4">+12%</div>
-            <p className="text-xs text-muted-foreground">Positive sentiment increase</p>
+            <p className="text-xs text-muted-foreground">
+              Positive sentiment increase
+            </p>
           </CardContent>
         </Card>
       </div>
@@ -272,7 +364,9 @@ export function SentimentTrendsScreen() {
             <MessageSquare className="h-5 w-5 text-primary" />
             Sentiment Trends Over Time
           </CardTitle>
-          <CardDescription>Daily sentiment percentages for the past week</CardDescription>
+          <CardDescription>
+            Daily sentiment percentages for the past week
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <SentimentChart />
@@ -286,7 +380,10 @@ export function SentimentTrendsScreen() {
             <CardTitle className="text-center">This Week</CardTitle>
           </CardHeader>
           <CardContent>
-            <SentimentPieChart data={currentWeekSentiment} title="Current Week Distribution" />
+            <SentimentPieChart
+              data={currentWeekSentiment}
+              title="Current Week Distribution"
+            />
           </CardContent>
         </Card>
 
@@ -295,7 +392,10 @@ export function SentimentTrendsScreen() {
             <CardTitle className="text-center">Last Week</CardTitle>
           </CardHeader>
           <CardContent>
-            <SentimentPieChart data={lastWeekSentiment} title="Previous Week Distribution" />
+            <SentimentPieChart
+              data={lastWeekSentiment}
+              title="Previous Week Distribution"
+            />
           </CardContent>
         </Card>
       </div>
@@ -307,7 +407,9 @@ export function SentimentTrendsScreen() {
             <Users className="h-5 w-5 text-primary" />
             Sentiment by Interaction Category
           </CardTitle>
-          <CardDescription>How customers feel across different types of support requests</CardDescription>
+          <CardDescription>
+            How customers feel across different types of support requests
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <CategorySentimentChart />
@@ -325,25 +427,32 @@ export function SentimentTrendsScreen() {
         <CardContent>
           <div className="space-y-4">
             {sentimentInsights.map((insight, index) => {
-              const IconComponent = insight.icon
+              const IconComponent = insight.icon;
               return (
-                <div key={index} className="flex gap-4 p-4 bg-card border rounded-lg">
+                <div
+                  key={index}
+                  className="flex gap-4 p-4 bg-card border rounded-lg"
+                >
                   <div className={`flex-shrink-0 ${insight.color}`}>
                     <IconComponent className="h-5 w-5" />
                   </div>
                   <div className="space-y-1">
-                    <h4 className="font-medium text-foreground">{insight.title}</h4>
-                    <p className="text-sm text-muted-foreground">{insight.description}</p>
+                    <h4 className="font-medium text-foreground">
+                      {insight.title}
+                    </h4>
+                    <p className="text-sm text-muted-foreground">
+                      {insight.description}
+                    </p>
                   </div>
                 </div>
-              )
+              );
             })}
           </div>
         </CardContent>
       </Card>
 
       {/* Detailed Breakdown */}
-      <Card>
+      {/* <Card>
         <CardHeader>
           <CardTitle>Detailed Category Analysis</CardTitle>
           <CardDescription>Performance breakdown by interaction type</CardDescription>
@@ -378,7 +487,7 @@ export function SentimentTrendsScreen() {
             ))}
           </div>
         </CardContent>
-      </Card>
+      </Card> */}
     </div>
-  )
+  );
 }
