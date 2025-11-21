@@ -1259,6 +1259,44 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
     };
   };
 
+  const getFilteredDailySummary = () => {
+    const filteredAgents = getFilteredAgents();
+    const agentNames = filteredAgents.map((a) => a.name);
+    
+    const filteredInsights = dailyTeamSummary.individual_agent_insights.filter((insight) =>
+      agentNames.includes(insight.agent)
+    );
+    
+    const overall_score = filteredInsights.length > 0
+      ? filteredInsights.reduce((sum, insight) => sum + insight.daily_score, 0) / filteredInsights.length
+      : 0;
+    
+    const agents_above_target = filteredInsights.filter((i) => i.daily_score >= 8.0).length;
+    const agents_below_target = filteredInsights.filter((i) => i.daily_score < 8.0).length;
+    const coaching_sessions_needed = filteredInsights.filter((i) => i.coaching_priority !== "low").length;
+    
+    return {
+      date: dailyTeamSummary.date,
+      team_performance: {
+        overall_score: Math.round(overall_score * 10) / 10,
+        improvement_vs_yesterday: 0.3,
+        agents_above_target,
+        agents_below_target,
+        coaching_sessions_needed,
+      },
+      individual_agent_insights: filteredInsights,
+    };
+  };
+
+  const getFilteredContactReviews = () => {
+    const filteredAgents = getFilteredAgents();
+    const agentNames = filteredAgents.map((a) => a.name);
+    
+    return sampleContactReviews.filter((review) =>
+      agentNames.includes(review.agentName)
+    );
+  };
+
   // If viewing agent detail, show that page
   if (selectedAgent) {
     const agent = agents.find((a) => a.id === selectedAgent);
@@ -3305,11 +3343,11 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">
-                    {dailyTeamSummary.team_performance.overall_score}
+                    {getFilteredDailySummary().team_performance.overall_score}
                   </div>
                   <p className="text-xs text-green-600">
                     +
-                    {dailyTeamSummary.team_performance.improvement_vs_yesterday}{" "}
+                    {getFilteredDailySummary().team_performance.improvement_vs_yesterday}{" "}
                     vs yesterday
                   </p>
                 </CardContent>
@@ -3324,7 +3362,7 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold text-green-600">
-                    {dailyTeamSummary.team_performance.agents_above_target}
+                    {getFilteredDailySummary().team_performance.agents_above_target}
                   </div>
                   <p className="text-xs text-muted-foreground">
                     agents performing well
@@ -3341,7 +3379,7 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold text-red-600">
-                    {dailyTeamSummary.team_performance.agents_below_target}
+                    {getFilteredDailySummary().team_performance.agents_below_target}
                   </div>
                   <p className="text-xs text-muted-foreground">
                     need attention
@@ -3358,7 +3396,7 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold text-orange-600">
-                    {dailyTeamSummary.team_performance.coaching_sessions_needed}
+                    {getFilteredDailySummary().team_performance.coaching_sessions_needed}
                   </div>
                   <p className="text-xs text-muted-foreground">
                     sessions scheduled
@@ -3373,7 +3411,7 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
                 </CardHeader>
                 <CardContent>
                   <div className="text-lg font-bold">
-                    {new Date(dailyTeamSummary.date).toLocaleDateString()}
+                    {new Date(getFilteredDailySummary().date).toLocaleDateString()}
                   </div>
                   <p className="text-xs text-muted-foreground">
                     today's summary
@@ -3395,7 +3433,7 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
                 </p>
               </CardHeader>
               <CardContent className="space-y-4">
-                {dailyTeamSummary.individual_agent_insights.map(
+                {getFilteredDailySummary().individual_agent_insights.map(
                   (agentInsight, index) => {
                     const getTrendIcon = (trend: string) => {
                       switch (trend) {
