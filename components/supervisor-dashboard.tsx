@@ -1401,9 +1401,9 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
                 </h2>
                 <p className="text-muted-foreground">{agent.email}</p>
                 <div className="flex items-center gap-2 mt-1">
-                  <Badge {...statusBadge}>
+                  {/* <Badge {...statusBadge}>
                     {statusBadge.icon} {statusBadge.text}
-                  </Badge>
+                  </Badge> */}
                   <span className="text-sm text-muted-foreground">
                     Last session: {agent.lastSession}
                   </span>
@@ -1494,9 +1494,8 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
             </Card>
           </div>
 
-          <div className="grid gap-6 md:grid-cols-2">
-            {/* Specific Interaction Examples */}
-            <Card>
+          {/* Specific Interaction Examples */}
+          {/* <Card>
               <CardHeader>
                 <CardTitle>Specific Interaction Examples</CardTitle>
                 <CardDescription>
@@ -1512,10 +1511,10 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
                   <li>• Success Example: Simple return handled correctly</li>
                 </ul>
               </CardContent>
-            </Card>
+            </Card> */}
 
-            {/* AI Coaching Recommendations */}
-            <Card>
+          {/* AI Coaching Recommendations */}
+          {/* <Card>
               <CardHeader>
                 <CardTitle>AI Coaching Recommendations</CardTitle>
                 <CardDescription>Prioritized plan of action</CardDescription>
@@ -1528,22 +1527,20 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
                   <li>• Suggested timeline: 2-week intensive support plan</li>
                 </ul>
               </CardContent>
-            </Card>
-          </div>
+            </Card> */}
 
           {/* Progress Tracking */}
           <Card>
             <CardHeader>
-              <CardTitle>Progress Tracking</CardTitle>
-              <CardDescription>
-                Training completion and improvement trend
-              </CardDescription>
+              <CardTitle>AI Coaching Recommendations</CardTitle>
+              <CardDescription>Prioritized plan of action</CardDescription>
             </CardHeader>
             <CardContent className="space-y-2">
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li>• Previous coaching session outcomes</li>
-                <li>• Training module completion: 40%</li>
-                <li>• Improvement trend: -5% error rate last week</li>
+                <li>• Priority 1: Refund policy deep-dive training</li>
+                <li>• Priority 2: System workflow practice sessions</li>
+                <li>• Priority 3: Pair with Sarah M. for mentoring</li>
+                <li>• Suggested timeline: 2-week intensive support plan</li>
               </ul>
             </CardContent>
           </Card>
@@ -1622,7 +1619,7 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
                       />
                     </div>
                   </div>
-                  <div className="flex justify-between items-center">
+                  {/* <div className="flex justify-between items-center">
                     <span className="text-sm">Engagement Level</span>
                     <div className="flex items-center gap-2">
                       <span className={`font-medium ${engagement.color}`}>
@@ -1632,7 +1629,7 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
                         ({agent.engagementTime}min)
                       </span>
                     </div>
-                  </div>
+                  </div> */}
                 </div>
               </CardContent>
             </Card>
@@ -2287,7 +2284,7 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
           </Card>
 
           {/* Coaching Priority */}
-          <Card>
+          {/* <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Target className="h-5 w-5 text-chart-2" />
@@ -2320,7 +2317,7 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
                 </div>
               </div>
             </CardContent>
-          </Card>
+          </Card> */}
 
           {/* Strengths and Improvement Areas */}
           <div className="grid grid-cols-2 gap-6">
@@ -2383,7 +2380,7 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
             </CardHeader>
             <CardContent className="space-y-6">
               {/* Session Details */}
-              <div className="grid grid-cols-2 gap-4">
+              {/* <div className="grid grid-cols-2 gap-4">
                 <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
                   <h4 className="font-medium text-blue-800 mb-2">
                     Suggested Duration
@@ -2400,20 +2397,20 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
                     {agentInsight.coaching_prep.focus_area.replace("_", " ")}
                   </div>
                 </div>
-              </div>
+              </div> */}
 
               {/* Talking Points */}
               <div>
-                <h4 className="font-medium mb-3 flex items-center gap-2">
+                {/* <h4 className="font-medium mb-3 flex items-center gap-2">
                   <MessageSquare className="h-4 w-4" />
                   Coaching Talking Points
-                </h4>
+                </h4> */}
                 <div className="space-y-2">
                   {agentInsight.coaching_prep.talking_points.map(
                     (point, index) => (
                       <div
                         key={index}
-                        className="flex items-start gap-3 p-3 bg-muted rounded-lg"
+                        className="flex items-start gap-3 p-3 bg-primary/10 rounded-lg"
                       >
                         <div className="h-6 w-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-medium mt-0.5">
                           {index + 1}
@@ -2778,6 +2775,7 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
                         {challenge.trend === "down" && (
                           <TrendingDown className="h-4 w-4 text-green-600" />
                         )}
+                        
                       </div>
                     </div>
                   ))}
@@ -3012,7 +3010,7 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
                   Coaching Progress Tracker
                 </h2>
                 <p className="text-muted-foreground">
-                  Individual coaching progress with traffic light indicators
+                  Individual coaching progress
                 </p>
                 {agentFilter === "affected" && selectedPattern && (
                   <div className="flex items-center gap-2 mt-2">
@@ -3117,7 +3115,7 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
                           </div>
 
                           {/* Engagement Level */}
-                          <div className="text-center">
+                          {/* <div className="text-center">
                             <div
                               className={`text-lg font-bold ${engagement.color}`}
                             >
@@ -3126,14 +3124,14 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
                             <p className="text-xs text-muted-foreground">
                               {agent.engagementTime}min
                             </p>
-                          </div>
+                          </div> */}
 
                           {/* Traffic Light Status */}
-                          <div className="text-center">
+                          {/* <div className="text-center">
                             <Badge {...statusBadge}>
                               {statusBadge.icon} {statusBadge.text}
                             </Badge>
-                          </div>
+                          </div> */}
 
                           <Button variant="outline" size="sm">
                             <ArrowRight className="h-4 w-4" />
@@ -3209,10 +3207,10 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
                   </div>
                   <div className="text-center p-4 border rounded-lg">
                     <div className="text-2xl font-bold text-purple-600">
-                      {getFilteredTeamMetrics().sessionCompletionRate}%
+                      {getFilteredTeamMetrics().sessionCompletionRate}
                     </div>
                     <p className="text-sm text-muted-foreground">
-                      Session Completion
+                      Sessions Completed
                     </p>
                   </div>
                 </div>
@@ -3359,9 +3357,9 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
                               </div>
                             </div>
                             <div className="flex items-center gap-2">
-                              <Badge {...statusBadge}>
+                              {/* <Badge {...statusBadge}>
                                 {statusBadge.icon} {statusBadge.text}
-                              </Badge>
+                              </Badge> */}
                               <Button
                                 variant="outline"
                                 size="sm"
@@ -3475,7 +3473,6 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
                   </p>
                 </CardContent>
               </Card>
-
             </div>
 
             {/* Individual Agent Insights */}
