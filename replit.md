@@ -12,6 +12,15 @@ The application features a modern dashboard interface with multiple specialized 
 - **Multi-Window Dashboard**: "See Details" button opens full coaching dashboard in new browser tab for parallel workflow
 - **Demo Routes**: `/demo-agent-desktop` for showcase, `/agent-dashboard` for standalone dashboard access
 - **localStorage Persistence**: "Remember Me" functionality for TrAIna login state
+- **Supervisor Dashboard Time Filtering**: Dynamic data views for Daily, Weekly, and Monthly performance tracking with automatic metric updates
+
+## Recent Changes
+
+- **Supervisor Dashboard Time Filtering** (November 21, 2025): Implemented dynamic data filtering for Daily, Weekly, and Monthly views with separate datasets, automatic label updates, and responsive chart displays
+- **Interactive Coaching Documents** (November 19, 2025): Fixed Dialog component to properly display document previews with download functionality for all 12 training materials
+- **TrAIna Widget Enhancement**: Updated "See Details" button to open agent dashboard in new browser tab for multi-window workflow
+- **Sentiment Visualization**: Updated "Sentiment by Interaction Category" graph to use line charts matching "Sentiment Trends Over Time" style
+- **Demo Route**: Created /demo-agent-desktop route for high-quality screenshots of Agent Desktop with TrAIna widget feedback
 
 ## User Preferences
 
