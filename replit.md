@@ -41,6 +41,11 @@ Preferred communication style: Simple, everyday language.
 - **Structured Data Models**: Well-defined interfaces for contact reviews, challenge patterns, sentiment analysis, and coaching materials
 - **Real-time Updates**: Designed to support live data updates through React state management
 - **Computed Metrics**: Team performance metrics automatically recalculate based on active filters
+- **Filtering System**: 
+  - `getFilteredAgents()`: Filters agents by dashboard-level agentFilter (all/at-risk/top) with pattern-specific override support
+  - `getFilteredTeamMetrics()`: Calculates summary metrics (agents coached, team improvement, at-risk count, top performers) from filtered agent dataset
+  - `getPerformanceTimelineData()`: Generates time-series data with appropriate granularity (daily/weekly/monthly) based on timeFilter state
+  - All summary cards, agent tables, and performance charts react to filter changes in real-time
 
 ### Navigation & UX
 - **Tab-based Navigation**: Multi-view dashboard with seamless navigation between different coaching modules
