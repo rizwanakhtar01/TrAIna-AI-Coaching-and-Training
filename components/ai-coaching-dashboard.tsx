@@ -52,11 +52,15 @@ export function AiCoachingDashboard({ onLogout }: AiCoachingDashboardProps) {
         <div className="flex h-16 items-center justify-between px-6">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
-              <div className="h-8 w-8 rounded bg-primary flex items-center justify-center">
-                <Target className="h-4 w-4 text-primary-foreground" />
+              <div className="h-8 w-auto flex items-center justify-center">
+                <img
+                  src="/Omnitraina Logo.png/"
+                  alt="Logo"
+                  className="h-full w-auto object-contain"
+                />
               </div>
               <h1 className="text-xl font-semibold text-foreground">
-                TrAIna - AI Coaching and Training
+                AI Coaching and Training
               </h1>
             </div>
             <Badge

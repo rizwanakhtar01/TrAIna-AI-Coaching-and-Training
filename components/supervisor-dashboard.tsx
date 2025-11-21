@@ -1192,10 +1192,10 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
         );
         return pattern ? pattern.affectedAgents.includes(agent.id) : true;
       }
-      
+
       if (agentFilter === "at-risk") return agent.status === "at-risk";
       if (agentFilter === "top") return agent.status === "excellent";
-      
+
       return true;
     });
   };
@@ -1230,31 +1230,48 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
 
   const getFilteredTeamMetrics = () => {
     const filteredAgents = getFilteredAgents();
-    
-    const totalAgentsCoached = filteredAgents.filter((a) => a.sessionsCompleted > 0).length;
-    const atRiskAgents = filteredAgents.filter((a) => a.status === "at-risk").length;
-    const topPerformers = filteredAgents.filter((a) => a.status === "excellent").length;
-    
-    const avgScore = filteredAgents.length > 0
-      ? filteredAgents.reduce((sum, a) => sum + a.averageScore, 0) / filteredAgents.length
-      : 0;
-    
-    const avgPrevScore = filteredAgents.length > 0
-      ? filteredAgents.reduce((sum, a) => sum + a.previousScore, 0) / filteredAgents.length
-      : 0;
-    
-    const improvementPercent = avgPrevScore > 0 
-      ? ((avgScore - avgPrevScore) / avgPrevScore) * 100 
-      : 0;
-    
-    const previousWeekImprovement = timeFilter === "daily" ? 8 : timeFilter === "monthly" ? 15 : 12;
-    
-    const totalSessions = filteredAgents.reduce((sum, a) => sum + a.sessionsCompleted, 0);
-    const totalTargetSessions = filteredAgents.reduce((sum, a) => sum + a.sessionsTarget, 0);
-    const sessionCompletionRate = totalTargetSessions > 0
-      ? Math.round((totalSessions / totalTargetSessions) * 100)
-      : 0;
-    
+
+    const totalAgentsCoached = filteredAgents.filter(
+      (a) => a.sessionsCompleted > 0,
+    ).length;
+    const atRiskAgents = filteredAgents.filter(
+      (a) => a.status === "at-risk",
+    ).length;
+    const topPerformers = filteredAgents.filter(
+      (a) => a.status === "excellent",
+    ).length;
+
+    const avgScore =
+      filteredAgents.length > 0
+        ? filteredAgents.reduce((sum, a) => sum + a.averageScore, 0) /
+          filteredAgents.length
+        : 0;
+
+    const avgPrevScore =
+      filteredAgents.length > 0
+        ? filteredAgents.reduce((sum, a) => sum + a.previousScore, 0) /
+          filteredAgents.length
+        : 0;
+
+    const improvementPercent =
+      avgPrevScore > 0 ? ((avgScore - avgPrevScore) / avgPrevScore) * 100 : 0;
+
+    const previousWeekImprovement =
+      timeFilter === "daily" ? 8 : timeFilter === "monthly" ? 15 : 12;
+
+    const totalSessions = filteredAgents.reduce(
+      (sum, a) => sum + a.sessionsCompleted,
+      0,
+    );
+    const totalTargetSessions = filteredAgents.reduce(
+      (sum, a) => sum + a.sessionsTarget,
+      0,
+    );
+    const sessionCompletionRate =
+      totalTargetSessions > 0
+        ? Math.round((totalSessions / totalTargetSessions) * 100)
+        : 0;
+
     return {
       totalAgentsCoached,
       atRiskAgents,
@@ -1269,19 +1286,29 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
   const getFilteredDailySummary = () => {
     const filteredAgents = getFilteredAgents();
     const agentNames = filteredAgents.map((a) => a.name);
-    
-    const filteredInsights = dailyTeamSummary.individual_agent_insights.filter((insight) =>
-      agentNames.includes(insight.agent)
+
+    const filteredInsights = dailyTeamSummary.individual_agent_insights.filter(
+      (insight) => agentNames.includes(insight.agent),
     );
-    
-    const overall_score = filteredInsights.length > 0
-      ? filteredInsights.reduce((sum, insight) => sum + insight.daily_score, 0) / filteredInsights.length
-      : 0;
-    
-    const agents_above_target = filteredInsights.filter((i) => i.daily_score >= 8.0).length;
-    const agents_below_target = filteredInsights.filter((i) => i.daily_score < 8.0).length;
-    const coaching_sessions_needed = filteredInsights.filter((i) => i.coaching_priority !== "low").length;
-    
+
+    const overall_score =
+      filteredInsights.length > 0
+        ? filteredInsights.reduce(
+            (sum, insight) => sum + insight.daily_score,
+            0,
+          ) / filteredInsights.length
+        : 0;
+
+    const agents_above_target = filteredInsights.filter(
+      (i) => i.daily_score >= 8.0,
+    ).length;
+    const agents_below_target = filteredInsights.filter(
+      (i) => i.daily_score < 8.0,
+    ).length;
+    const coaching_sessions_needed = filteredInsights.filter(
+      (i) => i.coaching_priority !== "low",
+    ).length;
+
     return {
       date: dailyTeamSummary.date,
       team_performance: {
@@ -1298,9 +1325,9 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
   const getFilteredContactReviews = () => {
     const filteredAgents = getFilteredAgents();
     const agentNames = filteredAgents.map((a) => a.name);
-    
+
     return sampleContactReviews.filter((review) =>
-      agentNames.includes(review.agentName)
+      agentNames.includes(review.agentName),
     );
   };
 
@@ -2490,11 +2517,16 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
         <div className="flex h-16 items-center justify-between px-6">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
-              <div className="h-8 w-8 rounded bg-primary flex items-center justify-center">
-                <Target className="h-4 w-4 text-primary-foreground" />
+              <div className="h-8 w-auto flex items-center justify-center">
+                <img
+                  src="/Omnitraina Logo.png/"
+                  alt="Logo"
+                  className="h-full w-auto object-contain"
+                />
               </div>
+
               <h1 className="text-xl font-semibold text-foreground">
-                TrAIna - AI Coaching and Training
+                AI Coaching and Training
               </h1>
             </div>
             <Badge
@@ -2626,7 +2658,12 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">
-                    Agents Coached This {timeFilter === "daily" ? "Day" : timeFilter === "monthly" ? "Month" : "Week"}
+                    Agents Coached This{" "}
+                    {timeFilter === "daily"
+                      ? "Day"
+                      : timeFilter === "monthly"
+                        ? "Month"
+                        : "Week"}
                   </CardTitle>
                   <Users className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
@@ -2635,7 +2672,8 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
                     {getFilteredTeamMetrics().totalAgentsCoached}
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    Out of {getFilteredAgents().length} {agentFilter === "all" ? "total" : agentFilter} agents
+                    Out of {getFilteredAgents().length}{" "}
+                    {agentFilter === "all" ? "total" : agentFilter} agents
                   </p>
                 </CardContent>
               </Card>
@@ -2648,11 +2686,22 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
                   <TrendingUp className="h-4 w-4 text-green-600" />
                 </CardHeader>
                 <CardContent>
-                  <div className={`text-2xl font-bold ${getFilteredTeamMetrics().teamImprovementPercent > 0 ? "text-green-600" : "text-red-600"}`}>
-                    {getFilteredTeamMetrics().teamImprovementPercent > 0 ? "+" : ""}{getFilteredTeamMetrics().teamImprovementPercent}%
+                  <div
+                    className={`text-2xl font-bold ${getFilteredTeamMetrics().teamImprovementPercent > 0 ? "text-green-600" : "text-red-600"}`}
+                  >
+                    {getFilteredTeamMetrics().teamImprovementPercent > 0
+                      ? "+"
+                      : ""}
+                    {getFilteredTeamMetrics().teamImprovementPercent}%
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    vs last {timeFilter === "daily" ? "day" : timeFilter === "monthly" ? "month" : "week"} (+{getFilteredTeamMetrics().previousWeekImprovement}%)
+                    vs last{" "}
+                    {timeFilter === "daily"
+                      ? "day"
+                      : timeFilter === "monthly"
+                        ? "month"
+                        : "week"}{" "}
+                    (+{getFilteredTeamMetrics().previousWeekImprovement}%)
                   </p>
                 </CardContent>
               </Card>
@@ -3151,7 +3200,9 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
                     </p>
                   </div>
                   <div className="text-center p-4 border rounded-lg">
-                    <div className="text-2xl font-bold text-blue-600">{getFilteredTeamMetrics().avgScore}</div>
+                    <div className="text-2xl font-bold text-blue-600">
+                      {getFilteredTeamMetrics().avgScore}
+                    </div>
                     <p className="text-sm text-muted-foreground">
                       Average Team Score
                     </p>
@@ -3287,51 +3338,53 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {getFilteredAgents().slice(0, 3).map((agent) => {
-                    const statusBadge = getStatusBadge(agent.status);
-                    return (
-                      <div key={agent.id} className="border rounded-lg p-4">
-                        <div className="flex items-center justify-between mb-3">
-                          <div className="flex items-center gap-3">
-                            <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-                              <span className="font-medium text-primary">
-                                {agent.avatar}
-                              </span>
+                  {getFilteredAgents()
+                    .slice(0, 3)
+                    .map((agent) => {
+                      const statusBadge = getStatusBadge(agent.status);
+                      return (
+                        <div key={agent.id} className="border rounded-lg p-4">
+                          <div className="flex items-center justify-between mb-3">
+                            <div className="flex items-center gap-3">
+                              <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+                                <span className="font-medium text-primary">
+                                  {agent.avatar}
+                                </span>
+                              </div>
+                              <div>
+                                <h4 className="font-medium">{agent.name}</h4>
+                                <p className="text-sm text-muted-foreground">
+                                  {agent.sessionsCompleted} sessions completed
+                                </p>
+                              </div>
                             </div>
-                            <div>
-                              <h4 className="font-medium">{agent.name}</h4>
-                              <p className="text-sm text-muted-foreground">
-                                {agent.sessionsCompleted} sessions completed
-                              </p>
+                            <div className="flex items-center gap-2">
+                              <Badge {...statusBadge}>
+                                {statusBadge.icon} {statusBadge.text}
+                              </Badge>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setSelectedAgent(agent.id)}
+                              >
+                                <FileText className="h-4 w-4 mr-2" />
+                                View Details
+                              </Button>
                             </div>
                           </div>
-                          <div className="flex items-center gap-2">
-                            <Badge {...statusBadge}>
-                              {statusBadge.icon} {statusBadge.text}
-                            </Badge>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => setSelectedAgent(agent.id)}
-                            >
-                              <FileText className="h-4 w-4 mr-2" />
-                              View Details
-                            </Button>
+                          <div className="text-xs text-muted-foreground">
+                            <p>
+                              Key improvements:{" "}
+                              {agent.improvementAreas.join(", ")}
+                            </p>
+                            <p>
+                              Current focus: Maintaining {agent.averageScore}{" "}
+                              average score with consistent engagement
+                            </p>
                           </div>
                         </div>
-                        <div className="text-xs text-muted-foreground">
-                          <p>
-                            Key improvements:{" "}
-                            {agent.improvementAreas.join(", ")}
-                          </p>
-                          <p>
-                            Current focus: Maintaining {agent.averageScore}{" "}
-                            average score with consistent engagement
-                          </p>
-                        </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    })}
                 </div>
               </CardContent>
             </Card>
@@ -3354,7 +3407,10 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
                   </div>
                   <p className="text-xs text-green-600">
                     +
-                    {getFilteredDailySummary().team_performance.improvement_vs_yesterday}{" "}
+                    {
+                      getFilteredDailySummary().team_performance
+                        .improvement_vs_yesterday
+                    }{" "}
                     vs yesterday
                   </p>
                 </CardContent>
@@ -3369,7 +3425,10 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold text-green-600">
-                    {getFilteredDailySummary().team_performance.agents_above_target}
+                    {
+                      getFilteredDailySummary().team_performance
+                        .agents_above_target
+                    }
                   </div>
                   <p className="text-xs text-muted-foreground">
                     agents performing well
@@ -3386,7 +3445,10 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold text-red-600">
-                    {getFilteredDailySummary().team_performance.agents_below_target}
+                    {
+                      getFilteredDailySummary().team_performance
+                        .agents_below_target
+                    }
                   </div>
                   <p className="text-xs text-muted-foreground">
                     need attention
@@ -3403,7 +3465,10 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold text-orange-600">
-                    {getFilteredDailySummary().team_performance.coaching_sessions_needed}
+                    {
+                      getFilteredDailySummary().team_performance
+                        .coaching_sessions_needed
+                    }
                   </div>
                   <p className="text-xs text-muted-foreground">
                     sessions scheduled
@@ -3418,7 +3483,9 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
                 </CardHeader>
                 <CardContent>
                   <div className="text-lg font-bold">
-                    {new Date(getFilteredDailySummary().date).toLocaleDateString()}
+                    {new Date(
+                      getFilteredDailySummary().date,
+                    ).toLocaleDateString()}
                   </div>
                   <p className="text-xs text-muted-foreground">
                     today's summary
@@ -3459,35 +3526,6 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
                       }
                     };
 
-                    const getPriorityBadge = (priority: string) => {
-                      switch (priority) {
-                        case "high":
-                          return {
-                            variant: "destructive" as const,
-                            text: "High Priority",
-                          };
-                        case "medium":
-                          return {
-                            variant: "secondary" as const,
-                            text: "Medium Priority",
-                          };
-                        case "low":
-                          return {
-                            variant: "outline" as const,
-                            text: "Low Priority",
-                          };
-                        default:
-                          return {
-                            variant: "outline" as const,
-                            text: "Unknown",
-                          };
-                      }
-                    };
-
-                    const priorityBadge = getPriorityBadge(
-                      agentInsight.coaching_priority,
-                    );
-
                     return (
                       <div
                         key={index}
@@ -3518,22 +3556,17 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
                               </div>
                             </div>
                           </div>
-                          <div className="flex items-center gap-2">
-                            <Badge {...priorityBadge}>
-                              {priorityBadge.text}
-                            </Badge>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => {
-                                setSelectedDailyAgent(agentInsight.agent);
-                                setShowDailyAgentDetails(true);
-                              }}
-                            >
-                              <Eye className="h-4 w-4 mr-2" />
-                              View Details
-                            </Button>
-                          </div>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              setSelectedDailyAgent(agentInsight.agent);
+                              setShowDailyAgentDetails(true);
+                            }}
+                          >
+                            <Eye className="h-4 w-4 mr-2" />
+                            View Details
+                          </Button>
                         </div>
 
                         <div className="grid grid-cols-2 gap-4 text-sm">
