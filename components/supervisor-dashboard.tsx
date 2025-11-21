@@ -1186,16 +1186,77 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
 
   const getFilteredAgents = () => {
     return agents.filter((agent) => {
-      if (agentFilter === "at-risk") return agent.status === "at-risk";
-      if (agentFilter === "top") return agent.status === "excellent";
       if (agentFilter === "affected" && selectedPattern) {
         const pattern = challengingPatterns.find(
           (p) => p.id === selectedPattern,
         );
         return pattern ? pattern.affectedAgents.includes(agent.id) : true;
       }
+      
+      if (agentFilter === "at-risk") return agent.status === "at-risk";
+      if (agentFilter === "top") return agent.status === "excellent";
+      
       return true;
     });
+  };
+
+  const getPerformanceTimelineData = () => {
+    if (timeFilter === "daily") {
+      return [
+        { period: "Mon", score: 8.2, sessions: 12 },
+        { period: "Tue", score: 8.4, sessions: 14 },
+        { period: "Wed", score: 8.3, sessions: 13 },
+        { period: "Thu", score: 8.5, sessions: 15 },
+        { period: "Fri", score: 8.6, sessions: 16 },
+        { period: "Sat", score: 8.4, sessions: 11 },
+        { period: "Sun", score: 8.3, sessions: 10 },
+      ];
+    } else if (timeFilter === "monthly") {
+      return [
+        { period: "Aug", score: 7.5, sessions: 180 },
+        { period: "Sep", score: 7.8, sessions: 195 },
+        { period: "Oct", score: 8.2, sessions: 210 },
+        { period: "Nov", score: 8.6, sessions: 225 },
+      ];
+    } else {
+      return [
+        { period: "Week 8", score: 7.8, sessions: 45 },
+        { period: "Week 9", score: 8.1, sessions: 52 },
+        { period: "Week 10", score: 8.3, sessions: 58 },
+        { period: "Week 11", score: 8.6, sessions: 61 },
+      ];
+    }
+  };
+
+  const getFilteredTeamMetrics = () => {
+    const filteredAgents = getFilteredAgents();
+    
+    const totalAgentsCoached = filteredAgents.filter((a) => a.sessionsCompleted > 0).length;
+    const atRiskAgents = filteredAgents.filter((a) => a.status === "at-risk").length;
+    const topPerformers = filteredAgents.filter((a) => a.status === "excellent").length;
+    
+    const avgScore = filteredAgents.length > 0
+      ? filteredAgents.reduce((sum, a) => sum + a.averageScore, 0) / filteredAgents.length
+      : 0;
+    
+    const avgPrevScore = filteredAgents.length > 0
+      ? filteredAgents.reduce((sum, a) => sum + a.previousScore, 0) / filteredAgents.length
+      : 0;
+    
+    const improvementPercent = avgPrevScore > 0 
+      ? ((avgScore - avgPrevScore) / avgPrevScore) * 100 
+      : 0;
+    
+    const previousWeekImprovement = timeFilter === "daily" ? 8 : timeFilter === "monthly" ? 15 : 12;
+    
+    return {
+      totalAgentsCoached,
+      atRiskAgents,
+      topPerformers,
+      teamImprovementPercent: Math.round(improvementPercent * 10) / 10,
+      previousWeekImprovement,
+      avgScore: Math.round(avgScore * 10) / 10,
+    };
   };
 
   // If viewing agent detail, show that page
@@ -1300,9 +1361,9 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={performanceTimelineData}>
+                <LineChart data={getPerformanceTimelineData()}>
                   <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
-                  <XAxis dataKey="week" className="text-xs" />
+                  <XAxis dataKey="period" className="text-xs" />
                   <YAxis domain={[7, 10]} className="text-xs" />
                   <Tooltip
                     contentStyle={{
@@ -2486,6 +2547,16 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
             </TabsList>
 
             <div className="flex items-center gap-2">
+              <Select value={agentFilter} onValueChange={setAgentFilter}>
+                <SelectTrigger className="w-36">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Agents</SelectItem>
+                  <SelectItem value="at-risk">At Risk</SelectItem>
+                  <SelectItem value="top">Top Performers</SelectItem>
+                </SelectContent>
+              </Select>
               <Select value={timeFilter} onValueChange={setTimeFilter}>
                 <SelectTrigger className="w-32">
                   <SelectValue />
@@ -2510,16 +2581,16 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">
-                    Agents Coached This Week
+                    Agents Coached This {timeFilter === "daily" ? "Day" : timeFilter === "monthly" ? "Month" : "Week"}
                   </CardTitle>
                   <Users className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">
-                    {teamOverviewData.totalAgentsCoached}
+                    {getFilteredTeamMetrics().totalAgentsCoached}
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    +2 from last week
+                    Out of {getFilteredAgents().length} {agentFilter === "all" ? "total" : agentFilter} agents
                   </p>
                 </CardContent>
               </Card>
@@ -2532,11 +2603,11 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
                   <TrendingUp className="h-4 w-4 text-green-600" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold text-green-600">
-                    +{teamOverviewData.teamImprovementPercent}%
+                  <div className={`text-2xl font-bold ${getFilteredTeamMetrics().teamImprovementPercent > 0 ? "text-green-600" : "text-red-600"}`}>
+                    {getFilteredTeamMetrics().teamImprovementPercent > 0 ? "+" : ""}{getFilteredTeamMetrics().teamImprovementPercent}%
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    vs last week (+{teamOverviewData.previousWeekImprovement}%)
+                    vs last {timeFilter === "daily" ? "day" : timeFilter === "monthly" ? "month" : "week"} (+{getFilteredTeamMetrics().previousWeekImprovement}%)
                   </p>
                 </CardContent>
               </Card>
@@ -2550,7 +2621,7 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold text-red-600">
-                    {agents.filter((a) => a.status === "at-risk").length}
+                    {getFilteredTeamMetrics().atRiskAgents}
                   </div>
                   <p className="text-xs text-muted-foreground">
                     Need immediate attention
@@ -2567,7 +2638,7 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold text-yellow-600">
-                    {agents.filter((a) => a.status === "excellent").length}
+                    {getFilteredTeamMetrics().topPerformers}
                   </div>
                   <p className="text-xs text-muted-foreground">
                     Excellent rating
@@ -2630,12 +2701,12 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
               </CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={300}>
-                  <LineChart data={performanceTimelineData}>
+                  <LineChart data={getPerformanceTimelineData()}>
                     <CartesianGrid
                       strokeDasharray="3 3"
                       className="opacity-30"
                     />
-                    <XAxis dataKey="week" className="text-xs" />
+                    <XAxis dataKey="period" className="text-xs" />
                     <YAxis className="text-xs" />
                     <Tooltip
                       contentStyle={{

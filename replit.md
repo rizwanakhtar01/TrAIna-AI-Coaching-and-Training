@@ -12,6 +12,8 @@ The application features a modern dashboard interface with multiple specialized 
 - **Multi-Window Dashboard**: "See Details" button opens full coaching dashboard in new browser tab for parallel workflow
 - **Demo Routes**: `/demo-agent-desktop` for showcase, `/agent-dashboard` for standalone dashboard access
 - **localStorage Persistence**: "Remember Me" functionality for TrAIna login state
+- **Interactive Supervisor Dashboard**: Dynamic filtering system with agent and time filters that update all metrics, charts, and data visualizations in real-time
+- **Document Preview System**: Interactive coaching documents with preview popup dialogs and download functionality
 
 ## User Preferences
 
@@ -35,8 +37,10 @@ Preferred communication style: Simple, everyday language.
 
 ### Data Architecture
 - **Mock Data**: Currently uses hardcoded sample data for demonstration purposes
+- **Dynamic Data Generation**: Filter-responsive data functions that generate different datasets based on time period (daily, weekly, monthly) and agent status filters
 - **Structured Data Models**: Well-defined interfaces for contact reviews, challenge patterns, sentiment analysis, and coaching materials
 - **Real-time Updates**: Designed to support live data updates through React state management
+- **Computed Metrics**: Team performance metrics automatically recalculate based on active filters
 
 ### Navigation & UX
 - **Tab-based Navigation**: Multi-view dashboard with seamless navigation between different coaching modules
