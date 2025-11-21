@@ -1021,19 +1021,109 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
     },
   ];
 
-  const teamOverviewData = {
-    totalAgentsCoached: agents.filter((a) => a.sessionsCompleted > 0).length,
-    topChallenges: challengingPatterns.slice(0, 3),
-    teamImprovementPercent: 12,
-    previousWeekImprovement: 8,
+  // Get team overview data based on time filter
+  const getTeamOverviewData = () => {
+    const baseData = {
+      totalAgentsCoached: agents.filter((a) => a.sessionsCompleted > 0).length,
+      topChallenges: challengingPatterns.slice(0, 3),
+    };
+
+    switch (timeFilter) {
+      case "daily":
+        return {
+          ...baseData,
+          teamImprovementPercent: 0.5,
+          previousPeriodImprovement: 0.3,
+          averageScore: 8.4,
+          previousScore: 8.3,
+          completionRate: 85,
+          previousCompletionRate: 82,
+          periodLabel: "today",
+          comparisonLabel: "yesterday",
+        };
+      case "weekly":
+        return {
+          ...baseData,
+          teamImprovementPercent: 12,
+          previousPeriodImprovement: 8,
+          averageScore: 8.6,
+          previousScore: 8.3,
+          completionRate: 92,
+          previousCompletionRate: 88,
+          periodLabel: "this week",
+          comparisonLabel: "last week",
+        };
+      case "monthly":
+        return {
+          ...baseData,
+          teamImprovementPercent: 25,
+          previousPeriodImprovement: 18,
+          averageScore: 8.5,
+          previousScore: 8.1,
+          completionRate: 88,
+          previousCompletionRate: 82,
+          periodLabel: "this month",
+          comparisonLabel: "last month",
+        };
+      default:
+        return {
+          ...baseData,
+          teamImprovementPercent: 12,
+          previousPeriodImprovement: 8,
+          averageScore: 8.6,
+          previousScore: 8.3,
+          completionRate: 92,
+          previousCompletionRate: 88,
+          periodLabel: "this week",
+          comparisonLabel: "last week",
+        };
+    }
   };
 
-  const performanceTimelineData = [
-    { week: "Week 8", score: 7.8, sessions: 45 },
-    { week: "Week 9", score: 8.1, sessions: 52 },
-    { week: "Week 10", score: 8.3, sessions: 58 },
-    { week: "Week 11", score: 8.6, sessions: 61 },
+  const teamOverviewData = getTeamOverviewData();
+
+  // Performance data for different time periods
+  const performanceDataDaily = [
+    { period: "Mon", score: 8.2, sessions: 12 },
+    { period: "Tue", score: 8.4, sessions: 15 },
+    { period: "Wed", score: 8.1, sessions: 11 },
+    { period: "Thu", score: 8.5, sessions: 14 },
+    { period: "Fri", score: 8.6, sessions: 13 },
+    { period: "Sat", score: 8.3, sessions: 8 },
+    { period: "Sun", score: 8.7, sessions: 9 },
   ];
+
+  const performanceDataWeekly = [
+    { period: "Week 8", score: 7.8, sessions: 45 },
+    { period: "Week 9", score: 8.1, sessions: 52 },
+    { period: "Week 10", score: 8.3, sessions: 58 },
+    { period: "Week 11", score: 8.6, sessions: 61 },
+  ];
+
+  const performanceDataMonthly = [
+    { period: "Aug", score: 7.5, sessions: 180 },
+    { period: "Sep", score: 7.8, sessions: 195 },
+    { period: "Oct", score: 8.1, sessions: 210 },
+    { period: "Nov", score: 8.3, sessions: 225 },
+    { period: "Dec", score: 8.5, sessions: 240 },
+    { period: "Jan", score: 8.6, sessions: 245 },
+  ];
+
+  // Get data based on time filter
+  const getPerformanceData = () => {
+    switch (timeFilter) {
+      case "daily":
+        return performanceDataDaily;
+      case "weekly":
+        return performanceDataWeekly;
+      case "monthly":
+        return performanceDataMonthly;
+      default:
+        return performanceDataWeekly;
+    }
+  };
+
+  const performanceTimelineData = getPerformanceData();
 
   // Helper functions
   const getStatusColor = (status: Agent["status"]) => {
@@ -2510,7 +2600,7 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">
-                    Agents Coached This Week
+                    Agents Coached {timeFilter === "daily" ? "Today" : timeFilter === "weekly" ? "This Week" : "This Month"}
                   </CardTitle>
                   <Users className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
@@ -2519,7 +2609,7 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
                     {teamOverviewData.totalAgentsCoached}
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    +2 from last week
+                    +2 from {teamOverviewData.comparisonLabel}
                   </p>
                 </CardContent>
               </Card>
@@ -2536,7 +2626,7 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
                     +{teamOverviewData.teamImprovementPercent}%
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    vs last week (+{teamOverviewData.previousWeekImprovement}%)
+                    vs {teamOverviewData.comparisonLabel} (+{teamOverviewData.previousPeriodImprovement}%)
                   </p>
                 </CardContent>
               </Card>
@@ -2581,7 +2671,7 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
               <CardHeader>
                 <CardTitle>Top 3 Recurring Challenges</CardTitle>
                 <CardDescription>
-                  Most frequent issues across your team this week
+                  Most frequent issues across your team {teamOverviewData.periodLabel}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -2625,7 +2715,7 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
               <CardHeader>
                 <CardTitle>Team Performance Trend</CardTitle>
                 <CardDescription>
-                  Average team score and session completion over time
+                  Average team score and session completion {timeFilter === "daily" ? "this week" : timeFilter === "weekly" ? "over recent weeks" : "over recent months"}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -2635,7 +2725,7 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
                       strokeDasharray="3 3"
                       className="opacity-30"
                     />
-                    <XAxis dataKey="week" className="text-xs" />
+                    <XAxis dataKey="period" className="text-xs" />
                     <YAxis className="text-xs" />
                     <Tooltip
                       contentStyle={{
