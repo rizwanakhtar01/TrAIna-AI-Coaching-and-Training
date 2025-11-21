@@ -3137,14 +3137,14 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
                 <div className="grid gap-4 md:grid-cols-3">
                   <div className="text-center p-4 border rounded-lg">
                     <div className="text-2xl font-bold text-green-600">
-                      +{teamOverviewData.teamImprovementPercent}%
+                      +{getFilteredTeamMetrics().teamImprovementPercent}%
                     </div>
                     <p className="text-sm text-muted-foreground">
                       Overall Improvement
                     </p>
                   </div>
                   <div className="text-center p-4 border rounded-lg">
-                    <div className="text-2xl font-bold text-blue-600">8.4</div>
+                    <div className="text-2xl font-bold text-blue-600">{getFilteredTeamMetrics().avgScore}</div>
                     <p className="text-sm text-muted-foreground">
                       Average Team Score
                     </p>
@@ -3280,7 +3280,7 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {agents.slice(0, 3).map((agent) => {
+                  {getFilteredAgents().slice(0, 3).map((agent) => {
                     const statusBadge = getStatusBadge(agent.status);
                     return (
                       <div key={agent.id} className="border rounded-lg p-4">
