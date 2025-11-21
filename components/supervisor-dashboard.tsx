@@ -1249,6 +1249,12 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
     
     const previousWeekImprovement = timeFilter === "daily" ? 8 : timeFilter === "monthly" ? 15 : 12;
     
+    const totalSessions = filteredAgents.reduce((sum, a) => sum + a.sessionsCompleted, 0);
+    const totalTargetSessions = filteredAgents.reduce((sum, a) => sum + a.sessionsTarget, 0);
+    const sessionCompletionRate = totalTargetSessions > 0
+      ? Math.round((totalSessions / totalTargetSessions) * 100)
+      : 0;
+    
     return {
       totalAgentsCoached,
       atRiskAgents,
@@ -1256,6 +1262,7 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
       teamImprovementPercent: Math.round(improvementPercent * 10) / 10,
       previousWeekImprovement,
       avgScore: Math.round(avgScore * 10) / 10,
+      sessionCompletionRate,
     };
   };
 
@@ -3151,7 +3158,7 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
                   </div>
                   <div className="text-center p-4 border rounded-lg">
                     <div className="text-2xl font-bold text-purple-600">
-                      87%
+                      {getFilteredTeamMetrics().sessionCompletionRate}%
                     </div>
                     <p className="text-sm text-muted-foreground">
                       Session Completion
