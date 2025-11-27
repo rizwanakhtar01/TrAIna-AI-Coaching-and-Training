@@ -59,7 +59,34 @@ import {
   Play,
   Save,
   Check,
+  Copy,
+  UserPlus,
+  Mail,
+  Shield,
+  Power,
+  MoreHorizontal,
 } from "lucide-react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface AdminDashboardProps {
   onLogout: () => void;
@@ -172,6 +199,16 @@ interface RoutingAnalytics {
   }[];
 }
 
+interface PlatformUser {
+  id: string;
+  fullName: string;
+  email: string;
+  role: "Agent" | "Supervisor" | "Admin";
+  amazonConnectUserId: string;
+  status: "Active" | "Inactive";
+  createdAt: string;
+}
+
 export function AdminDashboard({ onLogout }: AdminDashboardProps) {
   const [activeTab, setActiveTab] = useState("overview");
   const [isCreateWizardOpen, setIsCreateWizardOpen] = useState(false);
@@ -214,6 +251,65 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
       documentsCount: 0,
     });
   const [isUploadingDoc, setIsUploadingDoc] = useState(false);
+
+  // User Management State
+  const [isCreateUserOpen, setIsCreateUserOpen] = useState(false);
+  const [showUserCreatedSuccess, setShowUserCreatedSuccess] = useState(false);
+  const [newUser, setNewUser] = useState({
+    fullName: "",
+    email: "",
+    role: "Agent" as "Agent" | "Supervisor" | "Admin",
+    amazonConnectUserId: "",
+  });
+  const [generatedPassword, setGeneratedPassword] = useState("");
+  const [copiedPassword, setCopiedPassword] = useState(false);
+  const [users, setUsers] = useState<PlatformUser[]>([
+    {
+      id: "usr_001",
+      fullName: "Sarah Johnson",
+      email: "sarah.johnson@company.com",
+      role: "Agent",
+      amazonConnectUserId: "AC-001-SJ",
+      status: "Active",
+      createdAt: "2024-01-15",
+    },
+    {
+      id: "usr_002",
+      fullName: "Michael Chen",
+      email: "michael.chen@company.com",
+      role: "Agent",
+      amazonConnectUserId: "AC-002-MC",
+      status: "Active",
+      createdAt: "2024-01-18",
+    },
+    {
+      id: "usr_003",
+      fullName: "Emily Rodriguez",
+      email: "emily.rodriguez@company.com",
+      role: "Supervisor",
+      amazonConnectUserId: "AC-003-ER",
+      status: "Active",
+      createdAt: "2024-01-10",
+    },
+    {
+      id: "usr_004",
+      fullName: "David Kim",
+      email: "david.kim@company.com",
+      role: "Agent",
+      amazonConnectUserId: "AC-004-DK",
+      status: "Inactive",
+      createdAt: "2024-02-01",
+    },
+    {
+      id: "usr_005",
+      fullName: "Jessica Thompson",
+      email: "jessica.thompson@company.com",
+      role: "Admin",
+      amazonConnectUserId: "AC-005-JT",
+      status: "Active",
+      createdAt: "2024-01-05",
+    },
+  ]);
 
   // Sample routing analytics data (in a real app, this would come from API)
   const routingAnalytics: RoutingAnalytics = {
@@ -349,6 +445,63 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
       isActive: !prev.isActive,
       lastUpdated: new Date().toISOString(),
     }));
+  };
+
+  // User Management Helper Functions
+  const generatePassword = () => {
+    const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789!@#$%";
+    let password = "";
+    for (let i = 0; i < 12; i++) {
+      password += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return password;
+  };
+
+  const handleCreateUserOpen = () => {
+    setNewUser({
+      fullName: "",
+      email: "",
+      role: "Agent",
+      amazonConnectUserId: "",
+    });
+    setGeneratedPassword(generatePassword());
+    setCopiedPassword(false);
+    setShowUserCreatedSuccess(false);
+    setIsCreateUserOpen(true);
+  };
+
+  const handleCopyPassword = () => {
+    navigator.clipboard.writeText(generatedPassword);
+    setCopiedPassword(true);
+    setTimeout(() => setCopiedPassword(false), 2000);
+  };
+
+  const handleCreateUser = () => {
+    const newUserData: PlatformUser = {
+      id: `usr_${Math.random().toString(36).substr(2, 9)}`,
+      fullName: newUser.fullName,
+      email: newUser.email,
+      role: newUser.role,
+      amazonConnectUserId: newUser.amazonConnectUserId,
+      status: "Active",
+      createdAt: new Date().toISOString().split("T")[0],
+    };
+    setUsers((prev) => [...prev, newUserData]);
+    setShowUserCreatedSuccess(true);
+  };
+
+  const handleDeleteUser = (userId: string) => {
+    setUsers((prev) => prev.filter((user) => user.id !== userId));
+  };
+
+  const handleToggleUserStatus = (userId: string) => {
+    setUsers((prev) =>
+      prev.map((user) =>
+        user.id === userId
+          ? { ...user, status: user.status === "Active" ? "Inactive" : "Active" }
+          : user
+      )
+    );
   };
 
   // Agent Templates
@@ -985,11 +1138,11 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
           className="space-y-6"
         >
           <div className="flex items-center justify-between">
-            <TabsList className="grid w-full grid-cols-4 lg:w-[600px] bg-zinc-100">
+            <TabsList className="grid w-full grid-cols-5 lg:w-[750px] bg-zinc-100">
               <TabsTrigger value="overview">System Overview</TabsTrigger>
               <TabsTrigger value="orchestrator">Overall LLM Agent</TabsTrigger>
               <TabsTrigger value="agents">AI Agent Management</TabsTrigger>
-
+              <TabsTrigger value="users">User Management</TabsTrigger>
               <TabsTrigger value="training">Training History</TabsTrigger>
             </TabsList>
 
@@ -2147,6 +2300,287 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                 </div>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          {/* User Management Tab */}
+          <TabsContent value="users" className="space-y-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-2xl font-bold text-foreground">
+                  User Management
+                </h2>
+                <p className="text-muted-foreground">
+                  Manage platform users, roles, and access permissions
+                </p>
+              </div>
+              <Button onClick={handleCreateUserOpen}>
+                <UserPlus className="h-4 w-4 mr-2" />
+                Create New User
+              </Button>
+            </div>
+
+            {/* Users Table */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Users className="h-5 w-5" />
+                  Platform Users
+                </CardTitle>
+                <CardDescription>
+                  View and manage all users with access to the platform
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Full Name</TableHead>
+                      <TableHead>Email</TableHead>
+                      <TableHead>Role</TableHead>
+                      <TableHead>Amazon Connect User ID</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {users.map((user) => (
+                      <TableRow key={user.id}>
+                        <TableCell className="font-medium">
+                          <div className="flex items-center gap-2">
+                            <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+                              <span className="text-xs font-medium text-primary">
+                                {user.fullName
+                                  .split(" ")
+                                  .map((n) => n[0])
+                                  .join("")}
+                              </span>
+                            </div>
+                            {user.fullName}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-1">
+                            <Mail className="h-3 w-3 text-muted-foreground" />
+                            {user.email}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <Badge
+                            variant={
+                              user.role === "Admin"
+                                ? "default"
+                                : user.role === "Supervisor"
+                                  ? "secondary"
+                                  : "outline"
+                            }
+                          >
+                            <Shield className="h-3 w-3 mr-1" />
+                            {user.role}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="font-mono text-sm">
+                          {user.amazonConnectUserId}
+                        </TableCell>
+                        <TableCell>
+                          <Badge
+                            variant={
+                              user.status === "Active" ? "default" : "secondary"
+                            }
+                            className={
+                              user.status === "Active"
+                                ? "bg-green-100 text-green-800"
+                                : "bg-gray-100 text-gray-800"
+                            }
+                          >
+                            {user.status}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="sm">
+                                <MoreHorizontal className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem>
+                                <Edit className="h-4 w-4 mr-2" />
+                                Edit
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() => handleToggleUserStatus(user.id)}
+                              >
+                                <Power className="h-4 w-4 mr-2" />
+                                {user.status === "Active"
+                                  ? "Deactivate"
+                                  : "Activate"}
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                className="text-red-600"
+                                onClick={() => handleDeleteUser(user.id)}
+                              >
+                                <Trash2 className="h-4 w-4 mr-2" />
+                                Delete
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+
+            {/* Create User Dialog */}
+            <Dialog open={isCreateUserOpen} onOpenChange={setIsCreateUserOpen}>
+              <DialogContent className="sm:max-w-[500px]">
+                {!showUserCreatedSuccess ? (
+                  <>
+                    <DialogHeader>
+                      <DialogTitle className="flex items-center gap-2">
+                        <UserPlus className="h-5 w-5 text-primary" />
+                        Create New User
+                      </DialogTitle>
+                      <DialogDescription>
+                        Add a new user to the platform. They will receive login
+                        details via email.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4 py-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="fullName">Full Name</Label>
+                        <Input
+                          id="fullName"
+                          placeholder="Enter full name"
+                          value={newUser.fullName}
+                          onChange={(e) =>
+                            setNewUser({ ...newUser, fullName: e.target.value })
+                          }
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="email">Email</Label>
+                        <Input
+                          id="email"
+                          type="email"
+                          placeholder="Enter email address"
+                          value={newUser.email}
+                          onChange={(e) =>
+                            setNewUser({ ...newUser, email: e.target.value })
+                          }
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="role">Role</Label>
+                        <Select
+                          value={newUser.role}
+                          onValueChange={(value: "Agent" | "Supervisor" | "Admin") =>
+                            setNewUser({ ...newUser, role: value })
+                          }
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select role" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="Agent">Agent</SelectItem>
+                            <SelectItem value="Supervisor">Supervisor</SelectItem>
+                            <SelectItem value="Admin">Admin</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="amazonConnectId">
+                          Amazon Connect User ID
+                        </Label>
+                        <Input
+                          id="amazonConnectId"
+                          placeholder="e.g., AC-001-XX"
+                          value={newUser.amazonConnectUserId}
+                          onChange={(e) =>
+                            setNewUser({
+                              ...newUser,
+                              amazonConnectUserId: e.target.value,
+                            })
+                          }
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Auto-Generated Password</Label>
+                        <div className="flex items-center gap-2">
+                          <Input
+                            readOnly
+                            value={generatedPassword}
+                            className="font-mono bg-muted"
+                          />
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={handleCopyPassword}
+                          >
+                            {copiedPassword ? (
+                              <Check className="h-4 w-4 text-green-600" />
+                            ) : (
+                              <Copy className="h-4 w-4" />
+                            )}
+                          </Button>
+                        </div>
+                        <p className="text-xs text-muted-foreground">
+                          This password will be sent to the user via email
+                        </p>
+                      </div>
+                    </div>
+                    <DialogFooter>
+                      <Button
+                        variant="outline"
+                        onClick={() => setIsCreateUserOpen(false)}
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        onClick={handleCreateUser}
+                        disabled={
+                          !newUser.fullName ||
+                          !newUser.email ||
+                          !newUser.amazonConnectUserId
+                        }
+                      >
+                        Create User
+                      </Button>
+                    </DialogFooter>
+                  </>
+                ) : (
+                  <>
+                    <DialogHeader>
+                      <DialogTitle className="flex items-center gap-2 text-green-600">
+                        <CheckCircle className="h-5 w-5" />
+                        User Created Successfully
+                      </DialogTitle>
+                    </DialogHeader>
+                    <div className="py-6 text-center space-y-4">
+                      <div className="h-16 w-16 rounded-full bg-green-100 flex items-center justify-center mx-auto">
+                        <CheckCircle className="h-8 w-8 text-green-600" />
+                      </div>
+                      <div>
+                        <p className="font-medium">{newUser.fullName}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {newUser.email}
+                        </p>
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        An email will be sent to the user with their login
+                        details and temporary password.
+                      </p>
+                    </div>
+                    <DialogFooter>
+                      <Button onClick={() => setIsCreateUserOpen(false)}>
+                        Done
+                      </Button>
+                    </DialogFooter>
+                  </>
+                )}
+              </DialogContent>
+            </Dialog>
           </TabsContent>
 
           <TabsContent value="training" className="space-y-6">
