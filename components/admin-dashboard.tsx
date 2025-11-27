@@ -1810,36 +1810,6 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                       </div>
                     </div>
                   </div>
-
-                  <div className="space-y-4">
-                    <div className="space-y-2">
-                      <Label>Training Status</Label>
-                      <div className="border rounded-lg p-3 space-y-2">
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm">Documents Loaded:</span>
-                          <Badge variant="outline">
-                            {orchestratorConfig.documentsCount}
-                          </Badge>
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm">Vector Database:</span>
-                          <Badge
-                            variant={
-                              businessDocuments.some(
-                                (doc) => doc.vectorEmbedded,
-                              )
-                                ? "default"
-                                : "secondary"
-                            }
-                          >
-                            {businessDocuments.some((doc) => doc.vectorEmbedded)
-                              ? "Ready"
-                              : "Empty"}
-                          </Badge>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
                 </div>
 
                 <div className="space-y-2">
