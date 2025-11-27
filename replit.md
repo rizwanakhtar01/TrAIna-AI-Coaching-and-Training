@@ -14,6 +14,7 @@ The application features a modern dashboard interface with multiple specialized 
 - **localStorage Persistence**: "Remember Me" functionality for TrAIna login state
 - **Interactive Supervisor Dashboard**: Dynamic filtering system with agent and time filters that update all metrics, charts, and data visualizations in real-time
 - **Document Preview System**: Interactive coaching documents with preview popup dialogs and download functionality
+- **User Management System**: Admin dashboard feature for managing platform users with CRUD operations, role assignment (Agent/Supervisor/Admin), Amazon Connect User ID mapping, activation/deactivation, and auto-generated passwords
 
 ## User Preferences
 
