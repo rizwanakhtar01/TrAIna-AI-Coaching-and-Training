@@ -1745,7 +1745,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                   specialized agents
                 </p>
               </div>
-              <div className="flex gap-2">
+              {/* <div className="flex gap-2">
                 <Button
                   variant={
                     orchestratorConfig.isActive ? "destructive" : "default"
@@ -1756,7 +1756,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                   {orchestratorConfig.isActive ? "Deactivate" : "Activate"}{" "}
                   Orchestrator
                 </Button>
-              </div>
+              </div> */}
             </div>
 
             {/* Orchestrator Configuration Section */}
@@ -1774,7 +1774,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
               <CardContent className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-4">
-                    <div className="space-y-2">
+                    {/* <div className="space-y-2">
                       <Label htmlFor="orchestrator-name">Agent Name</Label>
                       <Input
                         id="orchestrator-name"
@@ -1787,9 +1787,9 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                         }
                         placeholder="OmniHive Orchestrator"
                       />
-                    </div>
+                    </div> */}
 
-                    <div className="space-y-2">
+                    {/* <div className="space-y-2">
                       <Label>Status</Label>
                       <div className="flex items-center gap-2">
                         <Badge
@@ -1808,7 +1808,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                           ).toLocaleString()}
                         </span>
                       </div>
-                    </div>
+                    </div> */}
                   </div>
                 </div>
 
