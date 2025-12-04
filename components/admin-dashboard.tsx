@@ -1254,13 +1254,12 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
           className="space-y-6"
         >
           <div className="flex items-center justify-between">
-            <TabsList className="grid w-full grid-cols-6 lg:w-[900px] bg-zinc-100">
+            <TabsList className="grid w-full grid-cols-5 lg:w-[900px] bg-zinc-100">
               <TabsTrigger value="overview">System Overview</TabsTrigger>
               <TabsTrigger value="orchestrator">Overall LLM Agent</TabsTrigger>
               <TabsTrigger value="agents">AI Agent Management</TabsTrigger>
               <TabsTrigger value="users">User Management</TabsTrigger>
               <TabsTrigger value="teams">Team Management</TabsTrigger>
-              <TabsTrigger value="training">Training History</TabsTrigger>
             </TabsList>
 
             <Dialog
@@ -2932,7 +2931,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
             </Dialog>
           </TabsContent>
 
-          <TabsContent value="training" className="space-y-6">
+          {/* <TabsContent value="training" className="space-y-6">
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-2xl font-bold text-foreground">
@@ -3052,7 +3051,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                 </CardContent>
               </Card>
             </div>
-          </TabsContent>
+          </TabsContent> */}
         </Tabs>
       </div>
     </div>
