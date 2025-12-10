@@ -84,6 +84,8 @@ function FloatingCoachingWidget({
     setRememberMe(false);
   };
 
+  const WIDGET_VERSION = "1.0.0";
+
   const yesterdayPerformance = {
     struggledAreas: [
       "Maintained positive tone across most interactions",
@@ -281,6 +283,36 @@ function FloatingCoachingWidget({
                       )}
                     </Button>
                   </form>
+                </div>
+              ) : yesterdayPerformance.struggledAreas.length === 0 &&
+                yesterdayPerformance.challengingAreas.length === 0 &&
+                yesterdayPerformance.focusAreas.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-8 space-y-4">
+                  <div className="h-16 w-16 rounded-full bg-gray-100 flex items-center justify-center">
+                    <BarChart3 className="h-8 w-8 text-gray-400" />
+                  </div>
+                  <div className="text-center">
+                    <h4 className="font-semibold text-gray-700">No Feedback Generated</h4>
+                    <p className="text-sm text-gray-500 mt-1">
+                      Your coaching feedback will appear here once available.
+                    </p>
+                  </div>
+                  <Button
+                    onClick={() => window.open("/agent-dashboard", "_blank")}
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                  >
+                    See Details
+                  </Button>
+                  <Button
+                    onClick={handleLogout}
+                    variant="outline"
+                    className="w-full"
+                  >
+                    Logout
+                  </Button>
+                  <p className="text-xs text-gray-400 mt-4">
+                    TrAIna v{WIDGET_VERSION}
+                  </p>
                 </div>
               ) : (
                 <>
