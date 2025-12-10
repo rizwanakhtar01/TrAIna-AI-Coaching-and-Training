@@ -48,6 +48,7 @@ function FloatingCoachingWidget({
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
+  const [showEmptyState, setShowEmptyState] = useState(false);
 
   useEffect(() => {
     const savedLoginState = localStorage.getItem("traina_logged_in");
@@ -284,9 +285,10 @@ function FloatingCoachingWidget({
                     </Button>
                   </form>
                 </div>
-              ) : yesterdayPerformance.struggledAreas.length === 0 &&
+              ) : showEmptyState ||
+                (yesterdayPerformance.struggledAreas.length === 0 &&
                 yesterdayPerformance.challengingAreas.length === 0 &&
-                yesterdayPerformance.focusAreas.length === 0 ? (
+                yesterdayPerformance.focusAreas.length === 0) ? (
                 <div className="flex flex-col items-center justify-center py-8 space-y-4">
                   <div className="h-16 w-16 rounded-full bg-gray-100 flex items-center justify-center">
                     <BarChart3 className="h-8 w-8 text-gray-400" />
@@ -313,6 +315,16 @@ function FloatingCoachingWidget({
                   <p className="text-xs text-gray-400 mt-4">
                     TrAIna v{WIDGET_VERSION}
                   </p>
+                  {showEmptyState && (
+                    <Button
+                      onClick={() => setShowEmptyState(false)}
+                      variant="ghost"
+                      size="sm"
+                      className="text-xs text-gray-500"
+                    >
+                      Show Feedback
+                    </Button>
+                  )}
                 </div>
               ) : (
                 <>
@@ -391,6 +403,16 @@ function FloatingCoachingWidget({
                     className="w-full bg-blue-600 hover:bg-blue-700 text-white"
                   >
                     See Details
+                  </Button>
+
+                  {/* Empty Screen toggle button */}
+                  <Button
+                    onClick={() => setShowEmptyState(true)}
+                    variant="ghost"
+                    size="sm"
+                    className="w-full text-xs text-gray-500"
+                  >
+                    Empty Screen
                   </Button>
 
                   {/* Logout button */}
