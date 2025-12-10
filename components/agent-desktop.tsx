@@ -324,39 +324,6 @@ function FloatingCoachingWidget({
                     </ul>
                   </div>
 
-                  {/* Contact references */}
-                  <div className="space-y-2">
-                    <h4 className="font-semibold text-gray-800 text-sm flex items-center gap-2">
-                      <Eye className="h-4 w-4 text-orange-500" />
-                      Recent Contacts to Learn From
-                    </h4>
-                    <div className="space-y-2">
-                      {yesterdayPerformance.contactReferences.map(
-                        (contact, index) => (
-                          <div
-                            key={index}
-                            className="p-2 bg-orange-50 rounded-md border border-orange-200"
-                          >
-                            <div className="flex items-center justify-between">
-                              <Badge
-                                variant="outline"
-                                className="text-xs font-mono"
-                              >
-                                {contact.id}
-                              </Badge>
-                              <span className="text-xs text-gray-500">
-                                {contact.time}
-                              </span>
-                            </div>
-                            <p className="text-xs text-gray-600 mt-1">
-                              {contact.issue}
-                            </p>
-                          </div>
-                        ),
-                      )}
-                    </div>
-                  </div>
-
                   {/* Areas to focus on today */}
                   <div className="space-y-2">
                     <h4 className="font-semibold text-gray-800 text-sm flex items-center gap-2">
