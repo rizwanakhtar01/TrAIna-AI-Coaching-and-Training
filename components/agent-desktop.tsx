@@ -300,8 +300,9 @@ function FloatingCoachingWidget({
                     </p>
                   </div>
                   <Button
-                    onClick={() => window.open("/agent-dashboard", "_blank")}
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                    disabled
+                    title="Coming Soon"
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     See Details
                   </Button>
@@ -399,8 +400,9 @@ function FloatingCoachingWidget({
 
                   {/* CTA Button */}
                   <Button
-                    onClick={() => window.open('/agent-dashboard', '_blank')}
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                    disabled
+                    title="Coming Soon"
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     See Details
                   </Button>
