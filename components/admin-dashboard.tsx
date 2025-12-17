@@ -269,7 +269,8 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
       documentsCount: 0,
     });
   const [isUploadingDoc, setIsUploadingDoc] = useState(false);
-  const [documentToDelete, setDocumentToDelete] = useState<BusinessDocument | null>(null);
+  const [documentToDelete, setDocumentToDelete] =
+    useState<BusinessDocument | null>(null);
 
   // User Management State
   const [isCreateUserOpen, setIsCreateUserOpen] = useState(false);
@@ -368,7 +369,8 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
 
   // Team Management State
   const [isManageTeamOpen, setIsManageTeamOpen] = useState(false);
-  const [selectedSupervisor, setSelectedSupervisor] = useState<PlatformUser | null>(null);
+  const [selectedSupervisor, setSelectedSupervisor] =
+    useState<PlatformUser | null>(null);
   const [teamSearchQuery, setTeamSearchQuery] = useState("");
   const [teamAssignments, setTeamAssignments] = useState<TeamAssignment[]>([
     { supervisorId: "usr_003", agentIds: ["usr_001", "usr_002"] },
@@ -513,7 +515,8 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
 
   // User Management Helper Functions
   const generatePassword = () => {
-    const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789!@#$%";
+    const chars =
+      "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789!@#$%";
     let password = "";
     for (let i = 0; i < 12; i++) {
       password += chars.charAt(Math.floor(Math.random() * chars.length));
@@ -562,19 +565,26 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
     setUsers((prev) =>
       prev.map((user) =>
         user.id === userId
-          ? { ...user, status: user.status === "Active" ? "Inactive" : "Active" }
-          : user
-      )
+          ? {
+              ...user,
+              status: user.status === "Active" ? "Inactive" : "Active",
+            }
+          : user,
+      ),
     );
   };
 
   // Team Management Helper Functions
-  const getSupervisors = () => users.filter((u) => u.role === "Supervisor" && u.status === "Active");
-  
-  const getAgents = () => users.filter((u) => u.role === "Agent" && u.status === "Active");
+  const getSupervisors = () =>
+    users.filter((u) => u.role === "Supervisor" && u.status === "Active");
+
+  const getAgents = () =>
+    users.filter((u) => u.role === "Agent" && u.status === "Active");
 
   const getAssignedAgentIds = (supervisorId: string) => {
-    const assignment = teamAssignments.find((a) => a.supervisorId === supervisorId);
+    const assignment = teamAssignments.find(
+      (a) => a.supervisorId === supervisorId,
+    );
     return assignment ? assignment.agentIds : [];
   };
 
@@ -588,8 +598,10 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
       (agent) =>
         !assignedIds.includes(agent.id) &&
         (teamSearchQuery === "" ||
-          agent.fullName.toLowerCase().includes(teamSearchQuery.toLowerCase()) ||
-          agent.email.toLowerCase().includes(teamSearchQuery.toLowerCase()))
+          agent.fullName
+            .toLowerCase()
+            .includes(teamSearchQuery.toLowerCase()) ||
+          agent.email.toLowerCase().includes(teamSearchQuery.toLowerCase())),
     );
   };
 
@@ -607,15 +619,20 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
   const handleAddAgentToTeam = (agentId: string) => {
     if (!selectedSupervisor) return;
     setTeamAssignments((prev) => {
-      const existing = prev.find((a) => a.supervisorId === selectedSupervisor.id);
+      const existing = prev.find(
+        (a) => a.supervisorId === selectedSupervisor.id,
+      );
       if (existing) {
         return prev.map((a) =>
           a.supervisorId === selectedSupervisor.id
             ? { ...a, agentIds: [...a.agentIds, agentId] }
-            : a
+            : a,
         );
       } else {
-        return [...prev, { supervisorId: selectedSupervisor.id, agentIds: [agentId] }];
+        return [
+          ...prev,
+          { supervisorId: selectedSupervisor.id, agentIds: [agentId] },
+        ];
       }
     });
   };
@@ -626,8 +643,8 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
       prev.map((a) =>
         a.supervisorId === selectedSupervisor.id
           ? { ...a, agentIds: a.agentIds.filter((id) => id !== agentId) }
-          : a
-      )
+          : a,
+      ),
     );
   };
 
@@ -2253,9 +2270,9 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                 <AlertDialogHeader>
                   <AlertDialogTitle>Delete Document</AlertDialogTitle>
                   <AlertDialogDescription>
-                    Are you sure you want to delete &quot;{documentToDelete?.name}&quot;?
-                    This action cannot be undone and will remove the document from
-                    the orchestrator&apos;s knowledge base.
+                    Are you sure you want to delete this file? This action
+                    cannot be undone and will remove the document from the
+                    knowledge base.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
@@ -2633,16 +2650,18 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                         <Label htmlFor="role">Role</Label>
                         <Select
                           value={newUser.role}
-                          onValueChange={(value: "Agent" | "Supervisor" | "Admin") =>
-                            setNewUser({ ...newUser, role: value })
-                          }
+                          onValueChange={(
+                            value: "Agent" | "Supervisor" | "Admin",
+                          ) => setNewUser({ ...newUser, role: value })}
                         >
                           <SelectTrigger>
                             <SelectValue placeholder="Select role" />
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="Agent">Agent</SelectItem>
-                            <SelectItem value="Supervisor">Supervisor</SelectItem>
+                            <SelectItem value="Supervisor">
+                              Supervisor
+                            </SelectItem>
                             <SelectItem value="Admin">Admin</SelectItem>
                           </SelectContent>
                         </Select>
@@ -2757,7 +2776,10 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
             {/* Supervisor Cards Grid */}
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {getSupervisors().map((supervisor) => (
-                <Card key={supervisor.id} className="hover:shadow-md transition-shadow">
+                <Card
+                  key={supervisor.id}
+                  className="hover:shadow-md transition-shadow"
+                >
                   <CardHeader className="pb-3">
                     <div className="flex items-center gap-3">
                       <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
@@ -2808,7 +2830,8 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                       No Supervisors Found
                     </h3>
                     <p className="text-sm text-muted-foreground mt-1">
-                      Add supervisors in User Management to start building teams.
+                      Add supervisors in User Management to start building
+                      teams.
                     </p>
                   </CardContent>
                 </Card>
@@ -2853,41 +2876,44 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                     <div className="border rounded-lg overflow-hidden">
                       <div className="max-h-[300px] overflow-y-auto">
                         {selectedSupervisor &&
-                          getAvailableAgents(selectedSupervisor.id).map((agent) => (
-                            <div
-                              key={agent.id}
-                              className="flex items-center justify-between p-3 hover:bg-muted border-b last:border-b-0 transition-colors"
-                            >
-                              <div className="flex items-center gap-3">
-                                <div className="h-8 w-8 rounded-full bg-gray-100 flex items-center justify-center">
-                                  <span className="text-xs font-medium text-gray-600">
-                                    {agent.fullName
-                                      .split(" ")
-                                      .map((n) => n[0])
-                                      .join("")}
-                                  </span>
-                                </div>
-                                <div>
-                                  <p className="font-medium text-sm">
-                                    {agent.fullName}
-                                  </p>
-                                  <p className="text-xs text-muted-foreground">
-                                    {agent.email}
-                                  </p>
-                                </div>
-                              </div>
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                className="h-8 w-8 p-0 hover:bg-green-100 hover:text-green-600"
-                                onClick={() => handleAddAgentToTeam(agent.id)}
+                          getAvailableAgents(selectedSupervisor.id).map(
+                            (agent) => (
+                              <div
+                                key={agent.id}
+                                className="flex items-center justify-between p-3 hover:bg-muted border-b last:border-b-0 transition-colors"
                               >
-                                <Plus className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          ))}
+                                <div className="flex items-center gap-3">
+                                  <div className="h-8 w-8 rounded-full bg-gray-100 flex items-center justify-center">
+                                    <span className="text-xs font-medium text-gray-600">
+                                      {agent.fullName
+                                        .split(" ")
+                                        .map((n) => n[0])
+                                        .join("")}
+                                    </span>
+                                  </div>
+                                  <div>
+                                    <p className="font-medium text-sm">
+                                      {agent.fullName}
+                                    </p>
+                                    <p className="text-xs text-muted-foreground">
+                                      {agent.email}
+                                    </p>
+                                  </div>
+                                </div>
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  className="h-8 w-8 p-0 hover:bg-green-100 hover:text-green-600"
+                                  onClick={() => handleAddAgentToTeam(agent.id)}
+                                >
+                                  <Plus className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            ),
+                          )}
                         {selectedSupervisor &&
-                          getAvailableAgents(selectedSupervisor.id).length === 0 && (
+                          getAvailableAgents(selectedSupervisor.id).length ===
+                            0 && (
                             <div className="p-6 text-center text-muted-foreground">
                               <Users className="h-8 w-8 mx-auto mb-2 opacity-50" />
                               <p className="text-sm">No available agents</p>
@@ -2913,41 +2939,46 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                     <div className="border rounded-lg overflow-hidden border-primary/20 bg-primary/5">
                       <div className="max-h-[300px] overflow-y-auto">
                         {selectedSupervisor &&
-                          getAssignedAgents(selectedSupervisor.id).map((agent) => (
-                            <div
-                              key={agent.id}
-                              className="flex items-center justify-between p-3 hover:bg-primary/10 border-b border-primary/10 last:border-b-0 transition-colors"
-                            >
-                              <div className="flex items-center gap-3">
-                                <div className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center">
-                                  <span className="text-xs font-medium text-primary">
-                                    {agent.fullName
-                                      .split(" ")
-                                      .map((n) => n[0])
-                                      .join("")}
-                                  </span>
-                                </div>
-                                <div>
-                                  <p className="font-medium text-sm">
-                                    {agent.fullName}
-                                  </p>
-                                  <p className="text-xs text-muted-foreground">
-                                    {agent.email}
-                                  </p>
-                                </div>
-                              </div>
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                className="h-8 w-8 p-0 hover:bg-red-100 hover:text-red-600"
-                                onClick={() => handleRemoveAgentFromTeam(agent.id)}
+                          getAssignedAgents(selectedSupervisor.id).map(
+                            (agent) => (
+                              <div
+                                key={agent.id}
+                                className="flex items-center justify-between p-3 hover:bg-primary/10 border-b border-primary/10 last:border-b-0 transition-colors"
                               >
-                                <UserMinus className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          ))}
+                                <div className="flex items-center gap-3">
+                                  <div className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center">
+                                    <span className="text-xs font-medium text-primary">
+                                      {agent.fullName
+                                        .split(" ")
+                                        .map((n) => n[0])
+                                        .join("")}
+                                    </span>
+                                  </div>
+                                  <div>
+                                    <p className="font-medium text-sm">
+                                      {agent.fullName}
+                                    </p>
+                                    <p className="text-xs text-muted-foreground">
+                                      {agent.email}
+                                    </p>
+                                  </div>
+                                </div>
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  className="h-8 w-8 p-0 hover:bg-red-100 hover:text-red-600"
+                                  onClick={() =>
+                                    handleRemoveAgentFromTeam(agent.id)
+                                  }
+                                >
+                                  <UserMinus className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            ),
+                          )}
                         {selectedSupervisor &&
-                          getAssignedAgents(selectedSupervisor.id).length === 0 && (
+                          getAssignedAgents(selectedSupervisor.id).length ===
+                            0 && (
                             <div className="p-6 text-center text-muted-foreground">
                               <UsersRound className="h-8 w-8 mx-auto mb-2 opacity-50" />
                               <p className="text-sm">No agents assigned yet</p>
