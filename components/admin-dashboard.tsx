@@ -26,6 +26,16 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
   Bot,
   Plus,
   Upload,
@@ -259,6 +269,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
       documentsCount: 0,
     });
   const [isUploadingDoc, setIsUploadingDoc] = useState(false);
+  const [documentToDelete, setDocumentToDelete] = useState<BusinessDocument | null>(null);
 
   // User Management State
   const [isCreateUserOpen, setIsCreateUserOpen] = useState(false);
@@ -2220,7 +2231,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                             <Button
                               variant="ghost"
                               size="sm"
-                              onClick={() => removeBusinessDocument(doc.id)}
+                              onClick={() => setDocumentToDelete(doc)}
                             >
                               <Trash2 className="h-4 w-4" />
                             </Button>
@@ -2232,6 +2243,37 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                 )}
               </CardContent>
             </Card>
+
+            {/* Delete Document Confirmation Dialog */}
+            <AlertDialog
+              open={documentToDelete !== null}
+              onOpenChange={(open) => !open && setDocumentToDelete(null)}
+            >
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Delete Document</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Are you sure you want to delete &quot;{documentToDelete?.name}&quot;?
+                    This action cannot be undone and will remove the document from
+                    the orchestrator&apos;s knowledge base.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction
+                    className="bg-red-600 hover:bg-red-700"
+                    onClick={() => {
+                      if (documentToDelete) {
+                        removeBusinessDocument(documentToDelete.id);
+                        setDocumentToDelete(null);
+                      }
+                    }}
+                  >
+                    Delete
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
 
             {/* Routing Analytics Dashboard */}
             <Card>
