@@ -25,6 +25,7 @@ import {
   Lock,
   Mail,
   Loader2,
+  RefreshCw,
 } from "lucide-react";
 
 interface AgentDesktopProps {
@@ -44,6 +45,7 @@ function FloatingCoachingWidget({
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -82,6 +84,13 @@ function FloatingCoachingWidget({
     setEmail("");
     setPassword("");
     setRememberMe(false);
+  };
+
+  const handleRefreshFeedback = async () => {
+    if (isRefreshing) return;
+    setIsRefreshing(true);
+    await new Promise((resolve) => setTimeout(resolve, 1200));
+    setIsRefreshing(false);
   };
 
   const yesterdayPerformance = {
@@ -163,14 +172,28 @@ function FloatingCoachingWidget({
                     </CardTitle>
                   </div>
                 )}
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setIsCollapsed(true)}
-                  className="h-7 w-7 p-0 ml-auto"
-                >
-                  <X className="h-4 w-4" />
-                </Button>
+                <div className="flex items-center gap-1 ml-auto">
+                  {isLoggedIn && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleRefreshFeedback}
+                      disabled={isRefreshing}
+                      className="h-7 w-7 p-0"
+                      title="Refresh feedback"
+                    >
+                      <RefreshCw className={`h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`} />
+                    </Button>
+                  )}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setIsCollapsed(true)}
+                    className="h-7 w-7 p-0"
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
               {isLoggedIn && (
                 <CardDescription className="text-base font-medium text-blue-600">
