@@ -63,6 +63,13 @@ function FloatingCoachingWidget({
   const [forgotPasswordLoading, setForgotPasswordLoading] = useState(false);
   const [resendCountdown, setResendCountdown] = useState(0);
   const [codeSentMessage, setCodeSentMessage] = useState(true);
+  
+  const [isFirstTimeLogin, setIsFirstTimeLogin] = useState(false);
+  const [showSetupPassword, setShowSetupPassword] = useState(false);
+  const [setupNewPassword, setSetupNewPassword] = useState("");
+  const [setupConfirmPassword, setSetupConfirmPassword] = useState("");
+  const [setupPasswordError, setSetupPasswordError] = useState("");
+  const [setupPasswordLoading, setSetupPasswordLoading] = useState(false);
 
   useEffect(() => {
     const savedLoginState = localStorage.getItem("traina_logged_in");
@@ -86,6 +93,11 @@ function FloatingCoachingWidget({
     await new Promise((resolve) => setTimeout(resolve, 1500));
 
     if (email === "thomson@traina.com" && password === "1234") {
+      if (isFirstTimeLogin) {
+        setShowSetupPassword(true);
+        setIsLoading(false);
+        return;
+      }
       setIsLoggedIn(true);
       if (rememberMe) {
         localStorage.setItem("traina_logged_in", "true");
@@ -96,6 +108,43 @@ function FloatingCoachingWidget({
       setError("Invalid credentials. Please try again.");
     }
     setIsLoading(false);
+  };
+
+  const handleSetupPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSetupPasswordError("");
+
+    if (setupNewPassword.length < 8) {
+      setSetupPasswordError("Password must be at least 8 characters.");
+      return;
+    }
+
+    if (setupNewPassword !== setupConfirmPassword) {
+      setSetupPasswordError("Passwords do not match.");
+      return;
+    }
+
+    setSetupPasswordLoading(true);
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+
+    setIsLoggedIn(true);
+    if (rememberMe) {
+      localStorage.setItem("traina_logged_in", "true");
+    }
+    setEmail("");
+    setPassword("");
+    setShowSetupPassword(false);
+    setIsFirstTimeLogin(false);
+    setSetupNewPassword("");
+    setSetupConfirmPassword("");
+    setSetupPasswordLoading(false);
+  };
+
+  const handleCancelSetupPassword = () => {
+    setShowSetupPassword(false);
+    setSetupNewPassword("");
+    setSetupConfirmPassword("");
+    setSetupPasswordError("");
   };
 
   const handleLogout = () => {
@@ -526,6 +575,96 @@ function FloatingCoachingWidget({
                       </div>
                     )}
                   </div>
+                ) : showSetupPassword ? (
+                  <div className="space-y-4 py-4">
+                    <div className="text-center space-y-2 mb-6">
+                      <div className="mx-auto w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                        <KeyRound className="h-6 w-6 text-blue-600" />
+                      </div>
+                      <h3 className="font-semibold text-gray-900 text-lg">
+                        Set Up Your Password
+                      </h3>
+                      <p className="text-sm text-gray-600">
+                        Welcome! Please create a new password for your account.
+                      </p>
+                    </div>
+
+                    <div className="mx-6 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                      <p className="text-sm text-blue-700">
+                        Logged in as <span className="font-medium">{email}</span>
+                      </p>
+                    </div>
+
+                    <form onSubmit={handleSetupPassword} className="space-y-4 px-6">
+                      <div className="space-y-2">
+                        <Label htmlFor="setupNewPassword" className="text-sm font-medium">
+                          New Password
+                        </Label>
+                        <div className="relative">
+                          <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                          <Input
+                            id="setupNewPassword"
+                            type="password"
+                            placeholder="At least 8 characters"
+                            value={setupNewPassword}
+                            onChange={(e) => setSetupNewPassword(e.target.value)}
+                            className="pl-10 rounded-lg border-gray-300"
+                            required
+                            disabled={setupPasswordLoading}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="setupConfirmPassword" className="text-sm font-medium">
+                          Confirm Password
+                        </Label>
+                        <div className="relative">
+                          <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                          <Input
+                            id="setupConfirmPassword"
+                            type="password"
+                            placeholder="Confirm your password"
+                            value={setupConfirmPassword}
+                            onChange={(e) => setSetupConfirmPassword(e.target.value)}
+                            className="pl-10 rounded-lg border-gray-300"
+                            required
+                            disabled={setupPasswordLoading}
+                          />
+                        </div>
+                      </div>
+
+                      {setupPasswordError && (
+                        <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+                          <p className="text-sm text-red-600">{setupPasswordError}</p>
+                        </div>
+                      )}
+
+                      <Button
+                        type="submit"
+                        className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-lg"
+                        disabled={setupPasswordLoading}
+                      >
+                        {setupPasswordLoading ? (
+                          <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            Setting up...
+                          </>
+                        ) : (
+                          "Set Password & Continue"
+                        )}
+                      </Button>
+
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="w-full"
+                        onClick={handleCancelSetupPassword}
+                      >
+                        Cancel
+                      </Button>
+                    </form>
+                  </div>
                 ) : (
                 <div className="space-y-4 py-4">
                   <div className="text-center space-y-2 mb-6">
@@ -610,6 +749,23 @@ function FloatingCoachingWidget({
                       >
                         Forgot Password?
                       </button>
+                    </div>
+
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        id="firstTimeLogin"
+                        checked={isFirstTimeLogin}
+                        onCheckedChange={(checked) =>
+                          setIsFirstTimeLogin(checked as boolean)
+                        }
+                        disabled={isLoading}
+                      />
+                      <Label
+                        htmlFor="firstTimeLogin"
+                        className="text-sm text-gray-600 cursor-pointer"
+                      >
+                        First time login (setup new password)
+                      </Label>
                     </div>
 
                     <Button
