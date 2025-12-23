@@ -1,0 +1,51 @@
+
+
+In the ' user managemnt' on admin pane, Add a bulk user import feature to the existing user management system. Here are the requirements:
+
+**1. UI Changes:**
+- Add an "Import Users" button next to the existing "Create New User" button in the user management header
+- The button should have an upload icon and open a modal when clicked
+
+**2. Import Modal (Step 1 - Upload):**
+- Create a modal with the title "Import Users" and subtitle "Upload a CSV file to add multiple users at once"
+- Include two steps:
+  - Step 1: "Download CSV Template" - Add a button to download a sample CSV template file
+  - Step 2: "Upload Your File" - Add a file upload area with drag-and-drop support that accepts only .csv files (max 5MB)
+- The CSV template should include columns: Full Name, Email, Role, Amazon Connect User ID
+- Required fields: Full Name, Email, Role
+- Optional fields: Amazon Connect User ID
+
+**3. Validation Screen:**
+- After file upload, parse and validate the CSV data
+- Show validation results with:
+  - Summary cards showing count of Valid users (green), Warnings (yellow), and Errors (red)
+  - List of specific issues found with row number, field name, and error message
+  - Validation rules:
+    * Email must be valid format and unique
+    * Full Name is required
+    * Role must be one of: Agent, Supervisor, Admin
+    * Flag warnings for missing optional fields
+- Add a note: "Users with errors will be skipped. Users with warnings will be imported with default values."
+- Show "Back" button and "Import X Users" button (disabled if errors exist)
+
+**4. Success Confirmation:**
+- Show success modal with checkmark icon
+- Display message: "X users have been successfully imported to the platform"
+- "Done" button to close and refresh the user list
+
+**5. Technical Requirements:**
+- Use the same styling and components as the existing user management interface
+- Integrate with existing user creation API/database functions
+- Handle CSV parsing on the backend
+- Validate data before insertion
+- Return detailed validation results to frontend
+- Bulk insert valid users into the database
+- Maintain existing user table functionality
+
+**6. Error Handling:**
+- Show appropriate error messages for file upload failures
+- Handle CSV parsing errors gracefully
+- Validate file size and format before processing
+- Show user-friendly error messages for all failure scenarios
+
+Please implement this feature maintaining consistency with the existing design system and user management functionality.

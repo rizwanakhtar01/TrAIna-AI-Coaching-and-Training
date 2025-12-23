@@ -367,6 +367,30 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
     },
   ]);
 
+  // Bulk Import State
+  interface CsvValidationIssue {
+    row: number;
+    field: string;
+    message: string;
+    type: "error" | "warning";
+  }
+  interface CsvUserRow {
+    fullName: string;
+    email: string;
+    role: string;
+    amazonConnectUserId: string;
+    isValid: boolean;
+    hasWarning: boolean;
+  }
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+  const [importStep, setImportStep] = useState<"upload" | "validation" | "success">("upload");
+  const [csvFile, setCsvFile] = useState<File | null>(null);
+  const [csvData, setCsvData] = useState<CsvUserRow[]>([]);
+  const [validationIssues, setValidationIssues] = useState<CsvValidationIssue[]>([]);
+  const [isProcessingCsv, setIsProcessingCsv] = useState(false);
+  const [importedCount, setImportedCount] = useState(0);
+  const [isDraggingCsv, setIsDraggingCsv] = useState(false);
+
   // Team Management State
   const [isManageTeamOpen, setIsManageTeamOpen] = useState(false);
   const [selectedSupervisor, setSelectedSupervisor] =
@@ -573,6 +597,128 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
       ),
     );
   };
+
+  // Bulk Import Helper Functions
+  const downloadCsvTemplate = () => {
+    const template = "Full Name,Email,Role,Amazon Connect User ID\nJohn Doe,john.doe@company.com,Agent,AC-001-JD\nJane Smith,jane.smith@company.com,Supervisor,";
+    const blob = new Blob([template], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "user_import_template.csv";
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const validateEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const parseCsvFile = async (file: File) => {
+    setIsProcessingCsv(true);
+    const text = await file.text();
+    const lines = text.split("\n").filter((line) => line.trim() !== "");
+    const issues: CsvValidationIssue[] = [];
+    const parsedRows: CsvUserRow[] = [];
+    const existingEmails = users.map((u) => u.email.toLowerCase());
+    const seenEmails = new Set<string>();
+
+    for (let i = 1; i < lines.length; i++) {
+      const values = lines[i].split(",").map((v) => v.trim().replace(/^"|"$/g, ""));
+      const [fullName, email, role, amazonConnectUserId] = values;
+      let isValid = true;
+      let hasWarning = false;
+
+      if (!fullName || fullName.trim() === "") {
+        issues.push({ row: i + 1, field: "Full Name", message: "Full Name is required", type: "error" });
+        isValid = false;
+      }
+
+      if (!email || email.trim() === "") {
+        issues.push({ row: i + 1, field: "Email", message: "Email is required", type: "error" });
+        isValid = false;
+      } else if (!validateEmail(email)) {
+        issues.push({ row: i + 1, field: "Email", message: "Invalid email format", type: "error" });
+        isValid = false;
+      } else if (existingEmails.includes(email.toLowerCase())) {
+        issues.push({ row: i + 1, field: "Email", message: "Email already exists in the system", type: "error" });
+        isValid = false;
+      } else if (seenEmails.has(email.toLowerCase())) {
+        issues.push({ row: i + 1, field: "Email", message: "Duplicate email in CSV file", type: "error" });
+        isValid = false;
+      } else {
+        seenEmails.add(email.toLowerCase());
+      }
+
+      const validRoles = ["Agent", "Supervisor", "Admin"];
+      if (!role || !validRoles.includes(role)) {
+        issues.push({ row: i + 1, field: "Role", message: `Role must be one of: ${validRoles.join(", ")}`, type: "error" });
+        isValid = false;
+      }
+
+      if (!amazonConnectUserId || amazonConnectUserId.trim() === "") {
+        issues.push({ row: i + 1, field: "Amazon Connect User ID", message: "Amazon Connect User ID is missing (will use default)", type: "warning" });
+        hasWarning = true;
+      }
+
+      parsedRows.push({
+        fullName: fullName || "",
+        email: email || "",
+        role: role || "",
+        amazonConnectUserId: amazonConnectUserId || "",
+        isValid,
+        hasWarning,
+      });
+    }
+
+    setCsvData(parsedRows);
+    setValidationIssues(issues);
+    setImportStep("validation");
+    setIsProcessingCsv(false);
+  };
+
+  const handleCsvFileSelect = (file: File) => {
+    if (file.size > 5 * 1024 * 1024) {
+      alert("File size must be less than 5MB");
+      return;
+    }
+    if (!file.name.endsWith(".csv")) {
+      alert("Please upload a CSV file");
+      return;
+    }
+    setCsvFile(file);
+    parseCsvFile(file);
+  };
+
+  const handleImportUsers = () => {
+    const validUsers = csvData.filter((row) => row.isValid);
+    const newUsers: PlatformUser[] = validUsers.map((row) => ({
+      id: `usr_${Math.random().toString(36).substr(2, 9)}`,
+      fullName: row.fullName,
+      email: row.email,
+      role: row.role as "Agent" | "Supervisor" | "Admin",
+      amazonConnectUserId: row.amazonConnectUserId || `AC-${Math.random().toString(36).substr(2, 6).toUpperCase()}`,
+      status: "Active" as const,
+      createdAt: new Date().toISOString().split("T")[0],
+    }));
+    setUsers((prev) => [...prev, ...newUsers]);
+    setImportedCount(newUsers.length);
+    setImportStep("success");
+  };
+
+  const resetImportModal = () => {
+    setIsImportModalOpen(false);
+    setImportStep("upload");
+    setCsvFile(null);
+    setCsvData([]);
+    setValidationIssues([]);
+    setImportedCount(0);
+  };
+
+  const getValidCount = () => csvData.filter((r) => r.isValid).length;
+  const getWarningCount = () => csvData.filter((r) => r.isValid && r.hasWarning).length;
+  const getErrorCount = () => csvData.filter((r) => !r.isValid).length;
 
   // Team Management Helper Functions
   const getSupervisors = () =>
@@ -2488,10 +2634,16 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                   Manage platform users, roles, and access permissions
                 </p>
               </div>
-              <Button onClick={handleCreateUserOpen}>
-                <UserPlus className="h-4 w-4 mr-2" />
-                Create New User
-              </Button>
+              <div className="flex gap-2">
+                <Button variant="outline" onClick={() => setIsImportModalOpen(true)}>
+                  <Upload className="h-4 w-4 mr-2" />
+                  Import Users
+                </Button>
+                <Button onClick={handleCreateUserOpen}>
+                  <UserPlus className="h-4 w-4 mr-2" />
+                  Create New User
+                </Button>
+              </div>
             </div>
 
             {/* Users Table */}
@@ -2753,6 +2905,178 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                       <Button onClick={() => setIsCreateUserOpen(false)}>
                         Done
                       </Button>
+                    </DialogFooter>
+                  </>
+                )}
+              </DialogContent>
+            </Dialog>
+
+            {/* Import Users Modal */}
+            <Dialog open={isImportModalOpen} onOpenChange={(open) => !open && resetImportModal()}>
+              <DialogContent className="sm:max-w-[600px]">
+                {importStep === "upload" && (
+                  <>
+                    <DialogHeader>
+                      <DialogTitle className="flex items-center gap-2">
+                        <Upload className="h-5 w-5 text-primary" />
+                        Import Users
+                      </DialogTitle>
+                      <DialogDescription>
+                        Upload a CSV file to add multiple users at once
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-6 py-4">
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2">
+                          <div className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-white text-sm font-medium">1</div>
+                          <Label className="font-medium">Download CSV Template</Label>
+                        </div>
+                        <p className="text-sm text-muted-foreground ml-8">
+                          Download and fill in the template with your user data
+                        </p>
+                        <div className="ml-8">
+                          <Button variant="outline" size="sm" onClick={downloadCsvTemplate}>
+                            <Download className="h-4 w-4 mr-2" />
+                            Download Template
+                          </Button>
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2">
+                          <div className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-white text-sm font-medium">2</div>
+                          <Label className="font-medium">Upload Your File</Label>
+                        </div>
+                        <p className="text-sm text-muted-foreground ml-8">
+                          Accepts .csv files up to 5MB
+                        </p>
+                        <div
+                          className={`ml-8 border-2 border-dashed rounded-lg p-8 text-center transition-colors ${isDraggingCsv ? "border-primary bg-primary/5" : "border-muted-foreground/25"}`}
+                          onDragOver={(e) => { e.preventDefault(); setIsDraggingCsv(true); }}
+                          onDragLeave={() => setIsDraggingCsv(false)}
+                          onDrop={(e) => {
+                            e.preventDefault();
+                            setIsDraggingCsv(false);
+                            const file = e.dataTransfer.files[0];
+                            if (file) handleCsvFileSelect(file);
+                          }}
+                        >
+                          <Upload className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
+                          <p className="text-sm text-muted-foreground mb-2">
+                            Drag and drop your CSV file here, or
+                          </p>
+                          <label>
+                            <input
+                              type="file"
+                              accept=".csv"
+                              className="hidden"
+                              onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) handleCsvFileSelect(file);
+                              }}
+                            />
+                            <Button variant="outline" size="sm" asChild>
+                              <span className="cursor-pointer">Browse Files</span>
+                            </Button>
+                          </label>
+                        </div>
+                      </div>
+
+                      <div className="bg-muted/50 rounded-lg p-4 space-y-2">
+                        <h4 className="font-medium text-sm">CSV Format Requirements</h4>
+                        <ul className="text-xs text-muted-foreground space-y-1">
+                          <li><strong>Required:</strong> Full Name, Email, Role</li>
+                          <li><strong>Optional:</strong> Amazon Connect User ID</li>
+                          <li><strong>Roles:</strong> Agent, Supervisor, Admin</li>
+                        </ul>
+                      </div>
+                    </div>
+                    <DialogFooter>
+                      <Button variant="outline" onClick={resetImportModal}>Cancel</Button>
+                    </DialogFooter>
+                  </>
+                )}
+
+                {importStep === "validation" && (
+                  <>
+                    <DialogHeader>
+                      <DialogTitle className="flex items-center gap-2">
+                        <FileText className="h-5 w-5 text-primary" />
+                        Validation Results
+                      </DialogTitle>
+                      <DialogDescription>
+                        Review the validation results before importing
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4 py-4">
+                      <div className="grid grid-cols-3 gap-3">
+                        <div className="bg-green-50 border border-green-200 rounded-lg p-3 text-center">
+                          <div className="text-2xl font-bold text-green-600">{getValidCount()}</div>
+                          <div className="text-xs text-green-700">Valid Users</div>
+                        </div>
+                        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 text-center">
+                          <div className="text-2xl font-bold text-yellow-600">{getWarningCount()}</div>
+                          <div className="text-xs text-yellow-700">Warnings</div>
+                        </div>
+                        <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-center">
+                          <div className="text-2xl font-bold text-red-600">{getErrorCount()}</div>
+                          <div className="text-xs text-red-700">Errors</div>
+                        </div>
+                      </div>
+
+                      {validationIssues.length > 0 && (
+                        <div className="border rounded-lg max-h-48 overflow-y-auto">
+                          <div className="p-3 space-y-2">
+                            {validationIssues.map((issue, idx) => (
+                              <div key={idx} className={`flex items-start gap-2 text-sm p-2 rounded ${issue.type === "error" ? "bg-red-50" : "bg-yellow-50"}`}>
+                                <AlertCircle className={`h-4 w-4 mt-0.5 ${issue.type === "error" ? "text-red-500" : "text-yellow-500"}`} />
+                                <div>
+                                  <span className="font-medium">Row {issue.row}</span>
+                                  <span className="text-muted-foreground"> - {issue.field}: </span>
+                                  <span>{issue.message}</span>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      <p className="text-xs text-muted-foreground bg-muted/50 p-3 rounded">
+                        Users with errors will be skipped. Users with warnings will be imported with default values.
+                      </p>
+                    </div>
+                    <DialogFooter className="gap-2">
+                      <Button variant="outline" onClick={() => { setImportStep("upload"); setCsvFile(null); setCsvData([]); setValidationIssues([]); }}>
+                        Back
+                      </Button>
+                      <Button onClick={handleImportUsers} disabled={getValidCount() === 0}>
+                        Import {getValidCount()} Users
+                      </Button>
+                    </DialogFooter>
+                  </>
+                )}
+
+                {importStep === "success" && (
+                  <>
+                    <DialogHeader>
+                      <DialogTitle className="flex items-center gap-2 text-green-600">
+                        <CheckCircle className="h-5 w-5" />
+                        Import Successful
+                      </DialogTitle>
+                    </DialogHeader>
+                    <div className="py-6 text-center space-y-4">
+                      <div className="h-16 w-16 rounded-full bg-green-100 flex items-center justify-center mx-auto">
+                        <CheckCircle className="h-8 w-8 text-green-600" />
+                      </div>
+                      <div>
+                        <p className="text-lg font-medium">{importedCount} users imported</p>
+                        <p className="text-sm text-muted-foreground">
+                          {importedCount} users have been successfully imported to the platform
+                        </p>
+                      </div>
+                    </div>
+                    <DialogFooter>
+                      <Button onClick={resetImportModal}>Done</Button>
                     </DialogFooter>
                   </>
                 )}
