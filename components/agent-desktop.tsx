@@ -363,7 +363,7 @@ function FloatingCoachingWidget({
 
                     {forgotPasswordStep === "code" && (
                       <>
-                        <div className="text-center space-y-2 mb-6">
+                        <div className="text-center space-y-2 mb-4">
                           <div className="mx-auto w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
                             <Lock className="h-6 w-6 text-blue-600" />
                           </div>
@@ -372,6 +372,13 @@ function FloatingCoachingWidget({
                           </h3>
                           <p className="text-sm text-gray-600">
                             We sent a code to <span className="font-medium">{resetEmail}</span>
+                          </p>
+                        </div>
+
+                        <div className="mx-6 p-3 bg-green-50 border border-green-200 rounded-lg flex items-center gap-2">
+                          <CheckCircle className="h-4 w-4 text-green-600 flex-shrink-0" />
+                          <p className="text-sm text-green-700">
+                            Verification code sent successfully!
                           </p>
                         </div>
 
