@@ -61,6 +61,8 @@ function FloatingCoachingWidget({
   const [confirmPassword, setConfirmPassword] = useState("");
   const [forgotPasswordError, setForgotPasswordError] = useState("");
   const [forgotPasswordLoading, setForgotPasswordLoading] = useState(false);
+  const [resendCountdown, setResendCountdown] = useState(0);
+  const [codeSentMessage, setCodeSentMessage] = useState(true);
 
   useEffect(() => {
     const savedLoginState = localStorage.getItem("traina_logged_in");
@@ -68,6 +70,13 @@ function FloatingCoachingWidget({
       setIsLoggedIn(true);
     }
   }, []);
+
+  useEffect(() => {
+    if (resendCountdown > 0) {
+      const timer = setTimeout(() => setResendCountdown(resendCountdown - 1), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [resendCountdown]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -139,6 +148,8 @@ function FloatingCoachingWidget({
     }
 
     setForgotPasswordStep("code");
+    setResendCountdown(60);
+    setCodeSentMessage(true);
     setForgotPasswordLoading(false);
   };
 
@@ -175,8 +186,15 @@ function FloatingCoachingWidget({
   };
 
   const handleResendCode = async () => {
+    if (resendCountdown > 0) return;
     setForgotPasswordLoading(true);
+    setVerificationCode("");
+    setNewPassword("");
+    setConfirmPassword("");
+    setForgotPasswordError("");
     await new Promise((resolve) => setTimeout(resolve, 1000));
+    setResendCountdown(60);
+    setCodeSentMessage(true);
     setForgotPasswordLoading(false);
   };
 
@@ -460,14 +478,20 @@ function FloatingCoachingWidget({
                           </Button>
 
                           <div className="text-center">
-                            <button
-                              type="button"
-                              className="text-sm text-blue-600 hover:text-blue-700"
-                              onClick={handleResendCode}
-                              disabled={forgotPasswordLoading}
-                            >
-                              Didn't receive code? Resend
-                            </button>
+                            {resendCountdown > 0 ? (
+                              <p className="text-sm text-gray-500">
+                                Resend code in {resendCountdown}s
+                              </p>
+                            ) : (
+                              <button
+                                type="button"
+                                className="text-sm text-blue-600 hover:text-blue-700 font-medium hover:underline"
+                                onClick={handleResendCode}
+                                disabled={forgotPasswordLoading}
+                              >
+                                Didn't receive code? Resend
+                              </button>
+                            )}
                           </div>
 
                           <p className="text-center text-sm text-gray-600">
