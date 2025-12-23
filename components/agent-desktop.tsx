@@ -463,14 +463,16 @@ function FloatingCoachingWidget({
                             </button>
                           </div>
 
-                          <Button
-                            type="button"
-                            variant="outline"
-                            className="w-full"
-                            onClick={() => setForgotPasswordStep("email")}
-                          >
-                            Back
-                          </Button>
+                          <p className="text-center text-sm text-gray-600">
+                            Wrong Email?{" "}
+                            <button
+                              type="button"
+                              className="text-blue-600 hover:text-blue-700 font-medium hover:underline"
+                              onClick={() => setForgotPasswordStep("email")}
+                            >
+                              Start Over
+                            </button>
+                          </p>
                         </form>
                       </>
                     )}
