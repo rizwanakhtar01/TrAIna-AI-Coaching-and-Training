@@ -725,7 +725,7 @@ function FloatingCoachingWidget({
                     )}
 
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-2">
+                      {/* <div className="flex items-center space-x-2">
                         <Checkbox
                           id="remember"
                           checked={rememberMe}
@@ -740,7 +740,7 @@ function FloatingCoachingWidget({
                         >
                           Remember me
                         </Label>
-                      </div>
+                      </div> */}
                       <button
                         type="button"
                         className="text-sm text-blue-600 hover:text-blue-700 font-medium"
