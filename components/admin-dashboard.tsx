@@ -2883,7 +2883,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                             value: "Agent" | "Supervisor" | "Admin",
                           ) => setNewUser({ ...newUser, role: value })}
                         >
-                          <SelectTrigger className="w-full">
+                          <SelectTrigger>
                             <SelectValue placeholder="Select role" />
                           </SelectTrigger>
                           <SelectContent>
@@ -3088,7 +3088,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                             <strong>Required:</strong> Full Name, Email, Role
                           </li>
                           <li>
-                            <strong>Optional:</strong> Amazon Connect User ID
+                            <strong>Required:</strong> Amazon Connect User ID
                           </li>
                           <li>
                             <strong>Roles:</strong> Agent, Supervisor, Admin
