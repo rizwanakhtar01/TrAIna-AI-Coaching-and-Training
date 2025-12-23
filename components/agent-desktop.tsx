@@ -189,8 +189,6 @@ function FloatingCoachingWidget({
     if (resendCountdown > 0) return;
     setForgotPasswordLoading(true);
     setVerificationCode("");
-    setNewPassword("");
-    setConfirmPassword("");
     setForgotPasswordError("");
     await new Promise((resolve) => setTimeout(resolve, 1000));
     setResendCountdown(60);
