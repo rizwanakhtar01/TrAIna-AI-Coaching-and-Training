@@ -283,6 +283,10 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
   });
   const [generatedPassword, setGeneratedPassword] = useState("");
   const [copiedPassword, setCopiedPassword] = useState(false);
+  const [userToDelete, setUserToDelete] = useState<PlatformUser | null>(null);
+  const [userToToggle, setUserToToggle] = useState<PlatformUser | null>(null);
+  const [isEditUserOpen, setIsEditUserOpen] = useState(false);
+  const [editingUser, setEditingUser] = useState<PlatformUser | null>(null);
   const [users, setUsers] = useState<PlatformUser[]>([
     {
       id: "usr_001",
@@ -585,21 +589,44 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
     setShowUserCreatedSuccess(true);
   };
 
-  const handleDeleteUser = (userId: string) => {
-    setUsers((prev) => prev.filter((user) => user.id !== userId));
+  const handleDeleteUser = () => {
+    if (userToDelete) {
+      setUsers((prev) => prev.filter((user) => user.id !== userToDelete.id));
+      setUserToDelete(null);
+    }
   };
 
-  const handleToggleUserStatus = (userId: string) => {
-    setUsers((prev) =>
-      prev.map((user) =>
-        user.id === userId
-          ? {
-              ...user,
-              status: user.status === "Active" ? "Inactive" : "Active",
-            }
-          : user,
-      ),
-    );
+  const handleToggleUserStatus = () => {
+    if (userToToggle) {
+      setUsers((prev) =>
+        prev.map((user) =>
+          user.id === userToToggle.id
+            ? {
+                ...user,
+                status: user.status === "Active" ? "Inactive" : "Active",
+              }
+            : user,
+        ),
+      );
+      setUserToToggle(null);
+    }
+  };
+
+  const handleEditUserOpen = (user: PlatformUser) => {
+    setEditingUser(user);
+    setIsEditUserOpen(true);
+  };
+
+  const handleSaveEditUser = () => {
+    if (editingUser) {
+      setUsers((prev) =>
+        prev.map((user) =>
+          user.id === editingUser.id ? editingUser : user,
+        ),
+      );
+      setIsEditUserOpen(false);
+      setEditingUser(null);
+    }
   };
 
   // Bulk Import Helper Functions
@@ -2807,13 +2834,11 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                              <DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => handleEditUserOpen(user)}>
                                 <Edit className="h-4 w-4 mr-2" />
                                 Edit
                               </DropdownMenuItem>
-                              <DropdownMenuItem
-                                onClick={() => handleToggleUserStatus(user.id)}
-                              >
+                              <DropdownMenuItem onClick={() => setUserToToggle(user)}>
                                 <Power className="h-4 w-4 mr-2" />
                                 {user.status === "Active"
                                   ? "Deactivate"
@@ -2821,7 +2846,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                               </DropdownMenuItem>
                               <DropdownMenuItem
                                 className="text-red-600"
-                                onClick={() => handleDeleteUser(user.id)}
+                                onClick={() => setUserToDelete(user)}
                               >
                                 <Trash2 className="h-4 w-4 mr-2" />
                                 Delete
@@ -3222,6 +3247,118 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                     </DialogFooter>
                   </>
                 )}
+              </DialogContent>
+            </Dialog>
+
+            {/* Delete User Confirmation */}
+            <AlertDialog open={userToDelete !== null} onOpenChange={(open) => !open && setUserToDelete(null)}>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Delete User</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Are you sure you want to delete {userToDelete?.fullName}? This action cannot be undone.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction className="bg-red-600 hover:bg-red-700" onClick={handleDeleteUser}>
+                    Delete
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+
+            {/* Toggle Status Confirmation */}
+            <AlertDialog open={userToToggle !== null} onOpenChange={(open) => !open && setUserToToggle(null)}>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>
+                    {userToToggle?.status === "Active" ? "Deactivate" : "Activate"} User
+                  </AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Are you sure you want to {userToToggle?.status === "Active" ? "deactivate" : "activate"} {userToToggle?.fullName}?
+                    {userToToggle?.status === "Active" 
+                      ? " They will no longer be able to access the platform."
+                      : " They will regain access to the platform."}
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleToggleUserStatus}>
+                    {userToToggle?.status === "Active" ? "Deactivate" : "Activate"}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+
+            {/* Edit User Dialog */}
+            <Dialog open={isEditUserOpen} onOpenChange={(open) => { if (!open) { setIsEditUserOpen(false); setEditingUser(null); }}}>
+              <DialogContent className="sm:max-w-[500px]">
+                <DialogHeader>
+                  <DialogTitle className="flex items-center gap-2">
+                    <Edit className="h-5 w-5 text-primary" />
+                    Edit User
+                  </DialogTitle>
+                  <DialogDescription>
+                    Update user information
+                  </DialogDescription>
+                </DialogHeader>
+                {editingUser && (
+                  <div className="space-y-4 py-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="editFullName">Full Name*</Label>
+                      <Input
+                        id="editFullName"
+                        placeholder="Enter full name"
+                        value={editingUser.fullName}
+                        onChange={(e) => setEditingUser({ ...editingUser, fullName: e.target.value })}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="editEmail">Email*</Label>
+                      <Input
+                        id="editEmail"
+                        type="email"
+                        placeholder="Enter email address"
+                        value={editingUser.email}
+                        onChange={(e) => setEditingUser({ ...editingUser, email: e.target.value })}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="editRole">Role*</Label>
+                      <Select
+                        value={editingUser.role}
+                        onValueChange={(value: "Agent" | "Supervisor" | "Admin") => setEditingUser({ ...editingUser, role: value })}
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Select role" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Agent">Agent</SelectItem>
+                          <SelectItem value="Supervisor">Supervisor</SelectItem>
+                          <SelectItem value="Admin">Admin</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="editAmazonConnectId">Amazon Connect User ID</Label>
+                      <Input
+                        id="editAmazonConnectId"
+                        placeholder="e.g., AC-001-XX"
+                        value={editingUser.amazonConnectUserId}
+                        onChange={(e) => setEditingUser({ ...editingUser, amazonConnectUserId: e.target.value })}
+                      />
+                    </div>
+                  </div>
+                )}
+                <DialogFooter>
+                  <Button variant="outline" onClick={() => { setIsEditUserOpen(false); setEditingUser(null); }}>
+                    Cancel
+                  </Button>
+                  <Button onClick={handleSaveEditUser} disabled={!editingUser?.fullName || !editingUser?.email}>
+                    Save Changes
+                  </Button>
+                </DialogFooter>
               </DialogContent>
             </Dialog>
           </TabsContent>
