@@ -615,18 +615,43 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
     return emailRegex.test(email);
   };
 
+  const parseCsvLine = (line: string): string[] => {
+    const result: string[] = [];
+    let current = "";
+    let inQuotes = false;
+    for (let i = 0; i < line.length; i++) {
+      const char = line[i];
+      if (char === '"') {
+        if (inQuotes && line[i + 1] === '"') {
+          current += '"';
+          i++;
+        } else {
+          inQuotes = !inQuotes;
+        }
+      } else if (char === ',' && !inQuotes) {
+        result.push(current.trim());
+        current = "";
+      } else {
+        current += char;
+      }
+    }
+    result.push(current.trim());
+    return result;
+  };
+
   const parseCsvFile = async (file: File) => {
     setIsProcessingCsv(true);
-    const text = await file.text();
-    const lines = text.split("\n").filter((line) => line.trim() !== "");
-    const issues: CsvValidationIssue[] = [];
-    const parsedRows: CsvUserRow[] = [];
-    const existingEmails = users.map((u) => u.email.toLowerCase());
-    const seenEmails = new Set<string>();
+    try {
+      const text = await file.text();
+      const lines = text.split("\n").filter((line) => line.trim() !== "");
+      const issues: CsvValidationIssue[] = [];
+      const parsedRows: CsvUserRow[] = [];
+      const existingEmails = users.map((u) => u.email.toLowerCase());
+      const seenEmails = new Set<string>();
 
-    for (let i = 1; i < lines.length; i++) {
-      const values = lines[i].split(",").map((v) => v.trim().replace(/^"|"$/g, ""));
-      const [fullName, email, role, amazonConnectUserId] = values;
+      for (let i = 1; i < lines.length; i++) {
+        const values = parseCsvLine(lines[i]);
+        const [fullName, email, role, amazonConnectUserId] = values;
       let isValid = true;
       let hasWarning = false;
 
@@ -672,10 +697,14 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
       });
     }
 
-    setCsvData(parsedRows);
-    setValidationIssues(issues);
-    setImportStep("validation");
-    setIsProcessingCsv(false);
+      setCsvData(parsedRows);
+      setValidationIssues(issues);
+      setImportStep("validation");
+    } catch (error) {
+      alert("Error parsing CSV file. Please check the file format and try again.");
+    } finally {
+      setIsProcessingCsv(false);
+    }
   };
 
   const handleCsvFileSelect = (file: File) => {
