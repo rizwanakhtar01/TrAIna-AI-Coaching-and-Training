@@ -26,6 +26,8 @@ import {
   Mail,
   Loader2,
   RefreshCw,
+  CheckCircle,
+  KeyRound,
 } from "lucide-react";
 
 interface AgentDesktopProps {
@@ -50,6 +52,15 @@ function FloatingCoachingWidget({
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
+  
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [forgotPasswordStep, setForgotPasswordStep] = useState<"email" | "code" | "success">("email");
+  const [resetEmail, setResetEmail] = useState("");
+  const [verificationCode, setVerificationCode] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [forgotPasswordError, setForgotPasswordError] = useState("");
+  const [forgotPasswordLoading, setForgotPasswordLoading] = useState(false);
 
   useEffect(() => {
     const savedLoginState = localStorage.getItem("traina_logged_in");
@@ -91,6 +102,82 @@ function FloatingCoachingWidget({
     setIsRefreshing(true);
     await new Promise((resolve) => setTimeout(resolve, 1200));
     setIsRefreshing(false);
+  };
+
+  const handleForgotPasswordOpen = () => {
+    setShowForgotPassword(true);
+    setForgotPasswordStep("email");
+    setResetEmail("");
+    setVerificationCode("");
+    setNewPassword("");
+    setConfirmPassword("");
+    setForgotPasswordError("");
+  };
+
+  const handleForgotPasswordClose = () => {
+    setShowForgotPassword(false);
+    setForgotPasswordStep("email");
+    setResetEmail("");
+    setVerificationCode("");
+    setNewPassword("");
+    setConfirmPassword("");
+    setForgotPasswordError("");
+  };
+
+  const handleSendVerificationCode = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setForgotPasswordError("");
+    setForgotPasswordLoading(true);
+
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(resetEmail)) {
+      setForgotPasswordError("Please enter a valid email address.");
+      setForgotPasswordLoading(false);
+      return;
+    }
+
+    setForgotPasswordStep("code");
+    setForgotPasswordLoading(false);
+  };
+
+  const handleVerifyAndResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setForgotPasswordError("");
+
+    if (verificationCode.length !== 6) {
+      setForgotPasswordError("Verification code must be 6 digits.");
+      return;
+    }
+
+    if (newPassword.length < 8) {
+      setForgotPasswordError("Password must be at least 8 characters.");
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      setForgotPasswordError("Passwords do not match.");
+      return;
+    }
+
+    setForgotPasswordLoading(true);
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+
+    if (verificationCode !== "123456") {
+      setForgotPasswordError("Invalid verification code. Please try again.");
+      setForgotPasswordLoading(false);
+      return;
+    }
+
+    setForgotPasswordStep("success");
+    setForgotPasswordLoading(false);
+  };
+
+  const handleResendCode = async () => {
+    setForgotPasswordLoading(true);
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    setForgotPasswordLoading(false);
   };
 
   const yesterdayPerformance = {
@@ -205,6 +292,208 @@ function FloatingCoachingWidget({
 
             <CardContent className="p-4 space-y-4 flex-1 overflow-y-auto">
               {!isLoggedIn ? (
+                showForgotPassword ? (
+                  <div className="space-y-4 py-4">
+                    {forgotPasswordStep === "email" && (
+                      <>
+                        <div className="text-center space-y-2 mb-6">
+                          <div className="mx-auto w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                            <KeyRound className="h-6 w-6 text-blue-600" />
+                          </div>
+                          <h3 className="font-semibold text-gray-900 text-lg">
+                            Reset Your Password
+                          </h3>
+                          <p className="text-sm text-gray-600">
+                            Enter your email and we'll send you a verification code
+                          </p>
+                        </div>
+
+                        <form onSubmit={handleSendVerificationCode} className="space-y-4 px-6">
+                          <div className="space-y-2">
+                            <Label htmlFor="resetEmail" className="text-sm font-medium">
+                              Email Address
+                            </Label>
+                            <div className="relative">
+                              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                              <Input
+                                id="resetEmail"
+                                type="email"
+                                placeholder="Enter your email"
+                                value={resetEmail}
+                                onChange={(e) => setResetEmail(e.target.value)}
+                                className="pl-10 rounded-lg border-gray-300"
+                                required
+                                disabled={forgotPasswordLoading}
+                              />
+                            </div>
+                          </div>
+
+                          {forgotPasswordError && (
+                            <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+                              <p className="text-sm text-red-600">{forgotPasswordError}</p>
+                            </div>
+                          )}
+
+                          <Button
+                            type="submit"
+                            className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-lg"
+                            disabled={forgotPasswordLoading}
+                          >
+                            {forgotPasswordLoading ? (
+                              <>
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                Sending...
+                              </>
+                            ) : (
+                              "Send Verification Code"
+                            )}
+                          </Button>
+
+                          <button
+                            type="button"
+                            className="w-full text-sm text-gray-600 hover:text-gray-800"
+                            onClick={handleForgotPasswordClose}
+                          >
+                            Back to Login
+                          </button>
+                        </form>
+                      </>
+                    )}
+
+                    {forgotPasswordStep === "code" && (
+                      <>
+                        <div className="text-center space-y-2 mb-6">
+                          <div className="mx-auto w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                            <Lock className="h-6 w-6 text-blue-600" />
+                          </div>
+                          <h3 className="font-semibold text-gray-900 text-lg">
+                            Enter Verification Code
+                          </h3>
+                          <p className="text-sm text-gray-600">
+                            We sent a code to <span className="font-medium">{resetEmail}</span>
+                          </p>
+                        </div>
+
+                        <form onSubmit={handleVerifyAndResetPassword} className="space-y-4 px-6">
+                          <div className="space-y-2">
+                            <Label htmlFor="verificationCode" className="text-sm font-medium">
+                              Verification Code
+                            </Label>
+                            <Input
+                              id="verificationCode"
+                              type="text"
+                              placeholder="Enter 6-digit code"
+                              value={verificationCode}
+                              onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                              className="rounded-lg border-gray-300 text-center text-lg tracking-widest"
+                              maxLength={6}
+                              required
+                              disabled={forgotPasswordLoading}
+                            />
+                          </div>
+
+                          <div className="space-y-2">
+                            <Label htmlFor="newPassword" className="text-sm font-medium">
+                              New Password
+                            </Label>
+                            <div className="relative">
+                              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                              <Input
+                                id="newPassword"
+                                type="password"
+                                placeholder="At least 8 characters"
+                                value={newPassword}
+                                onChange={(e) => setNewPassword(e.target.value)}
+                                className="pl-10 rounded-lg border-gray-300"
+                                required
+                                disabled={forgotPasswordLoading}
+                              />
+                            </div>
+                          </div>
+
+                          <div className="space-y-2">
+                            <Label htmlFor="confirmPassword" className="text-sm font-medium">
+                              Confirm Password
+                            </Label>
+                            <div className="relative">
+                              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                              <Input
+                                id="confirmPassword"
+                                type="password"
+                                placeholder="Confirm your password"
+                                value={confirmPassword}
+                                onChange={(e) => setConfirmPassword(e.target.value)}
+                                className="pl-10 rounded-lg border-gray-300"
+                                required
+                                disabled={forgotPasswordLoading}
+                              />
+                            </div>
+                          </div>
+
+                          {forgotPasswordError && (
+                            <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+                              <p className="text-sm text-red-600">{forgotPasswordError}</p>
+                            </div>
+                          )}
+
+                          <Button
+                            type="submit"
+                            className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-lg"
+                            disabled={forgotPasswordLoading}
+                          >
+                            {forgotPasswordLoading ? (
+                              <>
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                Resetting...
+                              </>
+                            ) : (
+                              "Reset Password"
+                            )}
+                          </Button>
+
+                          <div className="text-center">
+                            <button
+                              type="button"
+                              className="text-sm text-blue-600 hover:text-blue-700"
+                              onClick={handleResendCode}
+                              disabled={forgotPasswordLoading}
+                            >
+                              Didn't receive code? Resend
+                            </button>
+                          </div>
+
+                          <button
+                            type="button"
+                            className="w-full text-sm text-gray-600 hover:text-gray-800"
+                            onClick={() => setForgotPasswordStep("email")}
+                          >
+                            Back
+                          </button>
+                        </form>
+                      </>
+                    )}
+
+                    {forgotPasswordStep === "success" && (
+                      <div className="text-center space-y-4 py-6 px-6">
+                        <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
+                          <CheckCircle className="h-8 w-8 text-green-600" />
+                        </div>
+                        <h3 className="font-semibold text-gray-900 text-lg">
+                          Password Reset Successful
+                        </h3>
+                        <p className="text-sm text-gray-600">
+                          Your password has been updated. You can now sign in with your new password.
+                        </p>
+                        <Button
+                          className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-lg"
+                          onClick={handleForgotPasswordClose}
+                        >
+                          Back to Login
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                ) : (
                 <div className="space-y-4 py-4">
                   <div className="text-center space-y-2 mb-6">
                     <div className="mx-auto w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
@@ -284,6 +573,7 @@ function FloatingCoachingWidget({
                         type="button"
                         className="text-sm text-blue-600 hover:text-blue-700 font-medium"
                         disabled={isLoading}
+                        onClick={handleForgotPasswordOpen}
                       >
                         Forgot Password?
                       </button>
@@ -305,6 +595,7 @@ function FloatingCoachingWidget({
                     </Button>
                   </form>
                 </div>
+                )
               ) : (
                 <>
                   {/* Areas where agent struggled */}
