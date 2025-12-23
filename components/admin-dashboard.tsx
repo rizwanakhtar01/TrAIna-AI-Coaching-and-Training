@@ -2762,6 +2762,27 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                 </CardDescription>
               </CardHeader>
               <CardContent>
+                {users.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center py-12 text-center">
+                    <div className="h-16 w-16 rounded-full bg-muted flex items-center justify-center mb-4">
+                      <Users className="h-8 w-8 text-muted-foreground" />
+                    </div>
+                    <h3 className="text-lg font-medium mb-1">No users yet</h3>
+                    <p className="text-sm text-muted-foreground mb-4 max-w-sm">
+                      Get started by creating your first user or importing users from a CSV file.
+                    </p>
+                    <div className="flex gap-2">
+                      <Button variant="outline" onClick={() => setIsImportModalOpen(true)}>
+                        <Upload className="h-4 w-4 mr-2" />
+                        Import Users
+                      </Button>
+                      <Button onClick={handleCreateUserOpen}>
+                        <UserPlus className="h-4 w-4 mr-2" />
+                        Create User
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -2858,6 +2879,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                     ))}
                   </TableBody>
                 </Table>
+                )}
               </CardContent>
             </Card>
 
@@ -2908,7 +2930,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                             value: "Agent" | "Supervisor" | "Admin",
                           ) => setNewUser({ ...newUser, role: value })}
                         >
-                          <SelectTrigger>
+                          <SelectTrigger className="w-full">
                             <SelectValue placeholder="Select role" />
                           </SelectTrigger>
                           <SelectContent>
