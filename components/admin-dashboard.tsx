@@ -78,7 +78,9 @@ import {
   UserMinus,
   Search,
   UsersRound,
+  User,
 } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Table,
   TableBody,
@@ -400,14 +402,23 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
   const [isDraggingCsv, setIsDraggingCsv] = useState(false);
 
   // Team Management State
-  const [isManageTeamOpen, setIsManageTeamOpen] = useState(false);
-  const [selectedSupervisor, setSelectedSupervisor] =
-    useState<PlatformUser | null>(null);
-  const [teamSearchQuery, setTeamSearchQuery] = useState("");
-  const [teamAssignments, setTeamAssignments] = useState<TeamAssignment[]>([
-    { supervisorId: "usr_003", agentIds: ["usr_001", "usr_002"] },
-    { supervisorId: "usr_007", agentIds: ["usr_006", "usr_008"] },
+  interface Team {
+    id: string;
+    name: string;
+    supervisorId: string;
+    agentIds: string[];
+  }
+  const [teams, setTeams] = useState<Team[]>([
+    { id: "team_001", name: "Billing Support Team", supervisorId: "usr_003", agentIds: ["usr_001", "usr_002"] },
+    { id: "team_002", name: "Technical Support Team", supervisorId: "usr_007", agentIds: ["usr_006", "usr_008"] },
   ]);
+  const [teamListSearchQuery, setTeamListSearchQuery] = useState("");
+  const [isCreateTeamOpen, setIsCreateTeamOpen] = useState(false);
+  const [editingTeam, setEditingTeam] = useState<Team | null>(null);
+  const [newTeamName, setNewTeamName] = useState("");
+  const [newTeamSupervisorId, setNewTeamSupervisorId] = useState("");
+  const [newTeamAgentIds, setNewTeamAgentIds] = useState<string[]>([]);
+  const [createTeamAgentSearch, setCreateTeamAgentSearch] = useState("");
 
   // Sample routing analytics data (in a real app, this would come from API)
   const routingAnalytics: RoutingAnalytics = {
@@ -828,71 +839,86 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
   const getAgents = () =>
     users.filter((u) => u.role === "Agent" && u.status === "Active");
 
-  const getAssignedAgentIds = (supervisorId: string) => {
-    const assignment = teamAssignments.find(
-      (a) => a.supervisorId === supervisorId,
-    );
-    return assignment ? assignment.agentIds : [];
-  };
-
-  const getAssignedAgentsCount = (supervisorId: string) => {
-    return getAssignedAgentIds(supervisorId).length;
-  };
-
-  const getAvailableAgents = (supervisorId: string) => {
-    const assignedIds = getAssignedAgentIds(supervisorId);
-    return getAgents().filter(
-      (agent) =>
-        !assignedIds.includes(agent.id) &&
-        (teamSearchQuery === "" ||
-          agent.fullName
-            .toLowerCase()
-            .includes(teamSearchQuery.toLowerCase()) ||
-          agent.email.toLowerCase().includes(teamSearchQuery.toLowerCase())),
-    );
-  };
-
-  const getAssignedAgents = (supervisorId: string) => {
-    const assignedIds = getAssignedAgentIds(supervisorId);
-    return getAgents().filter((agent) => assignedIds.includes(agent.id));
-  };
-
-  const handleOpenManageTeam = (supervisor: PlatformUser) => {
-    setSelectedSupervisor(supervisor);
-    setTeamSearchQuery("");
-    setIsManageTeamOpen(true);
-  };
-
-  const handleAddAgentToTeam = (agentId: string) => {
-    if (!selectedSupervisor) return;
-    setTeamAssignments((prev) => {
-      const existing = prev.find(
-        (a) => a.supervisorId === selectedSupervisor.id,
+  const getFilteredTeams = () => {
+    if (!teamListSearchQuery) return teams;
+    const query = teamListSearchQuery.toLowerCase();
+    return teams.filter((team) => {
+      const supervisor = users.find((u) => u.id === team.supervisorId);
+      return (
+        team.name.toLowerCase().includes(query) ||
+        (supervisor && supervisor.fullName.toLowerCase().includes(query))
       );
-      if (existing) {
-        return prev.map((a) =>
-          a.supervisorId === selectedSupervisor.id
-            ? { ...a, agentIds: [...a.agentIds, agentId] }
-            : a,
-        );
-      } else {
-        return [
-          ...prev,
-          { supervisorId: selectedSupervisor.id, agentIds: [agentId] },
-        ];
-      }
     });
   };
 
-  const handleRemoveAgentFromTeam = (agentId: string) => {
-    if (!selectedSupervisor) return;
-    setTeamAssignments((prev) =>
-      prev.map((a) =>
-        a.supervisorId === selectedSupervisor.id
-          ? { ...a, agentIds: a.agentIds.filter((id) => id !== agentId) }
-          : a,
-      ),
+  const getSupervisorName = (supervisorId: string) => {
+    const supervisor = users.find((u) => u.id === supervisorId);
+    return supervisor ? supervisor.fullName : "Unknown";
+  };
+
+  const getFilteredAgentsForCreate = () => {
+    const agents = getAgents();
+    if (!createTeamAgentSearch) return agents;
+    const query = createTeamAgentSearch.toLowerCase();
+    return agents.filter(
+      (agent) =>
+        agent.fullName.toLowerCase().includes(query) ||
+        agent.email.toLowerCase().includes(query)
     );
+  };
+
+  const handleOpenCreateTeam = () => {
+    setEditingTeam(null);
+    setNewTeamName("");
+    setNewTeamSupervisorId("");
+    setNewTeamAgentIds([]);
+    setCreateTeamAgentSearch("");
+    setIsCreateTeamOpen(true);
+  };
+
+  const handleOpenEditTeam = (team: Team) => {
+    setEditingTeam(team);
+    setNewTeamName(team.name);
+    setNewTeamSupervisorId(team.supervisorId);
+    setNewTeamAgentIds([...team.agentIds]);
+    setCreateTeamAgentSearch("");
+    setIsCreateTeamOpen(true);
+  };
+
+  const handleToggleAgent = (agentId: string) => {
+    setNewTeamAgentIds((prev) =>
+      prev.includes(agentId)
+        ? prev.filter((id) => id !== agentId)
+        : [...prev, agentId]
+    );
+  };
+
+  const handleSaveTeam = () => {
+    if (!newTeamName.trim() || !newTeamSupervisorId) return;
+
+    if (editingTeam) {
+      setTeams((prev) =>
+        prev.map((t) =>
+          t.id === editingTeam.id
+            ? { ...t, name: newTeamName.trim(), supervisorId: newTeamSupervisorId, agentIds: newTeamAgentIds }
+            : t
+        )
+      );
+    } else {
+      const newTeam: Team = {
+        id: `team_${Date.now()}`,
+        name: newTeamName.trim(),
+        supervisorId: newTeamSupervisorId,
+        agentIds: newTeamAgentIds,
+      };
+      setTeams((prev) => [...prev, newTeam]);
+    }
+
+    setIsCreateTeamOpen(false);
+    setEditingTeam(null);
+    setNewTeamName("");
+    setNewTeamSupervisorId("");
+    setNewTeamAgentIds([]);
   };
 
   // Agent Templates
@@ -3393,236 +3419,191 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                   Team Management
                 </h2>
                 <p className="text-muted-foreground">
-                  Assign agents to supervisors and manage team structures
+                  Create and manage teams with supervisors and agents
                 </p>
               </div>
+              <Button onClick={handleOpenCreateTeam}>
+                <Plus className="h-4 w-4 mr-2" />
+                Create Team
+              </Button>
             </div>
 
-            {/* Supervisor Cards Grid */}
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {getSupervisors().map((supervisor) => (
-                <Card
-                  key={supervisor.id}
-                  className="hover:shadow-md transition-shadow"
-                >
+            {/* Search Bar */}
+            <div className="relative max-w-md">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search teams..."
+                value={teamListSearchQuery}
+                onChange={(e) => setTeamListSearchQuery(e.target.value)}
+                className="pl-9"
+              />
+            </div>
+
+            {/* Teams Grid */}
+            <div className="grid gap-6 md:grid-cols-2">
+              {getFilteredTeams().map((team) => (
+                <Card key={team.id} className="hover:shadow-md transition-shadow bg-gray-50/50">
                   <CardHeader className="pb-3">
-                    <div className="flex items-center gap-3">
-                      <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-                        <span className="text-lg font-semibold text-primary">
-                          {supervisor.fullName
-                            .split(" ")
-                            .map((n) => n[0])
-                            .join("")}
-                        </span>
-                      </div>
-                      <div>
-                        <CardTitle className="text-lg">
-                          {supervisor.fullName}
-                        </CardTitle>
-                        <CardDescription className="flex items-center gap-1">
-                          <Mail className="h-3 w-3" />
-                          {supervisor.email}
-                        </CardDescription>
-                      </div>
-                    </div>
+                    <CardTitle className="text-lg flex items-center gap-2">
+                      <UsersRound className="h-5 w-5 text-primary" />
+                      {team.name}
+                    </CardTitle>
+                    <CardDescription className="flex items-center gap-1 mt-1">
+                      <User className="h-3 w-3" />
+                      Supervisor: {getSupervisorName(team.supervisorId)}
+                    </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
+                    <div className="flex items-center justify-between p-3 bg-white rounded-lg border">
                       <div className="flex items-center gap-2">
                         <Users className="h-5 w-5 text-primary" />
-                        <span className="font-medium">Agents Assigned</span>
+                        <span className="font-medium text-sm">Agents Assigned</span>
                       </div>
-                      <Badge variant="secondary" className="text-lg px-3">
-                        {getAssignedAgentsCount(supervisor.id)}
-                      </Badge>
+                      <span className="text-sm font-semibold text-primary">
+                        {team.agentIds.length} {team.agentIds.length === 1 ? "Agent" : "Agents"}
+                      </span>
                     </div>
                     <Button
+                      variant="outline"
                       className="w-full"
-                      onClick={() => handleOpenManageTeam(supervisor)}
+                      onClick={() => handleOpenEditTeam(team)}
                     >
-                      <UsersRound className="h-4 w-4 mr-2" />
+                      <Settings className="h-4 w-4 mr-2" />
                       Manage Team
                     </Button>
                   </CardContent>
                 </Card>
               ))}
 
-              {getSupervisors().length === 0 && (
-                <Card className="col-span-full">
+              {getFilteredTeams().length === 0 && teams.length > 0 && (
+                <Card className="col-span-full bg-gray-50/50">
                   <CardContent className="flex flex-col items-center justify-center py-12 text-center">
-                    <Users className="h-12 w-12 text-muted-foreground mb-4" />
+                    <Search className="h-12 w-12 text-muted-foreground mb-4" />
                     <h3 className="text-lg font-semibold text-muted-foreground">
-                      No Supervisors Found
+                      No Teams Found
                     </h3>
                     <p className="text-sm text-muted-foreground mt-1">
-                      Add supervisors in User Management to start building
-                      teams.
+                      No teams match your search criteria.
                     </p>
+                  </CardContent>
+                </Card>
+              )}
+
+              {teams.length === 0 && (
+                <Card className="col-span-full bg-gray-50/50">
+                  <CardContent className="flex flex-col items-center justify-center py-12 text-center">
+                    <UsersRound className="h-12 w-12 text-muted-foreground mb-4" />
+                    <h3 className="text-lg font-semibold text-muted-foreground">
+                      No Teams Yet
+                    </h3>
+                    <p className="text-sm text-muted-foreground mt-1 mb-4">
+                      Create your first team to start organizing agents.
+                    </p>
+                    <Button onClick={handleOpenCreateTeam}>
+                      <Plus className="h-4 w-4 mr-2" />
+                      Create Team
+                    </Button>
                   </CardContent>
                 </Card>
               )}
             </div>
 
-            {/* Manage Team Modal */}
-            <Dialog open={isManageTeamOpen} onOpenChange={setIsManageTeamOpen}>
-              <DialogContent className="sm:max-w-[800px] max-h-[80vh]">
+            {/* Create/Edit Team Modal */}
+            <Dialog open={isCreateTeamOpen} onOpenChange={setIsCreateTeamOpen}>
+              <DialogContent className="sm:max-w-[500px] max-h-[85vh] overflow-y-auto">
                 <DialogHeader>
                   <DialogTitle className="flex items-center gap-2">
                     <UsersRound className="h-5 w-5 text-primary" />
-                    Manage Team - {selectedSupervisor?.fullName}
+                    {editingTeam ? "Edit Team" : "Create Team"}
                   </DialogTitle>
                   <DialogDescription>
-                    Add or remove agents from this supervisor&apos;s team
+                    {editingTeam ? "Update team details and agent assignments" : "Set up a new team with a supervisor and agents"}
                   </DialogDescription>
                 </DialogHeader>
 
-                <div className="grid grid-cols-2 gap-6 py-4">
-                  {/* Available Agents Panel */}
+                <div className="space-y-6 py-4">
+                  {/* Team Name */}
+                  <div className="space-y-2">
+                    <Label htmlFor="teamName">Team Name</Label>
+                    <Input
+                      id="teamName"
+                      placeholder="e.g., Billing Support Team"
+                      value={newTeamName}
+                      onChange={(e) => setNewTeamName(e.target.value)}
+                    />
+                  </div>
+
+                  {/* Supervisor Dropdown */}
+                  <div className="space-y-2">
+                    <Label>Supervisor</Label>
+                    <Select value={newTeamSupervisorId} onValueChange={setNewTeamSupervisorId}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a supervisor" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {getSupervisors().map((supervisor) => (
+                          <SelectItem key={supervisor.id} value={supervisor.id}>
+                            {supervisor.fullName}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Add Agents Section */}
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">
-                        Available Agents
-                      </h3>
-                      <Badge variant="outline">
-                        {selectedSupervisor
-                          ? getAvailableAgents(selectedSupervisor.id).length
-                          : 0}
-                      </Badge>
+                      <Label>Add Agents</Label>
+                      <span className="text-sm text-muted-foreground">
+                        {newTeamAgentIds.length} selected
+                      </span>
                     </div>
                     <div className="relative">
                       <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                       <Input
                         placeholder="Search agents..."
-                        value={teamSearchQuery}
-                        onChange={(e) => setTeamSearchQuery(e.target.value)}
+                        value={createTeamAgentSearch}
+                        onChange={(e) => setCreateTeamAgentSearch(e.target.value)}
                         className="pl-9"
                       />
                     </div>
-                    <div className="border rounded-lg overflow-hidden">
-                      <div className="max-h-[300px] overflow-y-auto">
-                        {selectedSupervisor &&
-                          getAvailableAgents(selectedSupervisor.id).map(
-                            (agent) => (
-                              <div
-                                key={agent.id}
-                                className="flex items-center justify-between p-3 hover:bg-muted border-b last:border-b-0 transition-colors"
-                              >
-                                <div className="flex items-center gap-3">
-                                  <div className="h-8 w-8 rounded-full bg-gray-100 flex items-center justify-center">
-                                    <span className="text-xs font-medium text-gray-600">
-                                      {agent.fullName
-                                        .split(" ")
-                                        .map((n) => n[0])
-                                        .join("")}
-                                    </span>
-                                  </div>
-                                  <div>
-                                    <p className="font-medium text-sm">
-                                      {agent.fullName}
-                                    </p>
-                                    <p className="text-xs text-muted-foreground">
-                                      {agent.email}
-                                    </p>
-                                  </div>
-                                </div>
-                                <Button
-                                  size="sm"
-                                  variant="ghost"
-                                  className="h-8 w-8 p-0 hover:bg-green-100 hover:text-green-600"
-                                  onClick={() => handleAddAgentToTeam(agent.id)}
-                                >
-                                  <Plus className="h-4 w-4" />
-                                </Button>
-                              </div>
-                            ),
-                          )}
-                        {selectedSupervisor &&
-                          getAvailableAgents(selectedSupervisor.id).length ===
-                            0 && (
-                            <div className="p-6 text-center text-muted-foreground">
-                              <Users className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                              <p className="text-sm">No available agents</p>
+                    <div className="border rounded-lg max-h-[200px] overflow-y-auto">
+                      {getFilteredAgentsForCreate().length > 0 ? (
+                        getFilteredAgentsForCreate().map((agent) => (
+                          <div
+                            key={agent.id}
+                            className="flex items-center gap-3 p-3 hover:bg-muted border-b last:border-b-0 cursor-pointer transition-colors"
+                            onClick={() => handleToggleAgent(agent.id)}
+                          >
+                            <Checkbox
+                              checked={newTeamAgentIds.includes(agent.id)}
+                              onCheckedChange={() => handleToggleAgent(agent.id)}
+                            />
+                            <div className="flex-1">
+                              <p className="font-medium text-sm">{agent.fullName}</p>
+                              <p className="text-xs text-muted-foreground">{agent.email}</p>
                             </div>
-                          )}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Assigned Agents Panel */}
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">
-                        Assigned Agents
-                      </h3>
-                      <Badge variant="default">
-                        {selectedSupervisor
-                          ? getAssignedAgents(selectedSupervisor.id).length
-                          : 0}
-                      </Badge>
-                    </div>
-                    <div className="h-[38px]" />
-                    <div className="border rounded-lg overflow-hidden border-primary/20 bg-primary/5">
-                      <div className="max-h-[300px] overflow-y-auto">
-                        {selectedSupervisor &&
-                          getAssignedAgents(selectedSupervisor.id).map(
-                            (agent) => (
-                              <div
-                                key={agent.id}
-                                className="flex items-center justify-between p-3 hover:bg-primary/10 border-b border-primary/10 last:border-b-0 transition-colors"
-                              >
-                                <div className="flex items-center gap-3">
-                                  <div className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center">
-                                    <span className="text-xs font-medium text-primary">
-                                      {agent.fullName
-                                        .split(" ")
-                                        .map((n) => n[0])
-                                        .join("")}
-                                    </span>
-                                  </div>
-                                  <div>
-                                    <p className="font-medium text-sm">
-                                      {agent.fullName}
-                                    </p>
-                                    <p className="text-xs text-muted-foreground">
-                                      {agent.email}
-                                    </p>
-                                  </div>
-                                </div>
-                                <Button
-                                  size="sm"
-                                  variant="ghost"
-                                  className="h-8 w-8 p-0 hover:bg-red-100 hover:text-red-600"
-                                  onClick={() =>
-                                    handleRemoveAgentFromTeam(agent.id)
-                                  }
-                                >
-                                  <UserMinus className="h-4 w-4" />
-                                </Button>
-                              </div>
-                            ),
-                          )}
-                        {selectedSupervisor &&
-                          getAssignedAgents(selectedSupervisor.id).length ===
-                            0 && (
-                            <div className="p-6 text-center text-muted-foreground">
-                              <UsersRound className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                              <p className="text-sm">No agents assigned yet</p>
-                              <p className="text-xs mt-1">
-                                Click + to add agents from the left panel
-                              </p>
-                            </div>
-                          )}
-                      </div>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="p-6 text-center text-muted-foreground">
+                          <Users className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                          <p className="text-sm">No agents available</p>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
 
                 <DialogFooter>
+                  <Button variant="outline" onClick={() => setIsCreateTeamOpen(false)}>
+                    Cancel
+                  </Button>
                   <Button
-                    variant="outline"
-                    onClick={() => setIsManageTeamOpen(false)}
+                    onClick={handleSaveTeam}
+                    disabled={!newTeamName.trim() || !newTeamSupervisorId}
                   >
-                    Close
+                    {editingTeam ? "Save Changes" : "Create Team"}
                   </Button>
                 </DialogFooter>
               </DialogContent>
