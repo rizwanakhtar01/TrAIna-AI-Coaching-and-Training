@@ -3452,7 +3452,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                 </TableHeader>
                 <TableBody>
                   {getFilteredTeams().map((team) => (
-                    <TableRow key={team.id}>
+                    <TableRow key={team.id} className="hover:bg-blue-50/50">
                       <TableCell className="font-medium">
                         <div className="flex items-center gap-2">
                           <UsersRound className="h-4 w-4 text-primary" />
@@ -3472,7 +3472,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                           onClick={() => handleOpenEditTeam(team)}
                         >
                           <Settings className="h-4 w-4 mr-2" />
-                          Manage
+                          Edit
                         </Button>
                       </TableCell>
                     </TableRow>
