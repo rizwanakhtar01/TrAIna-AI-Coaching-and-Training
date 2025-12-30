@@ -3439,74 +3439,77 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
               />
             </div>
 
-            {/* Teams Grid */}
-            <div className="grid gap-6 md:grid-cols-2">
-              {getFilteredTeams().map((team) => (
-                <Card key={team.id} className="hover:shadow-md transition-shadow bg-gray-50/50">
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-lg flex items-center gap-2">
-                      <UsersRound className="h-5 w-5 text-primary" />
-                      {team.name}
-                    </CardTitle>
-                    <CardDescription className="flex items-center gap-1 mt-1">
-                      <User className="h-3 w-3" />
-                      Supervisor: {getSupervisorName(team.supervisorId)}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="flex items-center justify-between p-3 bg-white rounded-lg border">
-                      <div className="flex items-center gap-2">
-                        <Users className="h-5 w-5 text-primary" />
-                        <span className="font-medium text-sm">Agents Assigned</span>
-                      </div>
-                      <span className="text-sm font-semibold text-primary">
-                        {team.agentIds.length} {team.agentIds.length === 1 ? "Agent" : "Agents"}
-                      </span>
-                    </div>
-                    <Button
-                      variant="outline"
-                      className="w-full"
-                      onClick={() => handleOpenEditTeam(team)}
-                    >
-                      <Settings className="h-4 w-4 mr-2" />
-                      Manage Team
-                    </Button>
-                  </CardContent>
-                </Card>
-              ))}
-
-              {getFilteredTeams().length === 0 && teams.length > 0 && (
-                <Card className="col-span-full bg-gray-50/50">
-                  <CardContent className="flex flex-col items-center justify-center py-12 text-center">
-                    <Search className="h-12 w-12 text-muted-foreground mb-4" />
-                    <h3 className="text-lg font-semibold text-muted-foreground">
-                      No Teams Found
-                    </h3>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      No teams match your search criteria.
-                    </p>
-                  </CardContent>
-                </Card>
-              )}
-
-              {teams.length === 0 && (
-                <Card className="col-span-full bg-gray-50/50">
-                  <CardContent className="flex flex-col items-center justify-center py-12 text-center">
-                    <UsersRound className="h-12 w-12 text-muted-foreground mb-4" />
-                    <h3 className="text-lg font-semibold text-muted-foreground">
-                      No Teams Yet
-                    </h3>
-                    <p className="text-sm text-muted-foreground mt-1 mb-4">
-                      Create your first team to start organizing agents.
-                    </p>
-                    <Button onClick={handleOpenCreateTeam}>
-                      <Plus className="h-4 w-4 mr-2" />
-                      Create Team
-                    </Button>
-                  </CardContent>
-                </Card>
-              )}
-            </div>
+            {/* Teams List */}
+            <Card>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Team Name</TableHead>
+                    <TableHead>Supervisor</TableHead>
+                    <TableHead>Agents</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {getFilteredTeams().map((team) => (
+                    <TableRow key={team.id}>
+                      <TableCell className="font-medium">
+                        <div className="flex items-center gap-2">
+                          <UsersRound className="h-4 w-4 text-primary" />
+                          {team.name}
+                        </div>
+                      </TableCell>
+                      <TableCell>{getSupervisorName(team.supervisorId)}</TableCell>
+                      <TableCell>
+                        <Badge variant="secondary">
+                          {team.agentIds.length} {team.agentIds.length === 1 ? "Agent" : "Agents"}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleOpenEditTeam(team)}
+                        >
+                          <Settings className="h-4 w-4 mr-2" />
+                          Manage
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                  {getFilteredTeams().length === 0 && teams.length > 0 && (
+                    <TableRow>
+                      <TableCell colSpan={4} className="text-center py-12">
+                        <Search className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                        <h3 className="text-lg font-semibold text-muted-foreground">
+                          No Teams Found
+                        </h3>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          No teams match your search criteria.
+                        </p>
+                      </TableCell>
+                    </TableRow>
+                  )}
+                  {teams.length === 0 && (
+                    <TableRow>
+                      <TableCell colSpan={4} className="text-center py-12">
+                        <UsersRound className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                        <h3 className="text-lg font-semibold text-muted-foreground">
+                          No Teams Yet
+                        </h3>
+                        <p className="text-sm text-muted-foreground mt-1 mb-4">
+                          Create your first team to start organizing agents.
+                        </p>
+                        <Button onClick={handleOpenCreateTeam}>
+                          <Plus className="h-4 w-4 mr-2" />
+                          Create Team
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </Card>
 
             {/* Create/Edit Team Modal */}
             <Dialog open={isCreateTeamOpen} onOpenChange={setIsCreateTeamOpen}>
