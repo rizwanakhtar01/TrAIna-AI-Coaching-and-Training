@@ -3537,10 +3537,10 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                   </div>
 
                   {/* Supervisor Dropdown */}
-                  <div className="space-y-2">
+                  <div className="space-y-2 w-full">
                     <Label>Supervisor</Label>
                     <Select value={newTeamSupervisorId} onValueChange={setNewTeamSupervisorId}>
-                      <SelectTrigger>
+                      <SelectTrigger className="w-full">
                         <SelectValue placeholder="Select a supervisor" />
                       </SelectTrigger>
                       <SelectContent>
