@@ -1570,16 +1570,17 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
               <TabsTrigger value="teams">Team Management</TabsTrigger>
             </TabsList>
 
-            <Dialog
-              open={isCreateWizardOpen}
-              onOpenChange={setIsCreateWizardOpen}
-            >
-              <DialogTrigger asChild>
-                <Button>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Create AI Agent
-                </Button>
-              </DialogTrigger>
+            {activeTab === "agents" && (
+              <Dialog
+                open={isCreateWizardOpen}
+                onOpenChange={setIsCreateWizardOpen}
+              >
+                <DialogTrigger asChild>
+                  <Button>
+                    <Plus className="h-4 w-4 mr-2" />
+                    Create AI Agent
+                  </Button>
+                </DialogTrigger>
               <DialogContent className="!max-w-[93.6rem] sm:!max-w-[93.6rem] max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                   <DialogTitle className="flex items-center gap-2">
@@ -2092,6 +2093,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                 </DialogFooter>
               </DialogContent>
             </Dialog>
+            )}
           </div>
 
           <TabsContent value="overview" className="space-y-6">
