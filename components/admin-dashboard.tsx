@@ -419,6 +419,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
   const [newTeamSupervisorId, setNewTeamSupervisorId] = useState("");
   const [newTeamAgentIds, setNewTeamAgentIds] = useState<string[]>([]);
   const [createTeamAgentSearch, setCreateTeamAgentSearch] = useState("");
+  const [teamToDelete, setTeamToDelete] = useState<Team | null>(null);
 
   // Sample routing analytics data (in a real app, this would come from API)
   const routingAnalytics: RoutingAnalytics = {
@@ -919,6 +920,12 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
     setNewTeamName("");
     setNewTeamSupervisorId("");
     setNewTeamAgentIds([]);
+  };
+
+  const handleDeleteTeam = () => {
+    if (!teamToDelete) return;
+    setTeams((prev) => prev.filter((t) => t.id !== teamToDelete.id));
+    setTeamToDelete(null);
   };
 
   // Agent Templates
@@ -3466,14 +3473,26 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                         </Badge>
                       </TableCell>
                       <TableCell className="text-right">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleOpenEditTeam(team)}
-                        >
-                          <Settings className="h-4 w-4 mr-2" />
-                          Edit
-                        </Button>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon" className="h-8 w-8">
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => handleOpenEditTeam(team)}>
+                              <Edit className="h-4 w-4 mr-2" />
+                              Edit
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              className="text-red-600 focus:text-red-600"
+                              onClick={() => setTeamToDelete(team)}
+                            >
+                              <Trash2 className="h-4 w-4 mr-2" />
+                              Delete
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -3611,6 +3630,27 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                 </DialogFooter>
               </DialogContent>
             </Dialog>
+
+            {/* Delete Team Confirmation Dialog */}
+            <AlertDialog open={!!teamToDelete} onOpenChange={(open) => !open && setTeamToDelete(null)}>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Delete Team</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Are you sure you want to delete "{teamToDelete?.name}"? This action cannot be undone.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={handleDeleteTeam}
+                    className="bg-red-600 hover:bg-red-700 text-white"
+                  >
+                    Delete
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </TabsContent>
 
           {/* <TabsContent value="training" className="space-y-6">
