@@ -2914,20 +2914,18 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
               </div>
               <div className="flex items-center gap-2">
                 <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
-                  <Select
-                    value={contactReviewTimeFilter}
-                    onValueChange={(value: "today" | "yesterday" | "custom") => {
-                      setContactReviewTimeFilter(value);
-                      if (value !== "custom") {
-                        setContactReviewCustomDate(undefined);
-                        setIsCalendarOpen(false);
-                      } else {
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className="w-[130px] justify-between"
+                      onClick={() => {
+                        if (contactReviewTimeFilter !== "custom") {
+                          setContactReviewTimeFilter("custom");
+                        }
                         setIsCalendarOpen(true);
-                      }
-                    }}
-                  >
-                    <SelectTrigger className="w-[130px]">
-                      <SelectValue placeholder="Time Range">
+                      }}
+                    >
+                      <span className="truncate">
                         {contactReviewTimeFilter === "custom" && contactReviewCustomDate
                           ? format(contactReviewCustomDate, "MMM d, yyyy")
                           : contactReviewTimeFilter === "today"
@@ -2935,22 +2933,40 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
                             : contactReviewTimeFilter === "yesterday"
                               ? "Yesterday"
                               : "Custom"}
-                      </SelectValue>
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="today">Today</SelectItem>
-                      <SelectItem value="yesterday">Yesterday</SelectItem>
-                      <SelectItem value="custom">Custom</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <PopoverTrigger asChild>
-                    <span className="sr-only">Open calendar</span>
+                      </span>
+                      <Calendar className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0" align="start">
+                    <div className="p-2 border-b flex gap-1">
+                      <Button
+                        variant={contactReviewTimeFilter === "today" ? "default" : "ghost"}
+                        size="sm"
+                        onClick={() => {
+                          setContactReviewTimeFilter("today");
+                          setContactReviewCustomDate(undefined);
+                          setIsCalendarOpen(false);
+                        }}
+                      >
+                        Today
+                      </Button>
+                      <Button
+                        variant={contactReviewTimeFilter === "yesterday" ? "default" : "ghost"}
+                        size="sm"
+                        onClick={() => {
+                          setContactReviewTimeFilter("yesterday");
+                          setContactReviewCustomDate(undefined);
+                          setIsCalendarOpen(false);
+                        }}
+                      >
+                        Yesterday
+                      </Button>
+                    </div>
                     <CalendarPicker
                       mode="single"
                       selected={contactReviewCustomDate}
                       onSelect={(date) => {
+                        setContactReviewTimeFilter("custom");
                         setContactReviewCustomDate(date);
                         setIsCalendarOpen(false);
                       }}
