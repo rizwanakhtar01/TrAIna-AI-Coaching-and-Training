@@ -2913,50 +2913,51 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
                 </p>
               </div>
               <div className="flex items-center gap-2">
-                <Select
-                  value={contactReviewTimeFilter}
-                  onValueChange={(value: "today" | "yesterday" | "custom") => {
-                    setContactReviewTimeFilter(value);
-                    if (value !== "custom") {
-                      setContactReviewCustomDate(undefined);
-                      setIsCalendarOpen(false);
-                    } else {
-                      setIsCalendarOpen(true);
-                    }
-                  }}
-                >
-                  <SelectTrigger className="w-[130px]">
-                    <SelectValue placeholder="Time Range" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="today">Today</SelectItem>
-                    <SelectItem value="yesterday">Yesterday</SelectItem>
-                    <SelectItem value="custom">Custom</SelectItem>
-                  </SelectContent>
-                </Select>
-                {contactReviewTimeFilter === "custom" && (
-                  <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
-                    <PopoverTrigger asChild>
-                      <Button variant="outline" size="sm" className="gap-2">
-                        <Calendar className="h-4 w-4" />
-                        {contactReviewCustomDate
+                <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
+                  <Select
+                    value={contactReviewTimeFilter}
+                    onValueChange={(value: "today" | "yesterday" | "custom") => {
+                      setContactReviewTimeFilter(value);
+                      if (value !== "custom") {
+                        setContactReviewCustomDate(undefined);
+                        setIsCalendarOpen(false);
+                      } else {
+                        setIsCalendarOpen(true);
+                      }
+                    }}
+                  >
+                    <SelectTrigger className="w-[130px]">
+                      <SelectValue placeholder="Time Range">
+                        {contactReviewTimeFilter === "custom" && contactReviewCustomDate
                           ? format(contactReviewCustomDate, "MMM d, yyyy")
-                          : "Pick date"}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="end">
-                      <CalendarPicker
-                        mode="single"
-                        selected={contactReviewCustomDate}
-                        onSelect={(date) => {
-                          setContactReviewCustomDate(date);
-                          setIsCalendarOpen(false);
-                        }}
-                        initialFocus
-                      />
-                    </PopoverContent>
-                  </Popover>
-                )}
+                          : contactReviewTimeFilter === "today"
+                            ? "Today"
+                            : contactReviewTimeFilter === "yesterday"
+                              ? "Yesterday"
+                              : "Custom"}
+                      </SelectValue>
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="today">Today</SelectItem>
+                      <SelectItem value="yesterday">Yesterday</SelectItem>
+                      <SelectItem value="custom">Custom</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <PopoverTrigger asChild>
+                    <span className="sr-only">Open calendar</span>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <CalendarPicker
+                      mode="single"
+                      selected={contactReviewCustomDate}
+                      onSelect={(date) => {
+                        setContactReviewCustomDate(date);
+                        setIsCalendarOpen(false);
+                      }}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
                 <Select value={contactReviewChannelFilter} onValueChange={setContactReviewChannelFilter}>
                   <SelectTrigger className="w-[130px]">
                     <SelectValue placeholder="Channel" />

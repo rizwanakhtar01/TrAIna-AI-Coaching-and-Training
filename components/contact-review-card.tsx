@@ -583,51 +583,51 @@ export function ContactReviewsList() {
           />
         </div>
 
-        <Select
-          value={filterTime}
-          onValueChange={(value: "today" | "yesterday" | "custom") => {
-            setFilterTime(value);
-            if (value !== "custom") {
-              setCustomDate(undefined);
-              setIsCalendarOpen(false);
-            } else {
-              setIsCalendarOpen(true);
-            }
-          }}
-        >
-          <SelectTrigger className="w-[130px]">
-            <SelectValue placeholder="Time Range" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="today">Today</SelectItem>
-            <SelectItem value="yesterday">Yesterday</SelectItem>
-            <SelectItem value="custom">Custom</SelectItem>
-          </SelectContent>
-        </Select>
-        
-        {filterTime === "custom" && (
-          <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
-            <PopoverTrigger asChild>
-              <Button variant="outline" size="sm" className="gap-2">
-                <Calendar className="h-4 w-4" />
-                {customDate
+        <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
+          <Select
+            value={filterTime}
+            onValueChange={(value: "today" | "yesterday" | "custom") => {
+              setFilterTime(value);
+              if (value !== "custom") {
+                setCustomDate(undefined);
+                setIsCalendarOpen(false);
+              } else {
+                setIsCalendarOpen(true);
+              }
+            }}
+          >
+            <SelectTrigger className="w-[130px]">
+              <SelectValue placeholder="Time Range">
+                {filterTime === "custom" && customDate
                   ? format(customDate, "MMM d, yyyy")
-                  : "Pick date"}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="end">
-              <CalendarPicker
-                mode="single"
-                selected={customDate}
-                onSelect={(date) => {
-                  setCustomDate(date);
-                  setIsCalendarOpen(false);
-                }}
-                initialFocus
-              />
-            </PopoverContent>
-          </Popover>
-        )}
+                  : filterTime === "today"
+                    ? "Today"
+                    : filterTime === "yesterday"
+                      ? "Yesterday"
+                      : "Custom"}
+              </SelectValue>
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="today">Today</SelectItem>
+              <SelectItem value="yesterday">Yesterday</SelectItem>
+              <SelectItem value="custom">Custom</SelectItem>
+            </SelectContent>
+          </Select>
+          <PopoverTrigger asChild>
+            <span className="sr-only">Open calendar</span>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="start">
+            <CalendarPicker
+              mode="single"
+              selected={customDate}
+              onSelect={(date) => {
+                setCustomDate(date);
+                setIsCalendarOpen(false);
+              }}
+              initialFocus
+            />
+          </PopoverContent>
+        </Popover>
 
         <Select value={filterChannel} onValueChange={setFilterChannel}>
           <SelectTrigger className="w-32">
