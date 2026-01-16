@@ -177,6 +177,8 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
   const [contactReviewTimeFilter, setContactReviewTimeFilter] = useState<"today" | "yesterday" | "custom">("today");
   const [contactReviewCustomDate, setContactReviewCustomDate] = useState<Date | undefined>(undefined);
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+  const [contactReviewChannelFilter, setContactReviewChannelFilter] = useState("all");
+  const [contactReviewScoreFilter, setContactReviewScoreFilter] = useState("all");
   const [selectedDailyAgent, setSelectedDailyAgent] = useState<string | null>(
     null,
   );
@@ -2689,12 +2691,12 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
           className="space-y-6"
         >
           <div className="flex items-center justify-between">
-            <TabsList className="grid w-full grid-cols-5 lg:w-[750px] bg-zinc-100">
+            <TabsList className="grid w-full grid-cols-6 lg:w-[900px] bg-zinc-100">
               <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
               <TabsTrigger value="daily-summary">Daily Summary</TabsTrigger>
+              <TabsTrigger value="contact-reviews">Contact Reviews</TabsTrigger>
               <TabsTrigger value="patterns">Challenging Patterns</TabsTrigger>
               <TabsTrigger value="progress">Coaching Progress</TabsTrigger>
-
               <TabsTrigger value="reports">Weekly Reports</TabsTrigger>
             </TabsList>
 
@@ -2897,6 +2899,171 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
                 </ResponsiveContainer>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          {/* Contact Reviews Tab */}
+          <TabsContent value="contact-reviews" className="space-y-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-2xl font-bold text-foreground">
+                  Contact Reviews
+                </h2>
+                <p className="text-muted-foreground">
+                  AI-generated feedback from customer interactions
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <Select
+                  value={contactReviewTimeFilter}
+                  onValueChange={(value: "today" | "yesterday" | "custom") => {
+                    setContactReviewTimeFilter(value);
+                    if (value !== "custom") {
+                      setContactReviewCustomDate(undefined);
+                      setIsCalendarOpen(false);
+                    } else {
+                      setIsCalendarOpen(true);
+                    }
+                  }}
+                >
+                  <SelectTrigger className="w-[130px]">
+                    <SelectValue placeholder="Time Range" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="today">Today</SelectItem>
+                    <SelectItem value="yesterday">Yesterday</SelectItem>
+                    <SelectItem value="custom">Custom</SelectItem>
+                  </SelectContent>
+                </Select>
+                {contactReviewTimeFilter === "custom" && (
+                  <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
+                    <PopoverTrigger asChild>
+                      <Button variant="outline" size="sm" className="gap-2">
+                        <Calendar className="h-4 w-4" />
+                        {contactReviewCustomDate
+                          ? format(contactReviewCustomDate, "MMM d, yyyy")
+                          : "Pick date"}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="end">
+                      <CalendarPicker
+                        mode="single"
+                        selected={contactReviewCustomDate}
+                        onSelect={(date) => {
+                          setContactReviewCustomDate(date);
+                          setIsCalendarOpen(false);
+                        }}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                )}
+                <Select value={contactReviewChannelFilter} onValueChange={setContactReviewChannelFilter}>
+                  <SelectTrigger className="w-[130px]">
+                    <SelectValue placeholder="Channel" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Channels</SelectItem>
+                    <SelectItem value="phone">Phone</SelectItem>
+                    <SelectItem value="chat">Chat</SelectItem>
+                    <SelectItem value="email">Email</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Select value={contactReviewScoreFilter} onValueChange={setContactReviewScoreFilter}>
+                  <SelectTrigger className="w-[130px]">
+                    <SelectValue placeholder="Score" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Scores</SelectItem>
+                    <SelectItem value="excellent">Excellent (9+)</SelectItem>
+                    <SelectItem value="good">Good (7-8.9)</SelectItem>
+                    <SelectItem value="needs-improvement">Needs Improvement (&lt;7)</SelectItem>
+                  </SelectContent>
+                </Select>
+                {(contactReviewTimeFilter !== "today" ||
+                  contactReviewChannelFilter !== "all" ||
+                  contactReviewScoreFilter !== "all") && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      setContactReviewTimeFilter("today");
+                      setContactReviewChannelFilter("all");
+                      setContactReviewScoreFilter("all");
+                      setContactReviewCustomDate(undefined);
+                    }}
+                  >
+                    Clear Filters
+                  </Button>
+                )}
+              </div>
+            </div>
+
+            {(() => {
+              const getTimeLabel = () => {
+                if (contactReviewTimeFilter === "today") return "Today";
+                if (contactReviewTimeFilter === "yesterday") return "Yesterday";
+                if (contactReviewTimeFilter === "custom" && contactReviewCustomDate) {
+                  return format(contactReviewCustomDate, "MMM d, yyyy");
+                }
+                return "";
+              };
+
+              const filteredReviews = sampleContactReviews.filter((review) => {
+                const reviewDate = new Date(review.timestamp);
+
+                if (contactReviewTimeFilter === "today" && !isToday(reviewDate)) return false;
+                if (contactReviewTimeFilter === "yesterday" && !isYesterday(reviewDate)) return false;
+                if (contactReviewTimeFilter === "custom" && contactReviewCustomDate && !isSameDay(reviewDate, contactReviewCustomDate)) return false;
+
+                if (contactReviewChannelFilter !== "all" && review.channel !== contactReviewChannelFilter) return false;
+
+                if (contactReviewScoreFilter === "excellent" && review.overallScore < 9) return false;
+                if (contactReviewScoreFilter === "good" && (review.overallScore < 7 || review.overallScore >= 9)) return false;
+                if (contactReviewScoreFilter === "needs-improvement" && review.overallScore >= 7) return false;
+
+                return true;
+              });
+
+              if (filteredReviews.length === 0) {
+                return (
+                  <Card>
+                    <CardContent className="py-12">
+                      <div className="text-center">
+                        <MessageSquare className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                        <h3 className="text-lg font-semibold text-muted-foreground">
+                          No Contact Reviews Found
+                        </h3>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          No reviews match your current filter criteria for {getTimeLabel()}.
+                        </p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              }
+
+              return (
+                <>
+                  <div className="flex items-center justify-between">
+                    <Badge variant="secondary" className="bg-primary/10 text-primary">
+                      {filteredReviews.length} Review{filteredReviews.length !== 1 ? "s" : ""} {getTimeLabel()}
+                    </Badge>
+                    <div className="text-sm text-muted-foreground">
+                      Average Score:{" "}
+                      {(
+                        filteredReviews.reduce((acc, review) => acc + review.overallScore, 0) /
+                        filteredReviews.length
+                      ).toFixed(1)}
+                    </div>
+                  </div>
+                  <div className="space-y-4">
+                    {filteredReviews.map((review) => (
+                      <ContactReviewCard key={review.id} review={review} />
+                    ))}
+                  </div>
+                </>
+              );
+            })()}
           </TabsContent>
 
           {/* Challenging Patterns Explorer */}
