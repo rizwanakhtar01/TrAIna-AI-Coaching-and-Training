@@ -35,6 +35,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Calendar as CalendarPicker } from "@/components/ui/calendar";
+import { format, isToday, isYesterday, isSameDay, subDays } from "date-fns";
+
+const getToday = () => format(new Date(), "yyyy-MM-dd");
+const getYesterday = () => format(subDays(new Date(), 1), "yyyy-MM-dd");
 
 interface ContactReview {
   id: string;
@@ -78,7 +88,7 @@ const sampleReviews: ContactReview[] = [
       name: "Sarah Johnson",
       email: "sarah.johnson@email.com",
       phone: "+1 (555) 123-4567",
-      contactTimestamp: "2024-01-15 14:32:15",
+      contactTimestamp: `${getToday()} 14:32:15`,
       previousContacts: 2,
     },
     overallScore: 8.2,
@@ -136,7 +146,7 @@ const sampleReviews: ContactReview[] = [
       name: "Michael Chen",
       email: "m.chen@company.com",
       phone: "+1 (555) 987-6543",
-      contactTimestamp: "2024-01-15 14:15:22",
+      contactTimestamp: `${getToday()} 14:15:22`,
       previousContacts: 1,
     },
     overallScore: 7.8,
@@ -189,7 +199,7 @@ const sampleReviews: ContactReview[] = [
     customer: {
       name: "Emma Rodriguez",
       email: "emma.rodriguez@startup.io",
-      contactTimestamp: "2024-01-15 13:20:45",
+      contactTimestamp: `${getYesterday()} 13:20:45`,
       previousContacts: 3,
     },
     overallScore: 6.5,
@@ -509,6 +519,9 @@ export function ContactReviewsList() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterChannel, setFilterChannel] = useState("all");
   const [filterScore, setFilterScore] = useState("all");
+  const [filterTime, setFilterTime] = useState<"today" | "yesterday" | "custom">("today");
+  const [customDate, setCustomDate] = useState<Date | undefined>(undefined);
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
   const filteredReviews = sampleReviews.filter((review) => {
     const matchesSearch =
@@ -527,8 +540,23 @@ export function ContactReviewsList() {
         review.overallScore < 8) ||
       (filterScore === "low" && review.overallScore < 6);
 
-    return matchesSearch && matchesChannel && matchesScore;
+    const reviewDate = new Date(review.customer.contactTimestamp);
+    const matchesTime =
+      filterTime === "today" ? isToday(reviewDate) :
+      filterTime === "yesterday" ? isYesterday(reviewDate) :
+      filterTime === "custom" && customDate ? isSameDay(reviewDate, customDate) : true;
+
+    return matchesSearch && matchesChannel && matchesScore && matchesTime;
   });
+
+  const getTimeLabel = () => {
+    if (filterTime === "today") return "Today";
+    if (filterTime === "yesterday") return "Yesterday";
+    if (filterTime === "custom" && customDate) {
+      return format(customDate, "MMM d, yyyy");
+    }
+    return "";
+  };
 
   return (
     <div className="space-y-4">
@@ -540,7 +568,7 @@ export function ContactReviewsList() {
           </p>
         </div>
         <Badge variant="secondary" className="bg-primary/10 text-primary">
-          {filteredReviews.length} Reviews Today
+          {filteredReviews.length} Review{filteredReviews.length !== 1 ? "s" : ""} {getTimeLabel()}
         </Badge>
       </div>
 
@@ -554,6 +582,52 @@ export function ContactReviewsList() {
             className="pl-10"
           />
         </div>
+
+        <Select
+          value={filterTime}
+          onValueChange={(value: "today" | "yesterday" | "custom") => {
+            setFilterTime(value);
+            if (value !== "custom") {
+              setCustomDate(undefined);
+              setIsCalendarOpen(false);
+            } else {
+              setIsCalendarOpen(true);
+            }
+          }}
+        >
+          <SelectTrigger className="w-[130px]">
+            <SelectValue placeholder="Time Range" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="today">Today</SelectItem>
+            <SelectItem value="yesterday">Yesterday</SelectItem>
+            <SelectItem value="custom">Custom</SelectItem>
+          </SelectContent>
+        </Select>
+        
+        {filterTime === "custom" && (
+          <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
+            <PopoverTrigger asChild>
+              <Button variant="outline" size="sm" className="gap-2">
+                <Calendar className="h-4 w-4" />
+                {customDate
+                  ? format(customDate, "MMM d, yyyy")
+                  : "Pick date"}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="end">
+              <CalendarPicker
+                mode="single"
+                selected={customDate}
+                onSelect={(date) => {
+                  setCustomDate(date);
+                  setIsCalendarOpen(false);
+                }}
+                initialFocus
+              />
+            </PopoverContent>
+          </Popover>
+        )}
 
         <Select value={filterChannel} onValueChange={setFilterChannel}>
           <SelectTrigger className="w-32">
@@ -597,6 +671,8 @@ export function ContactReviewsList() {
                   setSearchTerm("");
                   setFilterChannel("all");
                   setFilterScore("all");
+                  setFilterTime("today");
+                  setCustomDate(undefined);
                 }}
                 className="mt-2"
               >
