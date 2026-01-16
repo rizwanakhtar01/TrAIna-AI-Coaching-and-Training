@@ -1,6 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { format, isToday, isYesterday, isSameDay } from "date-fns";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar as CalendarPicker } from "@/components/ui/calendar";
 import {
   Card,
   CardContent,
@@ -171,6 +174,9 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
 
   // State for daily summary agent details
   const [showDailyAgentDetails, setShowDailyAgentDetails] = useState(false);
+  const [contactReviewTimeFilter, setContactReviewTimeFilter] = useState<"today" | "yesterday" | "custom">("today");
+  const [contactReviewCustomDate, setContactReviewCustomDate] = useState<Date | undefined>(undefined);
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [selectedDailyAgent, setSelectedDailyAgent] = useState<string | null>(
     null,
   );
@@ -2446,27 +2452,99 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
           {/* Contact Reviews Section */}
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <MessageSquare className="h-5 w-5 text-chart-1" />
-                Recent Contact Reviews
-              </CardTitle>
-              <p className="text-sm text-muted-foreground">
-                AI-generated feedback from {agentInsight.agent}'s customer
-                interactions
-              </p>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="flex items-center gap-2">
+                    <MessageSquare className="h-5 w-5 text-chart-1" />
+                    Contact Reviews
+                  </CardTitle>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    AI-generated feedback from {agentInsight.agent}'s customer
+                    interactions
+                  </p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Select
+                    value={contactReviewTimeFilter}
+                    onValueChange={(value: "today" | "yesterday" | "custom") => {
+                      setContactReviewTimeFilter(value);
+                      if (value !== "custom") {
+                        setContactReviewCustomDate(undefined);
+                        setIsCalendarOpen(false);
+                      } else {
+                        setIsCalendarOpen(true);
+                      }
+                    }}
+                  >
+                    <SelectTrigger className="w-[140px]">
+                      <SelectValue placeholder="Select time" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="today">Today</SelectItem>
+                      <SelectItem value="yesterday">Yesterday</SelectItem>
+                      <SelectItem value="custom">Custom</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  {contactReviewTimeFilter === "custom" && (
+                    <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
+                      <PopoverTrigger asChild>
+                        <Button variant="outline" size="sm" className="gap-2">
+                          <Calendar className="h-4 w-4" />
+                          {contactReviewCustomDate
+                            ? format(contactReviewCustomDate, "MMM d, yyyy")
+                            : "Pick date"}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="end">
+                        <CalendarPicker
+                          mode="single"
+                          selected={contactReviewCustomDate}
+                          onSelect={(date) => {
+                            setContactReviewCustomDate(date);
+                            setIsCalendarOpen(false);
+                          }}
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
+                  )}
+                </div>
+              </div>
             </CardHeader>
             <CardContent>
               {(() => {
                 const agentContactReviews = sampleContactReviews.filter(
-                  (review) => review.agentName === agentInsight.agent,
+                  (review) => {
+                    if (review.agentName !== agentInsight.agent) return false;
+                    
+                    const reviewDate = new Date(review.timestamp);
+                    
+                    if (contactReviewTimeFilter === "today") {
+                      return isToday(reviewDate);
+                    } else if (contactReviewTimeFilter === "yesterday") {
+                      return isYesterday(reviewDate);
+                    } else if (contactReviewTimeFilter === "custom" && contactReviewCustomDate) {
+                      return isSameDay(reviewDate, contactReviewCustomDate);
+                    }
+                    return true;
+                  }
                 );
+
+                const getTimeLabel = () => {
+                  if (contactReviewTimeFilter === "today") return "Today";
+                  if (contactReviewTimeFilter === "yesterday") return "Yesterday";
+                  if (contactReviewTimeFilter === "custom" && contactReviewCustomDate) {
+                    return format(contactReviewCustomDate, "MMM d, yyyy");
+                  }
+                  return "";
+                };
 
                 if (agentContactReviews.length === 0) {
                   return (
                     <div className="text-center py-8">
                       <MessageSquare className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                       <p className="text-muted-foreground">
-                        No contact reviews available for this agent yet.
+                        No contact reviews available for {getTimeLabel()}.
                       </p>
                     </div>
                   );
@@ -2480,7 +2558,7 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
                         className="bg-primary/10 text-primary"
                       >
                         {agentContactReviews.length} Review
-                        {agentContactReviews.length !== 1 ? "s" : ""} Today
+                        {agentContactReviews.length !== 1 ? "s" : ""} {getTimeLabel()}
                       </Badge>
                       <div className="text-sm text-muted-foreground">
                         Average Score:{" "}
