@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { format, isToday, isYesterday, isSameDay } from "date-fns";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar as CalendarPicker } from "@/components/ui/calendar";
@@ -177,8 +177,38 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
   const [contactReviewTimeFilter, setContactReviewTimeFilter] = useState<"today" | "yesterday" | "custom">("today");
   const [contactReviewCustomDate, setContactReviewCustomDate] = useState<Date | undefined>(undefined);
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+  const [pendingCustomDate, setPendingCustomDate] = useState<Date | undefined>(undefined);
   const [contactReviewChannelFilter, setContactReviewChannelFilter] = useState("all");
   const [contactReviewScoreFilter, setContactReviewScoreFilter] = useState("all");
+
+  // Load persisted filter from localStorage on mount
+  useEffect(() => {
+    const savedFilter = localStorage.getItem("supervisorContactReviewTimeFilter");
+    const savedCustomDate = localStorage.getItem("supervisorContactReviewCustomDate");
+    
+    if (savedFilter) {
+      const parsed = JSON.parse(savedFilter);
+      if (parsed.type === "today" || parsed.type === "yesterday") {
+        setContactReviewTimeFilter(parsed.type);
+      } else if (parsed.type === "custom" && savedCustomDate) {
+        const date = new Date(savedCustomDate);
+        if (!isNaN(date.getTime()) && date <= new Date()) {
+          setContactReviewTimeFilter("custom");
+          setContactReviewCustomDate(date);
+        }
+      }
+    }
+  }, []);
+
+  // Persist filter to localStorage
+  const persistContactReviewFilter = (type: "today" | "yesterday" | "custom", date?: Date) => {
+    localStorage.setItem("supervisorContactReviewTimeFilter", JSON.stringify({ type }));
+    if (type === "custom" && date) {
+      localStorage.setItem("supervisorContactReviewCustomDate", date.toISOString());
+    } else {
+      localStorage.removeItem("supervisorContactReviewCustomDate");
+    }
+  };
   const [selectedDailyAgent, setSelectedDailyAgent] = useState<string | null>(
     null,
   );
@@ -2913,26 +2943,28 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
                 </p>
               </div>
               <div className="flex items-center gap-2">
-                <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
+                <Popover 
+                  open={isCalendarOpen} 
+                  onOpenChange={(open) => {
+                    setIsCalendarOpen(open);
+                    if (!open) {
+                      setPendingCustomDate(undefined);
+                    }
+                  }}
+                >
                   <PopoverTrigger asChild>
                     <Button
                       variant="outline"
-                      className="w-[130px] justify-between"
-                      onClick={() => {
-                        if (contactReviewTimeFilter !== "custom") {
-                          setContactReviewTimeFilter("custom");
-                        }
-                        setIsCalendarOpen(true);
-                      }}
+                      className="w-[150px] justify-between"
                     >
                       <span className="truncate">
                         {contactReviewTimeFilter === "custom" && contactReviewCustomDate
-                          ? format(contactReviewCustomDate, "MMM d, yyyy")
+                          ? `Custom: ${format(contactReviewCustomDate, "d MMM")}`
                           : contactReviewTimeFilter === "today"
                             ? "Today"
                             : contactReviewTimeFilter === "yesterday"
                               ? "Yesterday"
-                              : "Custom"}
+                              : "Today"}
                       </span>
                       <Calendar className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                     </Button>
@@ -2945,6 +2977,8 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
                         onClick={() => {
                           setContactReviewTimeFilter("today");
                           setContactReviewCustomDate(undefined);
+                          setPendingCustomDate(undefined);
+                          persistContactReviewFilter("today");
                           setIsCalendarOpen(false);
                         }}
                       >
@@ -2956,22 +2990,59 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
                         onClick={() => {
                           setContactReviewTimeFilter("yesterday");
                           setContactReviewCustomDate(undefined);
+                          setPendingCustomDate(undefined);
+                          persistContactReviewFilter("yesterday");
                           setIsCalendarOpen(false);
                         }}
                       >
                         Yesterday
                       </Button>
+                      <Button
+                        variant={contactReviewTimeFilter === "custom" ? "default" : "ghost"}
+                        size="sm"
+                        onClick={() => {
+                          setPendingCustomDate(contactReviewCustomDate);
+                        }}
+                      >
+                        Custom
+                      </Button>
                     </div>
                     <CalendarPicker
                       mode="single"
-                      selected={contactReviewCustomDate}
+                      selected={pendingCustomDate || contactReviewCustomDate}
                       onSelect={(date) => {
-                        setContactReviewTimeFilter("custom");
-                        setContactReviewCustomDate(date);
-                        setIsCalendarOpen(false);
+                        setPendingCustomDate(date);
                       }}
+                      disabled={(date) => date > new Date()}
                       initialFocus
                     />
+                    <div className="p-2 border-t flex justify-end gap-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          setPendingCustomDate(undefined);
+                          setIsCalendarOpen(false);
+                        }}
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        size="sm"
+                        disabled={!pendingCustomDate}
+                        onClick={() => {
+                          if (pendingCustomDate) {
+                            setContactReviewTimeFilter("custom");
+                            setContactReviewCustomDate(pendingCustomDate);
+                            persistContactReviewFilter("custom", pendingCustomDate);
+                            setPendingCustomDate(undefined);
+                            setIsCalendarOpen(false);
+                          }
+                        }}
+                      >
+                        Apply
+                      </Button>
+                    </div>
                   </PopoverContent>
                 </Popover>
                 <Select value={contactReviewChannelFilter} onValueChange={setContactReviewChannelFilter}>

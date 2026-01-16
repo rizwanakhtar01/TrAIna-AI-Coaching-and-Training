@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -522,6 +522,36 @@ export function ContactReviewsList() {
   const [filterTime, setFilterTime] = useState<"today" | "yesterday" | "custom">("today");
   const [customDate, setCustomDate] = useState<Date | undefined>(undefined);
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+  const [pendingCustomDate, setPendingCustomDate] = useState<Date | undefined>(undefined);
+
+  // Load persisted filter from localStorage on mount
+  useEffect(() => {
+    const savedFilter = localStorage.getItem("contactReviewTimeFilter");
+    const savedCustomDate = localStorage.getItem("contactReviewCustomDate");
+    
+    if (savedFilter) {
+      const parsed = JSON.parse(savedFilter);
+      if (parsed.type === "today" || parsed.type === "yesterday") {
+        setFilterTime(parsed.type);
+      } else if (parsed.type === "custom" && savedCustomDate) {
+        const date = new Date(savedCustomDate);
+        if (!isNaN(date.getTime()) && date <= new Date()) {
+          setFilterTime("custom");
+          setCustomDate(date);
+        }
+      }
+    }
+  }, []);
+
+  // Persist filter to localStorage
+  const persistFilter = (type: "today" | "yesterday" | "custom", date?: Date) => {
+    localStorage.setItem("contactReviewTimeFilter", JSON.stringify({ type }));
+    if (type === "custom" && date) {
+      localStorage.setItem("contactReviewCustomDate", date.toISOString());
+    } else {
+      localStorage.removeItem("contactReviewCustomDate");
+    }
+  };
 
   const filteredReviews = sampleReviews.filter((review) => {
     const matchesSearch =
@@ -583,26 +613,28 @@ export function ContactReviewsList() {
           />
         </div>
 
-        <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
+        <Popover 
+          open={isCalendarOpen} 
+          onOpenChange={(open) => {
+            setIsCalendarOpen(open);
+            if (!open) {
+              setPendingCustomDate(undefined);
+            }
+          }}
+        >
           <PopoverTrigger asChild>
             <Button
               variant="outline"
-              className="w-[130px] justify-between"
-              onClick={() => {
-                if (filterTime !== "custom") {
-                  setFilterTime("custom");
-                }
-                setIsCalendarOpen(true);
-              }}
+              className="w-[150px] justify-between"
             >
               <span className="truncate">
                 {filterTime === "custom" && customDate
-                  ? format(customDate, "MMM d, yyyy")
+                  ? `Custom: ${format(customDate, "d MMM")}`
                   : filterTime === "today"
                     ? "Today"
                     : filterTime === "yesterday"
                       ? "Yesterday"
-                      : "Custom"}
+                      : "Today"}
               </span>
               <Calendar className="ml-2 h-4 w-4 shrink-0 opacity-50" />
             </Button>
@@ -615,6 +647,8 @@ export function ContactReviewsList() {
                 onClick={() => {
                   setFilterTime("today");
                   setCustomDate(undefined);
+                  setPendingCustomDate(undefined);
+                  persistFilter("today");
                   setIsCalendarOpen(false);
                 }}
               >
@@ -626,22 +660,59 @@ export function ContactReviewsList() {
                 onClick={() => {
                   setFilterTime("yesterday");
                   setCustomDate(undefined);
+                  setPendingCustomDate(undefined);
+                  persistFilter("yesterday");
                   setIsCalendarOpen(false);
                 }}
               >
                 Yesterday
               </Button>
+              <Button
+                variant={filterTime === "custom" ? "default" : "ghost"}
+                size="sm"
+                onClick={() => {
+                  setPendingCustomDate(customDate);
+                }}
+              >
+                Custom
+              </Button>
             </div>
             <CalendarPicker
               mode="single"
-              selected={customDate}
+              selected={pendingCustomDate || customDate}
               onSelect={(date) => {
-                setFilterTime("custom");
-                setCustomDate(date);
-                setIsCalendarOpen(false);
+                setPendingCustomDate(date);
               }}
+              disabled={(date) => date > new Date()}
               initialFocus
             />
+            <div className="p-2 border-t flex justify-end gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  setPendingCustomDate(undefined);
+                  setIsCalendarOpen(false);
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                size="sm"
+                disabled={!pendingCustomDate}
+                onClick={() => {
+                  if (pendingCustomDate) {
+                    setFilterTime("custom");
+                    setCustomDate(pendingCustomDate);
+                    persistFilter("custom", pendingCustomDate);
+                    setPendingCustomDate(undefined);
+                    setIsCalendarOpen(false);
+                  }
+                }}
+              >
+                Apply
+              </Button>
+            </div>
           </PopoverContent>
         </Popover>
 
