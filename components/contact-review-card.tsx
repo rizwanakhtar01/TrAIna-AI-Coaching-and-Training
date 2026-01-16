@@ -668,10 +668,10 @@ export function ContactReviewsList() {
                 Yesterday
               </Button>
               <Button
-                variant={filterTime === "custom" ? "default" : "ghost"}
+                variant={filterTime === "custom" || pendingCustomDate ? "default" : "ghost"}
                 size="sm"
                 onClick={() => {
-                  setPendingCustomDate(customDate);
+                  setPendingCustomDate(customDate || new Date());
                 }}
               >
                 Custom

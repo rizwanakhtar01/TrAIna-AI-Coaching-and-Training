@@ -2998,10 +2998,10 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
                         Yesterday
                       </Button>
                       <Button
-                        variant={contactReviewTimeFilter === "custom" ? "default" : "ghost"}
+                        variant={contactReviewTimeFilter === "custom" || pendingCustomDate ? "default" : "ghost"}
                         size="sm"
                         onClick={() => {
-                          setPendingCustomDate(contactReviewCustomDate);
+                          setPendingCustomDate(contactReviewCustomDate || new Date());
                         }}
                       >
                         Custom
