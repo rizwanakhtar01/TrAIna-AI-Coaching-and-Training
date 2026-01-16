@@ -28,6 +28,7 @@ import {
   RefreshCw,
   CheckCircle,
   KeyRound,
+  GripVertical,
 } from "lucide-react";
 
 interface AgentDesktopProps {
@@ -53,6 +54,12 @@ function FloatingCoachingWidget({
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
   
+  // Vertical drag state
+  const [widgetY, setWidgetY] = useState(100);
+  const [isDragging, setIsDragging] = useState(false);
+  const dragStartY = React.useRef(0);
+  const dragStartWidgetY = React.useRef(0);
+  
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [forgotPasswordStep, setForgotPasswordStep] = useState<"email" | "code" | "success">("email");
   const [resetEmail, setResetEmail] = useState("");
@@ -76,7 +83,51 @@ function FloatingCoachingWidget({
     if (savedLoginState === "true") {
       setIsLoggedIn(true);
     }
+    // Load saved widget position
+    const savedY = localStorage.getItem("traina_widget_y");
+    if (savedY) {
+      setWidgetY(parseInt(savedY, 10));
+    }
   }, []);
+
+  // Drag handlers for vertical movement
+  const handleDragStart = (e: React.MouseEvent | React.TouchEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+    const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+    dragStartY.current = clientY;
+    dragStartWidgetY.current = widgetY;
+  };
+
+  const handleDragMove = React.useCallback((e: MouseEvent | TouchEvent) => {
+    if (!isDragging) return;
+    const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+    const deltaY = clientY - dragStartY.current;
+    const newY = Math.max(0, Math.min(window.innerHeight - 100, dragStartWidgetY.current + deltaY));
+    setWidgetY(newY);
+  }, [isDragging]);
+
+  const handleDragEnd = React.useCallback(() => {
+    if (isDragging) {
+      setIsDragging(false);
+      localStorage.setItem("traina_widget_y", widgetY.toString());
+    }
+  }, [isDragging, widgetY]);
+
+  useEffect(() => {
+    if (isDragging) {
+      window.addEventListener('mousemove', handleDragMove);
+      window.addEventListener('mouseup', handleDragEnd);
+      window.addEventListener('touchmove', handleDragMove);
+      window.addEventListener('touchend', handleDragEnd);
+      return () => {
+        window.removeEventListener('mousemove', handleDragMove);
+        window.removeEventListener('mouseup', handleDragEnd);
+        window.removeEventListener('touchmove', handleDragMove);
+        window.removeEventListener('touchend', handleDragEnd);
+      };
+    }
+  }, [isDragging, handleDragMove, handleDragEnd]);
 
   useEffect(() => {
     if (resendCountdown > 0) {
@@ -290,16 +341,27 @@ function FloatingCoachingWidget({
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: "100%" }}
           transition={{ type: "spring", stiffness: 120, damping: 20 }}
-          className="fixed top-1/2 right-0 -translate-y-1/2 z-50"
+          className="fixed right-0 z-50"
+          style={{ top: widgetY }}
         >
-          <div
-            className="bg-blue-600 text-white px-4 py-3 h-12 w-30 rounded-l-lg flex items-center justify-center text-center leading-snug"
-            onClick={() => setIsCollapsed(false)}
-          >
-            <Sparkles className="h-7 w-7" />
-            <span className="text-sm font-medium whitespace-normal break-words">
-              Your AI Coach
-            </span>
+          <div className="flex flex-col items-end">
+            <div
+              className="bg-blue-500 text-white px-2 py-1 rounded-l-md cursor-grab active:cursor-grabbing select-none"
+              onMouseDown={handleDragStart}
+              onTouchStart={handleDragStart}
+              title="Drag to move"
+            >
+              <GripVertical className="h-4 w-4" />
+            </div>
+            <div
+              className="bg-blue-600 text-white px-4 py-3 h-12 w-30 rounded-l-lg flex items-center justify-center text-center leading-snug cursor-pointer hover:bg-blue-700 transition-colors"
+              onClick={() => setIsCollapsed(false)}
+            >
+              <Sparkles className="h-7 w-7" />
+              <span className="text-sm font-medium whitespace-normal break-words">
+                Your AI Coach
+              </span>
+            </div>
           </div>
         </motion.div>
       ) : (
@@ -309,11 +371,20 @@ function FloatingCoachingWidget({
           animate={{ x: 0 }}
           exit={{ x: "100%" }}
           transition={{ type: "spring", stiffness: 120, damping: 20 }}
-          className="fixed top-0 right-0 h-screen border-l w-[300px] md:w-[400px] lg:w-[500px] z-50 overflow-hidden"
+          className="fixed right-0 border-l w-[300px] md:w-[400px] lg:w-[500px] z-50 overflow-hidden"
+          style={{ top: widgetY, height: `calc(100vh - ${widgetY}px)` }}
         >
           <Card className="h-full bg-white/95 backdrop-blur-sm rounded-none shadow-xl overflow-hidden flex flex-col">
+            <div
+              className="w-full h-6 bg-gradient-to-b from-blue-100 to-transparent flex items-center justify-center cursor-grab active:cursor-grabbing select-none"
+              onMouseDown={handleDragStart}
+              onTouchStart={handleDragStart}
+              title="Drag to move vertically"
+            >
+              <GripVertical className="h-4 w-4 text-blue-400 rotate-90" />
+            </div>
             <CardHeader
-              className={`pb-3 ${isLoggedIn ? "border-b border-gray-100" : ""}`}
+              className={`pb-3 pt-1 ${isLoggedIn ? "border-b border-gray-100" : ""}`}
             >
               <div className="flex items-center justify-between">
                 {isLoggedIn && (
