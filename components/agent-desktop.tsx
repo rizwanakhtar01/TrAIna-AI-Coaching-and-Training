@@ -70,6 +70,7 @@ function FloatingCoachingWidget({
   const [setupConfirmPassword, setSetupConfirmPassword] = useState("");
   const [setupPasswordError, setSetupPasswordError] = useState("");
   const [setupPasswordLoading, setSetupPasswordLoading] = useState(false);
+  const [isAcknowledged, setIsAcknowledged] = useState(false);
 
   useEffect(() => {
     const savedLoginState = localStorage.getItem("traina_logged_in");
@@ -855,6 +856,26 @@ function FloatingCoachingWidget({
                       {yesterdayPerformance.aiTip}
                     </p>
                   </div>
+
+                  {/* Acknowledge Button */}
+                  <Button
+                    onClick={() => setIsAcknowledged(true)}
+                    disabled={isAcknowledged}
+                    className={`w-full ${
+                      isAcknowledged 
+                        ? "bg-green-600 hover:bg-green-600 cursor-default" 
+                        : "bg-amber-500 hover:bg-amber-600"
+                    } text-white`}
+                  >
+                    {isAcknowledged ? (
+                      <>
+                        <CheckCircle className="h-4 w-4 mr-2" />
+                        Acknowledged
+                      </>
+                    ) : (
+                      "Acknowledge"
+                    )}
+                  </Button>
 
                   {/* CTA Button */}
                   <Button
