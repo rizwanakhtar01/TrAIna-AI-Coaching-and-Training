@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { format, isToday, isYesterday, isSameDay } from "date-fns";
+import { format, isToday, isYesterday, isSameDay, subDays } from "date-fns";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar as CalendarPicker } from "@/components/ui/calendar";
 import {
@@ -425,11 +425,16 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
     ],
   };
 
+  // Helper to get today and yesterday dates
+  const getToday = () => new Date();
+  const getYesterday = () => subDays(new Date(), 1);
+
   // Sample contact reviews data mapped to agents
   const sampleContactReviews: ContactReview[] = [
+    // TODAY's contacts
     {
       id: "1",
-      timestamp: "2 minutes ago",
+      timestamp: getToday().toISOString(),
       duration: "3:45",
       channel: "chat",
       customerIssue: "Subscription cancellation request",
@@ -440,7 +445,7 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
         name: "Sarah Johnson",
         email: "sarah.johnson@email.com",
         phone: "+1 (555) 123-4567",
-        contactTimestamp: "2024-01-15 14:32:15",
+        contactTimestamp: format(getToday(), "yyyy-MM-dd HH:mm:ss"),
         previousContacts: 2,
       },
       overallScore: 8.2,
@@ -488,7 +493,7 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
     },
     {
       id: "2",
-      timestamp: "15 minutes ago",
+      timestamp: getToday().toISOString(),
       duration: "6:12",
       channel: "phone",
       customerIssue: "Refund inquiry - 10 days overdue",
@@ -499,7 +504,7 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
         name: "Michael Chen",
         email: "m.chen@company.com",
         phone: "+1 (555) 987-6543",
-        contactTimestamp: "2024-01-15 14:15:22",
+        contactTimestamp: format(getToday(), "yyyy-MM-dd HH:mm:ss"),
         previousContacts: 1,
       },
       overallScore: 7.8,
@@ -543,7 +548,7 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
     },
     {
       id: "3",
-      timestamp: "1 hour ago",
+      timestamp: getToday().toISOString(),
       duration: "8:23",
       channel: "email",
       customerIssue: "Technical support - third contact attempt",
@@ -553,7 +558,7 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
       customer: {
         name: "Emma Rodriguez",
         email: "emma.rodriguez@startup.io",
-        contactTimestamp: "2024-01-15 13:20:45",
+        contactTimestamp: format(getToday(), "yyyy-MM-dd HH:mm:ss"),
         previousContacts: 3,
       },
       overallScore: 6.5,
@@ -603,7 +608,7 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
     },
     {
       id: "4",
-      timestamp: "2 hours ago",
+      timestamp: getToday().toISOString(),
       duration: "4:15",
       channel: "chat",
       customerIssue: "Product information inquiry",
@@ -613,7 +618,7 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
       customer: {
         name: "James Wilson",
         email: "james.w@example.com",
-        contactTimestamp: "2024-01-15 12:15:30",
+        contactTimestamp: format(getToday(), "yyyy-MM-dd HH:mm:ss"),
         previousContacts: 0,
       },
       overallScore: 9.1,
@@ -655,9 +660,10 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
       ],
       agentName: "Mike Rodriguez",
     },
+    // YESTERDAY's contacts
     {
       id: "5",
-      timestamp: "3 hours ago",
+      timestamp: getYesterday().toISOString(),
       duration: "5:30",
       channel: "phone",
       customerIssue: "Account setup assistance",
@@ -668,7 +674,7 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
         name: "Maria Garcia",
         email: "maria.garcia@startup.com",
         phone: "+1 (555) 456-7890",
-        contactTimestamp: "2024-01-15 11:30:45",
+        contactTimestamp: format(getYesterday(), "yyyy-MM-dd HH:mm:ss"),
         previousContacts: 0,
       },
       overallScore: 8.8,
@@ -710,7 +716,7 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
     },
     {
       id: "6",
-      timestamp: "4 hours ago",
+      timestamp: getYesterday().toISOString(),
       duration: "7:45",
       channel: "email",
       customerIssue: "Billing discrepancy resolution",
@@ -720,7 +726,7 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
       customer: {
         name: "Robert Taylor",
         email: "robert.taylor@company.org",
-        contactTimestamp: "2024-01-15 10:45:15",
+        contactTimestamp: format(getYesterday(), "yyyy-MM-dd HH:mm:ss"),
         previousContacts: 1,
       },
       overallScore: 8.5,
