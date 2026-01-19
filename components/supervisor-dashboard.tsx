@@ -180,6 +180,7 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
   const [pendingCustomDate, setPendingCustomDate] = useState<Date | undefined>(undefined);
   const [contactReviewChannelFilter, setContactReviewChannelFilter] = useState("all");
   const [contactReviewScoreFilter, setContactReviewScoreFilter] = useState("all");
+  const [contactReviewAgentFilter, setContactReviewAgentFilter] = useState("all");
 
   // Load persisted filter from localStorage on mount
   useEffect(() => {
@@ -3045,6 +3046,17 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
                     </div>
                   </PopoverContent>
                 </Popover>
+                <Select value={contactReviewAgentFilter} onValueChange={setContactReviewAgentFilter}>
+                  <SelectTrigger className="w-[150px]">
+                    <SelectValue placeholder="Agent" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Agents</SelectItem>
+                    {Array.from(new Set(sampleContactReviews.map(r => r.agentName))).filter(Boolean).map((agentName) => (
+                      <SelectItem key={agentName} value={agentName!}>{agentName}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
                 <Select value={contactReviewChannelFilter} onValueChange={setContactReviewChannelFilter}>
                   <SelectTrigger className="w-[130px]">
                     <SelectValue placeholder="Channel" />
@@ -3069,7 +3081,8 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
                 </Select>
                 {(contactReviewTimeFilter !== "today" ||
                   contactReviewChannelFilter !== "all" ||
-                  contactReviewScoreFilter !== "all") && (
+                  contactReviewScoreFilter !== "all" ||
+                  contactReviewAgentFilter !== "all") && (
                   <Button
                     variant="ghost"
                     size="sm"
@@ -3077,6 +3090,7 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
                       setContactReviewTimeFilter("today");
                       setContactReviewChannelFilter("all");
                       setContactReviewScoreFilter("all");
+                      setContactReviewAgentFilter("all");
                       setContactReviewCustomDate(undefined);
                     }}
                   >
@@ -3102,6 +3116,8 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
                 if (contactReviewTimeFilter === "today" && !isToday(reviewDate)) return false;
                 if (contactReviewTimeFilter === "yesterday" && !isYesterday(reviewDate)) return false;
                 if (contactReviewTimeFilter === "custom" && contactReviewCustomDate && !isSameDay(reviewDate, contactReviewCustomDate)) return false;
+
+                if (contactReviewAgentFilter !== "all" && review.agentName !== contactReviewAgentFilter) return false;
 
                 if (contactReviewChannelFilter !== "all" && review.channel !== contactReviewChannelFilter) return false;
 
