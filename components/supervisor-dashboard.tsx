@@ -2728,12 +2728,12 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
           className="space-y-6"
         >
           <div className="flex items-center justify-between">
-            <TabsList className="grid w-full grid-cols-5 lg:w-[750px] bg-zinc-100">
-              <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
-              <TabsTrigger value="daily-summary">Agent Performance Review</TabsTrigger>
-              <TabsTrigger value="patterns">Challenging Patterns</TabsTrigger>
-              <TabsTrigger value="progress">Coaching Progress</TabsTrigger>
-              <TabsTrigger value="reports">Weekly Reports</TabsTrigger>
+            <TabsList className="flex w-auto bg-zinc-100">
+              <TabsTrigger value="dashboard" className="px-4">Dashboard</TabsTrigger>
+              <TabsTrigger value="daily-summary" className="px-4">Agent Performance Review</TabsTrigger>
+              <TabsTrigger value="patterns" className="px-4">Challenging Patterns</TabsTrigger>
+              <TabsTrigger value="progress" className="px-4">Coaching Progress</TabsTrigger>
+              <TabsTrigger value="reports" className="px-4">Weekly Reports</TabsTrigger>
             </TabsList>
 
             <div className="flex items-center gap-2">
