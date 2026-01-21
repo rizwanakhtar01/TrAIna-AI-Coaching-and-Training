@@ -2243,7 +2243,7 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
                 }}
               >
                 <ArrowLeft className="h-4 w-4 mr-2" />
-                Back to Daily Summary
+                Back
               </Button>
               <div className="flex items-center gap-2">
                 <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
@@ -2262,7 +2262,7 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
                 variant="secondary"
                 className="bg-blue-100 text-blue-800 font-medium"
               >
-                Daily Summary
+                Agent Performance Review
               </Badge>
             </div>
             <div className="flex items-center gap-4">
@@ -2728,10 +2728,9 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
           className="space-y-6"
         >
           <div className="flex items-center justify-between">
-            <TabsList className="grid w-full grid-cols-6 lg:w-[900px] bg-zinc-100">
+            <TabsList className="grid w-full grid-cols-5 lg:w-[750px] bg-zinc-100">
               <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
-              <TabsTrigger value="daily-summary">Daily Summary</TabsTrigger>
-              <TabsTrigger value="contact-reviews">Contact Reviews</TabsTrigger>
+              <TabsTrigger value="daily-summary">Agent Performance Review</TabsTrigger>
               <TabsTrigger value="patterns">Challenging Patterns</TabsTrigger>
               <TabsTrigger value="progress">Coaching Progress</TabsTrigger>
               <TabsTrigger value="reports">Weekly Reports</TabsTrigger>
@@ -2936,244 +2935,6 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
                 </ResponsiveContainer>
               </CardContent>
             </Card>
-          </TabsContent>
-
-          {/* Contact Reviews Tab */}
-          <TabsContent value="contact-reviews" className="space-y-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-2xl font-bold text-foreground">
-                  Contact Reviews
-                </h2>
-                <p className="text-muted-foreground">
-                  AI-generated feedback from customer interactions
-                </p>
-              </div>
-              <div className="flex items-center gap-2">
-                <Popover 
-                  open={isCalendarOpen} 
-                  onOpenChange={(open) => {
-                    setIsCalendarOpen(open);
-                    if (!open) {
-                      setPendingCustomDate(undefined);
-                    }
-                  }}
-                >
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className="w-[150px] justify-between"
-                    >
-                      <span className="truncate">
-                        {contactReviewTimeFilter === "custom" && contactReviewCustomDate
-                          ? `Custom: ${format(contactReviewCustomDate, "d MMM")}`
-                          : contactReviewTimeFilter === "today"
-                            ? "Today"
-                            : contactReviewTimeFilter === "yesterday"
-                              ? "Yesterday"
-                              : "Today"}
-                      </span>
-                      <Calendar className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <div className="p-2 border-b flex gap-1">
-                      <Button
-                        variant={contactReviewTimeFilter === "today" ? "default" : "ghost"}
-                        size="sm"
-                        onClick={() => {
-                          setContactReviewTimeFilter("today");
-                          setContactReviewCustomDate(undefined);
-                          setPendingCustomDate(undefined);
-                          persistContactReviewFilter("today");
-                          setIsCalendarOpen(false);
-                        }}
-                      >
-                        Today
-                      </Button>
-                      <Button
-                        variant={contactReviewTimeFilter === "yesterday" ? "default" : "ghost"}
-                        size="sm"
-                        onClick={() => {
-                          setContactReviewTimeFilter("yesterday");
-                          setContactReviewCustomDate(undefined);
-                          setPendingCustomDate(undefined);
-                          persistContactReviewFilter("yesterday");
-                          setIsCalendarOpen(false);
-                        }}
-                      >
-                        Yesterday
-                      </Button>
-                      <Button
-                        variant={contactReviewTimeFilter === "custom" || pendingCustomDate ? "default" : "ghost"}
-                        size="sm"
-                        onClick={() => {
-                          setPendingCustomDate(contactReviewCustomDate || new Date());
-                        }}
-                      >
-                        Custom
-                      </Button>
-                    </div>
-                    <CalendarPicker
-                      mode="single"
-                      selected={pendingCustomDate || contactReviewCustomDate}
-                      onSelect={(date) => {
-                        setPendingCustomDate(date);
-                      }}
-                      disabled={(date) => date > new Date()}
-                      initialFocus
-                    />
-                    <div className="p-2 border-t flex justify-end gap-2">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => {
-                          setPendingCustomDate(undefined);
-                          setIsCalendarOpen(false);
-                        }}
-                      >
-                        Cancel
-                      </Button>
-                      <Button
-                        size="sm"
-                        disabled={!pendingCustomDate}
-                        onClick={() => {
-                          if (pendingCustomDate) {
-                            setContactReviewTimeFilter("custom");
-                            setContactReviewCustomDate(pendingCustomDate);
-                            persistContactReviewFilter("custom", pendingCustomDate);
-                            setPendingCustomDate(undefined);
-                            setIsCalendarOpen(false);
-                          }
-                        }}
-                      >
-                        Apply
-                      </Button>
-                    </div>
-                  </PopoverContent>
-                </Popover>
-                <Select value={contactReviewAgentFilter} onValueChange={setContactReviewAgentFilter}>
-                  <SelectTrigger className="w-[150px]">
-                    <SelectValue placeholder="Agent" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Agents</SelectItem>
-                    {Array.from(new Set(sampleContactReviews.map(r => r.agentName))).filter(Boolean).map((agentName) => (
-                      <SelectItem key={agentName} value={agentName!}>{agentName}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <Select value={contactReviewChannelFilter} onValueChange={setContactReviewChannelFilter}>
-                  <SelectTrigger className="w-[130px]">
-                    <SelectValue placeholder="Channel" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Channels</SelectItem>
-                    <SelectItem value="phone">Phone</SelectItem>
-                    <SelectItem value="chat">Chat</SelectItem>
-                    <SelectItem value="email">Email</SelectItem>
-                  </SelectContent>
-                </Select>
-                <Select value={contactReviewScoreFilter} onValueChange={setContactReviewScoreFilter}>
-                  <SelectTrigger className="w-[130px]">
-                    <SelectValue placeholder="Score" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Scores</SelectItem>
-                    <SelectItem value="excellent">Excellent (9+)</SelectItem>
-                    <SelectItem value="good">Good (7-8.9)</SelectItem>
-                    <SelectItem value="needs-improvement">Needs Improvement (&lt;7)</SelectItem>
-                  </SelectContent>
-                </Select>
-                {(contactReviewTimeFilter !== "today" ||
-                  contactReviewChannelFilter !== "all" ||
-                  contactReviewScoreFilter !== "all" ||
-                  contactReviewAgentFilter !== "all") && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => {
-                      setContactReviewTimeFilter("today");
-                      setContactReviewChannelFilter("all");
-                      setContactReviewScoreFilter("all");
-                      setContactReviewAgentFilter("all");
-                      setContactReviewCustomDate(undefined);
-                    }}
-                  >
-                    Clear Filters
-                  </Button>
-                )}
-              </div>
-            </div>
-
-            {(() => {
-              const getTimeLabel = () => {
-                if (contactReviewTimeFilter === "today") return "Today";
-                if (contactReviewTimeFilter === "yesterday") return "Yesterday";
-                if (contactReviewTimeFilter === "custom" && contactReviewCustomDate) {
-                  return format(contactReviewCustomDate, "MMM d, yyyy");
-                }
-                return "";
-              };
-
-              const filteredReviews = sampleContactReviews.filter((review) => {
-                const reviewDate = new Date(review.timestamp);
-
-                if (contactReviewTimeFilter === "today" && !isToday(reviewDate)) return false;
-                if (contactReviewTimeFilter === "yesterday" && !isYesterday(reviewDate)) return false;
-                if (contactReviewTimeFilter === "custom" && contactReviewCustomDate && !isSameDay(reviewDate, contactReviewCustomDate)) return false;
-
-                if (contactReviewAgentFilter !== "all" && review.agentName !== contactReviewAgentFilter) return false;
-
-                if (contactReviewChannelFilter !== "all" && review.channel !== contactReviewChannelFilter) return false;
-
-                if (contactReviewScoreFilter === "excellent" && review.overallScore < 9) return false;
-                if (contactReviewScoreFilter === "good" && (review.overallScore < 7 || review.overallScore >= 9)) return false;
-                if (contactReviewScoreFilter === "needs-improvement" && review.overallScore >= 7) return false;
-
-                return true;
-              });
-
-              if (filteredReviews.length === 0) {
-                return (
-                  <Card>
-                    <CardContent className="py-12">
-                      <div className="text-center">
-                        <MessageSquare className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                        <h3 className="text-lg font-semibold text-muted-foreground">
-                          No Contact Reviews Found
-                        </h3>
-                        <p className="text-sm text-muted-foreground mt-1">
-                          No reviews match your current filter criteria for {getTimeLabel()}.
-                        </p>
-                      </div>
-                    </CardContent>
-                  </Card>
-                );
-              }
-
-              return (
-                <>
-                  <div className="flex items-center justify-between">
-                    <Badge variant="secondary" className="bg-primary/10 text-primary">
-                      {filteredReviews.length} Review{filteredReviews.length !== 1 ? "s" : ""} {getTimeLabel()}
-                    </Badge>
-                    <div className="text-sm text-muted-foreground">
-                      Average Score:{" "}
-                      {(
-                        filteredReviews.reduce((acc, review) => acc + review.overallScore, 0) /
-                        filteredReviews.length
-                      ).toFixed(1)}
-                    </div>
-                  </div>
-                  <div className="space-y-4">
-                    {filteredReviews.map((review) => (
-                      <ContactReviewCard key={review.id} review={review} />
-                    ))}
-                  </div>
-                </>
-              );
-            })()}
           </TabsContent>
 
           {/* Challenging Patterns Explorer */}
