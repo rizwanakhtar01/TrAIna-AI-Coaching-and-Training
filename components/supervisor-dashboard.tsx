@@ -3881,12 +3881,6 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
                               <h4 className="font-semibold">
                                 {agentInsight.agent}
                               </h4>
-                              <div className="flex items-center gap-2">
-                                {getTrendIcon(agentInsight.trend)}
-                                <span className="text-sm text-muted-foreground capitalize">
-                                  {agentInsight.trend}
-                                </span>
-                              </div>
                             </div>
                           </div>
                           <Button
