@@ -1,0 +1,133 @@
+Good catch 👍 — you’re right. **AI vs Agent handling** belongs to OmniHive, not OmniTrAina.
+
+Below is the **corrected Phase 1 Replit prompt**, with that metric **removed and replaced** by metrics that *do* make sense for OmniTrAina (onboarding + training readiness).
+
+
+**PROMPT START**
+
+You are extending the existing **OmniTrAina** application by adding a **Super Admin Dashboard – Phase 1 only**.
+
+⚠️ Constraints:
+
+* Do NOT modify any existing customer-facing dashboards (Admin, Supervisor, Agent).
+* UI-only implementation.
+* No backend logic or APIs.
+* Use mock / placeholder data.
+
+---
+
+## 🧭 **1. Super Admin Entry & Layout**
+
+* Add a dedicated **Super Admin** route/view.
+* Use a sidebar-based layout consistent with the rest of the app.
+* Clearly label this area as **“Super Admin – OmniTrAina”**.
+
+---
+
+## 🏢 **2. Customer (Tenant) Management**
+
+### **Customers List Page**
+
+Create a primary section called **Customers** with a table showing:
+
+Columns:
+
+* Company Name
+* Tenant ID (placeholder)
+* Status (Active / Inactive)
+* Enabled Modules (Training, AI Coaching, Knowledge Base)
+* Actions: View / Edit / Suspend
+
+Populate with realistic mock data.
+
+---
+
+### **Create Customer Flow (UI Only)**
+
+Add a **“Create Customer”** button.
+
+Form fields:
+
+* Company Name
+* Primary Admin Email
+* Region (dropdown)
+* Enabled Modules (checkboxes):
+
+  * Agent Training
+  * AI Coaching
+  * Knowledge Base
+
+On submit:
+
+* Show success confirmation
+* Return to Customers List
+
+---
+
+### **Customer Profile View (Read-Only)**
+
+When clicking **View**, show:
+
+* Company Name
+* Tenant ID
+* Status
+* Enabled Modules
+
+**Onboarding Readiness Checklist (visual only):**
+
+* Admin created
+* Knowledge base uploaded
+* Training content added
+* Agents onboarded
+* First training session completed
+
+(No contact handling metrics.)
+
+---
+
+## 📊 **3. Platform Overview (Relevant to OmniTrAina)**
+
+Create a **Dashboard / Overview** page with cards showing:
+
+* Total Customers
+* Total Agents Onboarded (across tenants)
+* Total Training Modules Created
+* % Customers with KB Uploaded
+* % Customers with Active Training Programs
+
+Use static placeholder numbers.
+
+---
+
+## 🔐 **4. Access & Roles (Informational Only)**
+
+Create a section **Access & Roles**:
+
+* Describe Super Admin role
+* Show example list of Customer Admins (read-only)
+
+No editing or permissions management required.
+
+---
+
+## 🎨 **5. Design Guidelines**
+
+* Match existing OmniTrAina visual style
+* Clean, enterprise-focused UI
+* Desktop-first layout
+* Simple tables, cards, and forms
+
+---
+
+## 🧪 **6. Demo Data**
+
+Use sample customers:
+
+* Acme Corp
+* Nova Support
+* ZenRetail
+
+Each with different onboarding states to demonstrate the readiness checklist.
+
+---
+

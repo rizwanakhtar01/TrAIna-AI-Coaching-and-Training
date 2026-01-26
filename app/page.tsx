@@ -5,9 +5,10 @@ import { LoginScreen } from "@/components/login-screen"
 import { AiCoachingDashboard } from "@/components/ai-coaching-dashboard"
 import { SupervisorDashboard } from "@/components/supervisor-dashboard"
 import { AdminDashboard } from "@/components/admin-dashboard"
+import { SuperAdminDashboard } from "@/components/super-admin-dashboard"
 import { AgentDesktop } from "@/components/agent-desktop"
 
-type UserRole = "agent" | "supervisor" | "admin" | null
+type UserRole = "agent" | "supervisor" | "admin" | "superadmin" | null
 type ViewMode = "login" | "agentDesktop" | "dashboard" | null
 
 export default function Home() {
@@ -47,6 +48,8 @@ export default function Home() {
         return <SupervisorDashboard onLogout={handleLogout} />
       case "admin":
         return <AdminDashboard onLogout={handleLogout} />
+      case "superadmin":
+        return <SuperAdminDashboard onLogout={handleLogout} />
       default:
         return <LoginScreen onLogin={handleLogin} onAgentDesktop={handleAgentDesktop} />
     }

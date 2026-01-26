@@ -17,7 +17,7 @@ import {
 import { AlertCircle, ArrowLeft, CheckCircle, KeyRound, Lock, Loader2, Mail } from "lucide-react";
 
 interface LoginScreenProps {
-  onLogin: (role: "agent" | "supervisor" | "admin") => void;
+  onLogin: (role: "agent" | "supervisor" | "admin" | "superadmin") => void;
   onAgentDesktop: () => void;
 }
 
@@ -63,6 +63,7 @@ export function LoginScreen({ onLogin, onAgentDesktop }: LoginScreenProps) {
         role: "supervisor" as const,
       },
       "admin@traina.com": { password: "1234", role: "admin" as const },
+      "superadmin@traina.com": { password: "1234", role: "superadmin" as const },
     };
 
     const user = credentials[email as keyof typeof credentials];
@@ -105,6 +106,7 @@ export function LoginScreen({ onLogin, onAgentDesktop }: LoginScreenProps) {
         "agent@traina.com": { role: "agent" as const },
         "supervisor@traina.com": { role: "supervisor" as const },
         "admin@traina.com": { role: "admin" as const },
+        "superadmin@traina.com": { role: "superadmin" as const },
       };
       const user = credentials[email as keyof typeof credentials];
       if (user) {
@@ -565,6 +567,9 @@ export function LoginScreen({ onLogin, onAgentDesktop }: LoginScreenProps) {
                     </div>
                     <div>
                       <strong>Admin:</strong> admin@traina.com / 1234
+                    </div>
+                    <div>
+                      <strong>Super Admin:</strong> superadmin@traina.com / 1234
                     </div>
                   </div>
                 </div>
