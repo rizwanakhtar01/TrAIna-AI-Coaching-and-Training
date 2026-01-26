@@ -353,11 +353,6 @@ function ContactReviewCard({ review }: ContactReviewCardProps) {
             </Badge>
           </div>
           <div className="flex items-center gap-2">
-            <span
-              className={`text-lg font-semibold ${getScoreColor(review.overallScore)}`}
-            >
-              {review.overallScore}/10
-            </span>
             <span className="text-xs text-muted-foreground">
               {review.timestamp}
             </span>
@@ -743,17 +738,6 @@ export function ContactReviewsList({ agentName, storageKeyPrefix = "" }: Contact
           </SelectContent>
         </Select>
 
-        <Select value={filterScore} onValueChange={setFilterScore}>
-          <SelectTrigger className="w-32">
-            <SelectValue placeholder="Score" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Scores</SelectItem>
-            <SelectItem value="high">High (8+)</SelectItem>
-            <SelectItem value="medium">Medium (6-8)</SelectItem>
-            <SelectItem value="low">Low (&lt;6)</SelectItem>
-          </SelectContent>
-        </Select>
       </div>
 
       <div className="space-y-4">

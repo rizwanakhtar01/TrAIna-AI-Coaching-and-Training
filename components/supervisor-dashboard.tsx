@@ -2318,53 +2318,6 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
             </CardContent>
           </Card> */}
 
-          {/* Strengths and Improvement Areas */}
-          <div className="grid grid-cols-2 gap-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <CheckCircle className="h-5 w-5 text-green-600" />
-                  Key Strengths
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {agentInsight.strengths.map((strength, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center gap-2 p-2 bg-green-50 rounded border border-green-200"
-                  >
-                    <CheckCircle className="h-4 w-4 text-green-600" />
-                    <span className="text-sm font-medium capitalize">
-                      {strength.replace("_", " ")}
-                    </span>
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <AlertTriangle className="h-5 w-5 text-orange-600" />
-                  Improvement Areas
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {agentInsight.improvement_areas.map((area, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center gap-2 p-2 bg-orange-50 rounded border border-orange-200"
-                  >
-                    <AlertTriangle className="h-4 w-4 text-orange-600" />
-                    <span className="text-sm font-medium capitalize">
-                      {area.replace("_", " ")}
-                    </span>
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
-          </div>
-
           {/* Contact Reviews Section */}
           <ContactReviewsList 
             agentName={agentInsight.agent} 
