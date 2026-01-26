@@ -2281,53 +2281,6 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
         </header>
 
         <div className="p-6 space-y-6">
-          {/* Agent Performance Overview */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Users className="h-5 w-5 text-primary" />
-                Performance Overview
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-4 gap-4">
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-foreground">
-                    {agentInsight.daily_score}
-                  </div>
-                  <div className="text-sm text-muted-foreground">
-                    Daily Score
-                  </div>
-                </div>
-                <div className="text-center flex flex-col items-center">
-                  <div className="flex items-center gap-1">
-                    {getTrendIcon(agentInsight.trend)}
-                    <div className="text-2xl font-bold text-foreground capitalize">
-                      {agentInsight.trend}
-                    </div>
-                  </div>
-                  <div className="text-sm text-muted-foreground">Trend</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-foreground">
-                    {agentInsight.strengths.length}
-                  </div>
-                  <div className="text-sm text-muted-foreground">
-                    Key Strengths
-                  </div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-foreground">
-                    {agentInsight.improvement_areas.length}
-                  </div>
-                  <div className="text-sm text-muted-foreground">
-                    Areas to Improve
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
           {/* Coaching Priority */}
           {/* <Card>
             <CardHeader>
