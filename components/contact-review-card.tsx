@@ -517,37 +517,57 @@ function ContactReviewCard({ review }: ContactReviewCardProps) {
 interface ContactReviewsListProps {
   agentName?: string;
   storageKeyPrefix?: string;
+  externalFilters?: {
+    searchTerm: string;
+    filterChannel: string;
+    filterTime: "today" | "yesterday" | "custom";
+    customDate?: Date;
+  };
+  hideFilters?: boolean;
 }
 
-export function ContactReviewsList({ agentName, storageKeyPrefix = "" }: ContactReviewsListProps) {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filterChannel, setFilterChannel] = useState("all");
-  const [filterTime, setFilterTime] = useState<"today" | "yesterday" | "custom">("today");
-  const [customDate, setCustomDate] = useState<Date | undefined>(undefined);
+export function ContactReviewsList({ agentName, storageKeyPrefix = "", externalFilters, hideFilters = false }: ContactReviewsListProps) {
+  const [internalSearchTerm, setInternalSearchTerm] = useState("");
+  const [internalFilterChannel, setInternalFilterChannel] = useState("all");
+  const [internalFilterTime, setInternalFilterTime] = useState<"today" | "yesterday" | "custom">("today");
+  const [internalCustomDate, setInternalCustomDate] = useState<Date | undefined>(undefined);
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [pendingCustomDate, setPendingCustomDate] = useState<Date | undefined>(undefined);
+
+  // Use external filters if provided, otherwise use internal state
+  const searchTerm = externalFilters?.searchTerm ?? internalSearchTerm;
+  const filterChannel = externalFilters?.filterChannel ?? internalFilterChannel;
+  const filterTime = externalFilters?.filterTime ?? internalFilterTime;
+  const customDate = externalFilters?.customDate ?? internalCustomDate;
+  
+  const setSearchTerm = setInternalSearchTerm;
+  const setFilterChannel = setInternalFilterChannel;
+  const setFilterTime = setInternalFilterTime;
+  const setCustomDate = setInternalCustomDate;
 
   const storageKey = storageKeyPrefix ? `${storageKeyPrefix}_contactReviewTimeFilter` : "contactReviewTimeFilter";
   const storageDateKey = storageKeyPrefix ? `${storageKeyPrefix}_contactReviewCustomDate` : "contactReviewCustomDate";
 
-  // Load persisted filter from localStorage on mount
+  // Load persisted filter from localStorage on mount (only if not using external filters)
   useEffect(() => {
+    if (externalFilters) return;
+    
     const savedFilter = localStorage.getItem(storageKey);
     const savedCustomDate = localStorage.getItem(storageDateKey);
     
     if (savedFilter) {
       const parsed = JSON.parse(savedFilter);
       if (parsed.type === "today" || parsed.type === "yesterday") {
-        setFilterTime(parsed.type);
+        setInternalFilterTime(parsed.type);
       } else if (parsed.type === "custom" && savedCustomDate) {
         const date = new Date(savedCustomDate);
         if (!isNaN(date.getTime()) && date <= new Date()) {
-          setFilterTime("custom");
-          setCustomDate(date);
+          setInternalFilterTime("custom");
+          setInternalCustomDate(date);
         }
       }
     }
-  }, [storageKey, storageDateKey]);
+  }, [storageKey, storageDateKey, externalFilters]);
 
   // Persist filter to localStorage
   const persistFilter = (type: "today" | "yesterday" | "custom", date?: Date) => {
@@ -593,9 +613,9 @@ export function ContactReviewsList({ agentName, storageKeyPrefix = "" }: Contact
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-lg font-semibold">Recent Contact Reviews</h3>
+          <h3 className="text-lg font-semibold">Contact Reviews</h3>
           <p className="text-sm text-muted-foreground">
-            AI-generated feedback from your customer interactions
+            AI-generated feedback from customer interactions
           </p>
         </div>
         <Badge variant="secondary" className="bg-primary/10 text-primary">
@@ -603,6 +623,7 @@ export function ContactReviewsList({ agentName, storageKeyPrefix = "" }: Contact
         </Badge>
       </div>
 
+      {!hideFilters && !externalFilters && (
       <div className="flex gap-4 items-center">
         <div className="relative flex-1 max-w-sm">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -730,6 +751,7 @@ export function ContactReviewsList({ agentName, storageKeyPrefix = "" }: Contact
         </Select>
 
       </div>
+      )}
 
       <div className="space-y-4">
         {filteredReviews.map((review) => (
