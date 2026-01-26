@@ -2385,9 +2385,8 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
 
         <div className="p-6 space-y-6">
           {/* Search and Filters */}
-          <Card>
-            <CardContent className="pt-4">
-              <div className="flex gap-4 items-center flex-wrap">
+          <div className="pb-2">
+            <div className="flex gap-4 items-center flex-wrap">
                 <div className="relative flex-1 min-w-[200px] max-w-sm">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
@@ -2509,9 +2508,8 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
                     <SelectItem value="email">Email</SelectItem>
                   </SelectContent>
                 </Select>
-              </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
           {/* AI Coaching Feedback - What agent sees in their widget */}
           {agentInsight.ai_coaching_feedback && (
