@@ -16,6 +16,7 @@ The application features a modern dashboard interface with multiple specialized 
 - **Document Preview System**: Interactive coaching documents with preview popup dialogs and download functionality
 - **User Management System**: Admin dashboard feature for managing platform users with CRUD operations, role assignment (Agent/Supervisor/Admin), Amazon Connect User ID mapping, activation/deactivation, and auto-generated passwords
 - **Team Management System**: Supervisor-agent assignment interface with supervisor cards showing team size, dual-panel modal for managing team members (Available/Assigned agents), search functionality, and click-to-add/remove interactions
+- **Super Admin Dashboard**: Platform-wide tenant management for OmniTrAina with sidebar navigation, customer management (list, create, view, suspend), platform overview metrics (total customers, agents onboarded, training modules, KB uploaded %, active training %), onboarding readiness checklist tracking (5 steps), and Access & Roles informational section
 
 ## User Preferences
 
