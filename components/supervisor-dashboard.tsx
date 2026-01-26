@@ -2364,83 +2364,6 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
             </Card>
           </div>
 
-          {/* Coaching Preparation */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <BookOpen className="h-5 w-5 text-chart-4" />
-                Coaching Preparation
-              </CardTitle>
-              <p className="text-sm text-muted-foreground">
-                Ready-to-use talking points and session structure for your
-                coaching conversation
-              </p>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              {/* Session Details */}
-              {/* <div className="grid grid-cols-2 gap-4">
-                <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
-                  <h4 className="font-medium text-blue-800 mb-2">
-                    Suggested Duration
-                  </h4>
-                  <div className="text-2xl font-bold text-blue-600">
-                    {agentInsight.coaching_prep.suggested_duration}
-                  </div>
-                </div>
-                <div className="p-4 bg-purple-50 rounded-lg border border-purple-200">
-                  <h4 className="font-medium text-purple-800 mb-2">
-                    Focus Area
-                  </h4>
-                  <div className="text-lg font-semibold text-purple-600 capitalize">
-                    {agentInsight.coaching_prep.focus_area.replace("_", " ")}
-                  </div>
-                </div>
-              </div> */}
-
-              {/* Talking Points */}
-              <div>
-                {/* <h4 className="font-medium mb-3 flex items-center gap-2">
-                  <MessageSquare className="h-4 w-4" />
-                  Coaching Talking Points
-                </h4> */}
-                <div className="space-y-2">
-                  {agentInsight.coaching_prep.talking_points.map(
-                    (point, index) => (
-                      <div
-                        key={index}
-                        className="flex items-start gap-3 p-3 bg-primary/10 rounded-lg"
-                      >
-                        <div className="h-6 w-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-medium mt-0.5">
-                          {index + 1}
-                        </div>
-                        <p className="text-sm flex-1">{point}</p>
-                      </div>
-                    ),
-                  )}
-                </div>
-              </div>
-
-              {/* Quick Actions */}
-              <div className="pt-4 border-t">
-                <h4 className="font-medium mb-3">Quick Actions</h4>
-                <div className="flex gap-2">
-                  <Button variant="outline" size="sm">
-                    <Calendar className="h-4 w-4 mr-2" />
-                    Schedule Session
-                  </Button>
-                  <Button variant="outline" size="sm">
-                    <FileText className="h-4 w-4 mr-2" />
-                    Generate Notes
-                  </Button>
-                  <Button variant="outline" size="sm">
-                    <MessageSquare className="h-4 w-4 mr-2" />
-                    Send Preparation Email
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
           {/* Contact Reviews Section */}
           <Card>
             <CardHeader>
@@ -2544,24 +2467,13 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
 
                 return (
                   <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <Badge
-                        variant="secondary"
-                        className="bg-primary/10 text-primary"
-                      >
-                        {agentContactReviews.length} Review
-                        {agentContactReviews.length !== 1 ? "s" : ""} {getTimeLabel()}
-                      </Badge>
-                      <div className="text-sm text-muted-foreground">
-                        Average Score:{" "}
-                        {(
-                          agentContactReviews.reduce(
-                            (acc, review) => acc + review.overallScore,
-                            0,
-                          ) / agentContactReviews.length
-                        ).toFixed(1)}
-                      </div>
-                    </div>
+                    <Badge
+                      variant="secondary"
+                      className="bg-primary/10 text-primary"
+                    >
+                      {agentContactReviews.length} Review
+                      {agentContactReviews.length !== 1 ? "s" : ""} {getTimeLabel()}
+                    </Badge>
                     <div className="space-y-4">
                       {agentContactReviews.map((review) => (
                         <ContactReviewCard key={review.id} review={review} />
@@ -2572,6 +2484,84 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
               })()}
             </CardContent>
           </Card>
+
+          {/* Coaching Preparation */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <BookOpen className="h-5 w-5 text-chart-4" />
+                Coaching Preparation
+              </CardTitle>
+              <p className="text-sm text-muted-foreground">
+                Ready-to-use talking points and session structure for your
+                coaching conversation
+              </p>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* Session Details */}
+              {/* <div className="grid grid-cols-2 gap-4">
+                <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                  <h4 className="font-medium text-blue-800 mb-2">
+                    Suggested Duration
+                  </h4>
+                  <div className="text-2xl font-bold text-blue-600">
+                    {agentInsight.coaching_prep.suggested_duration}
+                  </div>
+                </div>
+                <div className="p-4 bg-purple-50 rounded-lg border border-purple-200">
+                  <h4 className="font-medium text-purple-800 mb-2">
+                    Focus Area
+                  </h4>
+                  <div className="text-lg font-semibold text-purple-600 capitalize">
+                    {agentInsight.coaching_prep.focus_area.replace("_", " ")}
+                  </div>
+                </div>
+              </div> */}
+
+              {/* Talking Points */}
+              <div>
+                {/* <h4 className="font-medium mb-3 flex items-center gap-2">
+                  <MessageSquare className="h-4 w-4" />
+                  Coaching Talking Points
+                </h4> */}
+                <div className="space-y-2">
+                  {agentInsight.coaching_prep.talking_points.map(
+                    (point, index) => (
+                      <div
+                        key={index}
+                        className="flex items-start gap-3 p-3 bg-primary/10 rounded-lg"
+                      >
+                        <div className="h-6 w-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-medium mt-0.5">
+                          {index + 1}
+                        </div>
+                        <p className="text-sm flex-1">{point}</p>
+                      </div>
+                    ),
+                  )}
+                </div>
+              </div>
+
+              {/* Quick Actions */}
+              <div className="pt-4 border-t">
+                <h4 className="font-medium mb-3">Quick Actions</h4>
+                <div className="flex gap-2">
+                  <Button variant="outline" size="sm">
+                    <Calendar className="h-4 w-4 mr-2" />
+                    Schedule Session
+                  </Button>
+                  <Button variant="outline" size="sm">
+                    <FileText className="h-4 w-4 mr-2" />
+                    Generate Notes
+                  </Button>
+                  <Button variant="outline" size="sm">
+                    <MessageSquare className="h-4 w-4 mr-2" />
+                    Send Preparation Email
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
         </div>
       </div>
     );
