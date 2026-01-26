@@ -2804,27 +2804,6 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
               <TabsTrigger value="patterns" className="px-4">Challenging Patterns</TabsTrigger>
               <TabsTrigger value="progress" className="px-4">Coaching Progress</TabsTrigger>
             </TabsList>
-
-            <div className="flex items-center gap-2">
-              <Select value={agentFilter} onValueChange={setAgentFilter}>
-                <SelectTrigger className="w-36">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="at-risk">At Risk</SelectItem>
-                  <SelectItem value="top">Top Performers</SelectItem>
-                </SelectContent>
-              </Select>
-              <Select value={timeFilter} onValueChange={setTimeFilter}>
-                <SelectTrigger className="w-32">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="daily">Daily</SelectItem>
-                  <SelectItem value="monthly">Monthly</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
           </div>
 
           {/* Team Overview Dashboard */}
