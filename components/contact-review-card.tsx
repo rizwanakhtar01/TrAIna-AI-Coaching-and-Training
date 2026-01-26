@@ -522,7 +522,6 @@ interface ContactReviewsListProps {
 export function ContactReviewsList({ agentName, storageKeyPrefix = "" }: ContactReviewsListProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterChannel, setFilterChannel] = useState("all");
-  const [filterScore, setFilterScore] = useState("all");
   const [filterTime, setFilterTime] = useState<"today" | "yesterday" | "custom">("today");
   const [customDate, setCustomDate] = useState<Date | undefined>(undefined);
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
@@ -572,21 +571,13 @@ export function ContactReviewsList({ agentName, storageKeyPrefix = "" }: Contact
     const matchesChannel =
       filterChannel === "all" || review.channel === filterChannel;
 
-    const matchesScore =
-      filterScore === "all" ||
-      (filterScore === "high" && review.overallScore >= 8) ||
-      (filterScore === "medium" &&
-        review.overallScore >= 6 &&
-        review.overallScore < 8) ||
-      (filterScore === "low" && review.overallScore < 6);
-
     const reviewDate = new Date(review.customer.contactTimestamp);
     const matchesTime =
       filterTime === "today" ? isToday(reviewDate) :
       filterTime === "yesterday" ? isYesterday(reviewDate) :
       filterTime === "custom" && customDate ? isSameDay(reviewDate, customDate) : true;
 
-    return matchesSearch && matchesChannel && matchesScore && matchesTime;
+    return matchesSearch && matchesChannel && matchesTime;
   });
 
   const getTimeLabel = () => {
@@ -756,7 +747,6 @@ export function ContactReviewsList({ agentName, storageKeyPrefix = "" }: Contact
                 onClick={() => {
                   setSearchTerm("");
                   setFilterChannel("all");
-                  setFilterScore("all");
                   setFilterTime("today");
                   setCustomDate(undefined);
                 }}
