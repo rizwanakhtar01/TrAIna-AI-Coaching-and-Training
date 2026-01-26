@@ -164,8 +164,8 @@ interface SupervisorDashboardProps {
 export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [selectedAgent, setSelectedAgent] = useState<string | null>(null);
-  const [timeFilter, setTimeFilter] = useState("weekly");
-  const [agentFilter, setAgentFilter] = useState("all");
+  const [timeFilter, setTimeFilter] = useState("daily");
+  const [agentFilter, setAgentFilter] = useState("at-risk");
   const [intentFilter, setIntentFilter] = useState("all");
   const [channelFilter, setChannelFilter] = useState("all");
   const [editingNotes, setEditingNotes] = useState<string | null>(null);
@@ -1303,20 +1303,18 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
   // Filter functions
   const getFilteredPatterns = () => {
     return challengingPatterns.filter((pattern) => {
-      if (agentFilter !== "all") {
-        const agentIds = pattern.affectedAgents;
-        if (agentFilter === "at-risk") {
-          const atRiskAgentIds = agents
-            .filter((a) => a.status === "at-risk")
-            .map((a) => a.id);
-          if (!agentIds.some((id) => atRiskAgentIds.includes(id))) return false;
-        }
-        if (agentFilter === "top") {
-          const topAgentIds = agents
-            .filter((a) => a.status === "excellent")
-            .map((a) => a.id);
-          if (!agentIds.some((id) => topAgentIds.includes(id))) return false;
-        }
+      const agentIds = pattern.affectedAgents;
+      if (agentFilter === "at-risk") {
+        const atRiskAgentIds = agents
+          .filter((a) => a.status === "at-risk")
+          .map((a) => a.id);
+        if (!agentIds.some((id) => atRiskAgentIds.includes(id))) return false;
+      }
+      if (agentFilter === "top") {
+        const topAgentIds = agents
+          .filter((a) => a.status === "excellent")
+          .map((a) => a.id);
+        if (!agentIds.some((id) => topAgentIds.includes(id))) return false;
       }
 
       if (intentFilter !== "all") {
@@ -2805,7 +2803,6 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
               <TabsTrigger value="daily-summary" className="px-4">Agent Performance Review</TabsTrigger>
               <TabsTrigger value="patterns" className="px-4">Challenging Patterns</TabsTrigger>
               <TabsTrigger value="progress" className="px-4">Coaching Progress</TabsTrigger>
-              <TabsTrigger value="reports" className="px-4">Weekly Reports</TabsTrigger>
             </TabsList>
 
             <div className="flex items-center gap-2">
@@ -2814,7 +2811,6 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Agents</SelectItem>
                   <SelectItem value="at-risk">At Risk</SelectItem>
                   <SelectItem value="top">Top Performers</SelectItem>
                 </SelectContent>
@@ -2825,14 +2821,9 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="daily">Daily</SelectItem>
-                  <SelectItem value="weekly">Weekly</SelectItem>
                   <SelectItem value="monthly">Monthly</SelectItem>
                 </SelectContent>
               </Select>
-              <Button variant="outline" size="sm" onClick={exportToCSV}>
-                <Download className="h-4 w-4 mr-2" />
-                Export CSV
-              </Button>
             </div>
           </div>
 
@@ -2858,7 +2849,7 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
                   </div>
                   <p className="text-xs text-muted-foreground">
                     Out of {getFilteredAgents().length}{" "}
-                    {agentFilter === "all" ? "total" : agentFilter} agents
+                    {agentFilter} agents
                   </p>
                 </CardContent>
               </Card>
@@ -3056,14 +3047,12 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
                     <SelectItem value="email">Email</SelectItem>
                   </SelectContent>
                 </Select>
-                {(agentFilter !== "all" ||
-                  intentFilter !== "all" ||
+                {(intentFilter !== "all" ||
                   channelFilter !== "all") && (
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => {
-                      setAgentFilter("all");
                       setIntentFilter("all");
                       setChannelFilter("all");
                     }}
@@ -3352,228 +3341,6 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
                 );
               })}
             </div>
-          </TabsContent>
-
-          {/* Weekly Reports */}
-          <TabsContent value="reports" className="space-y-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-2xl font-bold text-foreground">
-                  Weekly Coaching Summary Reports
-                </h2>
-                <p className="text-muted-foreground">
-                  Auto-generated per-agent and team-level reports
-                </p>
-              </div>
-            </div>
-
-            {/* Team-level Report Summary */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Team Performance Summary - Week 11, 2025</CardTitle>
-                <CardDescription>
-                  Comprehensive team coaching analytics and improvement metrics
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="grid gap-4 md:grid-cols-3">
-                  <div className="text-center p-4 border rounded-lg">
-                    <div className="text-2xl font-bold text-green-600">
-                      +{getFilteredTeamMetrics().teamImprovementPercent}%
-                    </div>
-                    <p className="text-sm text-muted-foreground">
-                      Overall Improvement
-                    </p>
-                  </div>
-                  <div className="text-center p-4 border rounded-lg">
-                    <div className="text-2xl font-bold text-blue-600">
-                      {getFilteredTeamMetrics().avgScore}
-                    </div>
-                    <p className="text-sm text-muted-foreground">
-                      Average Team Score
-                    </p>
-                  </div>
-                  <div className="text-center p-4 border rounded-lg">
-                    <div className="text-2xl font-bold text-purple-600">
-                      {getFilteredTeamMetrics().sessionCompletionRate}
-                    </div>
-                    <p className="text-sm text-muted-foreground">
-                      Sessions Completed
-                    </p>
-                  </div>
-                </div>
-
-                <div className="pt-4 border-t">
-                  <h4 className="font-medium mb-3">Top 3 Improved Skills</h4>
-                  <div className="space-y-2">
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm">
-                        Empathy & Active Listening
-                      </span>
-                      <Badge
-                        variant="default"
-                        className="bg-green-100 text-green-800"
-                      >
-                        +18% improvement
-                      </Badge>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm">First Call Resolution</span>
-                      <Badge
-                        variant="default"
-                        className="bg-green-100 text-green-800"
-                      >
-                        +15% improvement
-                      </Badge>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm">Policy Compliance</span>
-                      <Badge
-                        variant="default"
-                        className="bg-green-100 text-green-800"
-                      >
-                        +12% improvement
-                      </Badge>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="pt-4 border-t">
-                  <h4 className="font-medium mb-3">
-                    Top 3 Areas Needing Focus
-                  </h4>
-                  <div className="space-y-2">
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm">Technical Troubleshooting</span>
-                      <Badge
-                        variant="destructive"
-                        className="bg-red-100 text-red-800"
-                      >
-                        -5% decline
-                      </Badge>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm">
-                        Billing Dispute Resolution
-                      </span>
-                      <Badge
-                        variant="outline"
-                        className="bg-yellow-100 text-yellow-800"
-                      >
-                        No change
-                      </Badge>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm">Upselling & Cross-selling</span>
-                      <Badge
-                        variant="outline"
-                        className="bg-yellow-100 text-yellow-800"
-                      >
-                        +2% improvement
-                      </Badge>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="pt-4 border-t">
-                  <h4 className="font-medium mb-3">AI-Generated Summary</h4>
-                  <div className="p-4 bg-blue-50 rounded-lg">
-                    <p className="text-sm text-gray-700">
-                      This week showed significant improvement in team empathy
-                      scores, with 5 out of 6 agents demonstrating enhanced
-                      active listening skills. However, technical support
-                      scenarios continue to challenge the team, particularly
-                      complex billing disputes. Recommendation: Schedule focused
-                      technical training sessions and consider pairing
-                      struggling agents with top performers for mentorship.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex justify-between items-center pt-4 border-t">
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium">
-                      Generated: March 15, 2025 at 9:00 AM
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      Report covers March 8-14, 2025 • 6 agents • 61 total
-                      sessions
-                    </p>
-                  </div>
-                  <div className="flex gap-2">
-                    <Button variant="outline" size="sm" onClick={exportToPDF}>
-                      <Download className="h-4 w-4 mr-2" />
-                      Export PDF
-                    </Button>
-                    <Button variant="outline" size="sm" onClick={exportToCSV}>
-                      <Download className="h-4 w-4 mr-2" />
-                      Export CSV
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Individual Agent Reports */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Individual Agent Reports</CardTitle>
-                <CardDescription>
-                  Per-agent performance summaries and recommendations
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {getFilteredAgents()
-                    .slice(0, 3)
-                    .map((agent) => {
-                      const statusBadge = getStatusBadge(agent.status);
-                      return (
-                        <div key={agent.id} className="border rounded-lg p-4">
-                          <div className="flex items-center justify-between mb-3">
-                            <div className="flex items-center gap-3">
-                              <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-                                <span className="font-medium text-primary">
-                                  {agent.avatar}
-                                </span>
-                              </div>
-                              <div>
-                                <h4 className="font-medium">{agent.name}</h4>
-                                <p className="text-sm text-muted-foreground">
-                                  {agent.sessionsCompleted} sessions completed
-                                </p>
-                              </div>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              {/* <Badge {...statusBadge}>
-                                {statusBadge.icon} {statusBadge.text}
-                              </Badge> */}
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => setSelectedAgent(agent.id)}
-                              >
-                                <FileText className="h-4 w-4 mr-2" />
-                                View Details
-                              </Button>
-                            </div>
-                          </div>
-                          <div className="text-xs text-muted-foreground">
-                            <p>
-                              Key improvements:{" "}
-                              {agent.improvementAreas.join(", ")}
-                            </p>
-                            <p>
-                              Current focus: Maintaining {agent.averageScore}{" "}
-                              average score with consistent engagement
-                            </p>
-                          </div>
-                        </div>
-                      );
-                    })}
-                </div>
-              </CardContent>
-            </Card>
           </TabsContent>
 
           {/* Daily Team Coaching Summary */}
