@@ -54,6 +54,7 @@ interface ContactReview {
   customerIssue: string;
   contactSummary: string;
   queue: string;
+  agentName?: string;
   customer: {
     name: string;
     email: string;
@@ -84,6 +85,7 @@ const sampleReviews: ContactReview[] = [
     contactSummary:
       "Customer requested subscription cancellation due to low usage. Refund processed successfully but missed retention opportunity.",
     queue: "Billing & Subscriptions",
+    agentName: "Sarah Mitchell",
     customer: {
       name: "Sarah Johnson",
       email: "sarah.johnson@email.com",
@@ -142,6 +144,7 @@ const sampleReviews: ContactReview[] = [
     contactSummary:
       "Customer frustrated about delayed refund. Issue escalated to expedite processing. Good recovery after initial misstep.",
     queue: "Customer Support",
+    agentName: "John Davis",
     customer: {
       name: "Michael Chen",
       email: "m.chen@company.com",
@@ -196,6 +199,7 @@ const sampleReviews: ContactReview[] = [
     contactSummary:
       "Repeat technical issue with login. Customer frustrated after multiple failed attempts. Finally escalated to technical team.",
     queue: "Technical Support",
+    agentName: "Lisa Kim",
     customer: {
       name: "Emma Rodriguez",
       email: "emma.rodriguez@startup.io",
@@ -515,7 +519,12 @@ function ContactReviewCard({ review }: ContactReviewCardProps) {
   );
 }
 
-export function ContactReviewsList() {
+interface ContactReviewsListProps {
+  agentName?: string;
+  storageKeyPrefix?: string;
+}
+
+export function ContactReviewsList({ agentName, storageKeyPrefix = "" }: ContactReviewsListProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterChannel, setFilterChannel] = useState("all");
   const [filterScore, setFilterScore] = useState("all");
@@ -524,10 +533,13 @@ export function ContactReviewsList() {
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [pendingCustomDate, setPendingCustomDate] = useState<Date | undefined>(undefined);
 
+  const storageKey = storageKeyPrefix ? `${storageKeyPrefix}_contactReviewTimeFilter` : "contactReviewTimeFilter";
+  const storageDateKey = storageKeyPrefix ? `${storageKeyPrefix}_contactReviewCustomDate` : "contactReviewCustomDate";
+
   // Load persisted filter from localStorage on mount
   useEffect(() => {
-    const savedFilter = localStorage.getItem("contactReviewTimeFilter");
-    const savedCustomDate = localStorage.getItem("contactReviewCustomDate");
+    const savedFilter = localStorage.getItem(storageKey);
+    const savedCustomDate = localStorage.getItem(storageDateKey);
     
     if (savedFilter) {
       const parsed = JSON.parse(savedFilter);
@@ -541,19 +553,22 @@ export function ContactReviewsList() {
         }
       }
     }
-  }, []);
+  }, [storageKey, storageDateKey]);
 
   // Persist filter to localStorage
   const persistFilter = (type: "today" | "yesterday" | "custom", date?: Date) => {
-    localStorage.setItem("contactReviewTimeFilter", JSON.stringify({ type }));
+    localStorage.setItem(storageKey, JSON.stringify({ type }));
     if (type === "custom" && date) {
-      localStorage.setItem("contactReviewCustomDate", date.toISOString());
+      localStorage.setItem(storageDateKey, date.toISOString());
     } else {
-      localStorage.removeItem("contactReviewCustomDate");
+      localStorage.removeItem(storageDateKey);
     }
   };
 
   const filteredReviews = sampleReviews.filter((review) => {
+    // Filter by agent name if provided
+    if (agentName && review.agentName !== agentName) return false;
+
     const matchesSearch =
       review.customerIssue.toLowerCase().includes(searchTerm.toLowerCase()) ||
       review.whatWentWell.toLowerCase().includes(searchTerm.toLowerCase()) ||
