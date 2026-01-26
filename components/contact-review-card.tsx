@@ -517,9 +517,25 @@ function ContactReviewCard({ review }: ContactReviewCardProps) {
 interface ContactReviewsListProps {
   agentName?: string;
   storageKeyPrefix?: string;
+  // Controlled mode props - when provided, filters are controlled externally
+  controlledSearchTerm?: string;
+  controlledFilterChannel?: string;
+  controlledFilterTime?: "today" | "yesterday" | "custom";
+  controlledCustomDate?: Date;
+  hideFilters?: boolean;
 }
 
-export function ContactReviewsList({ agentName, storageKeyPrefix = "" }: ContactReviewsListProps) {
+export function ContactReviewsList({ 
+  agentName, 
+  storageKeyPrefix = "",
+  controlledSearchTerm,
+  controlledFilterChannel,
+  controlledFilterTime,
+  controlledCustomDate,
+  hideFilters = false,
+}: ContactReviewsListProps) {
+  const isControlled = controlledFilterTime !== undefined;
+  
   const [searchTerm, setSearchTerm] = useState("");
   const [filterChannel, setFilterChannel] = useState("all");
   const [filterTime, setFilterTime] = useState<"today" | "yesterday" | "custom">("today");
@@ -527,11 +543,19 @@ export function ContactReviewsList({ agentName, storageKeyPrefix = "" }: Contact
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [pendingCustomDate, setPendingCustomDate] = useState<Date | undefined>(undefined);
 
+  // Use controlled values if provided, otherwise use internal state
+  const effectiveSearchTerm = isControlled ? (controlledSearchTerm ?? "") : searchTerm;
+  const effectiveFilterChannel = isControlled ? (controlledFilterChannel ?? "all") : filterChannel;
+  const effectiveFilterTime = isControlled ? controlledFilterTime : filterTime;
+  const effectiveCustomDate = isControlled ? controlledCustomDate : customDate;
+
   const storageKey = storageKeyPrefix ? `${storageKeyPrefix}_contactReviewTimeFilter` : "contactReviewTimeFilter";
   const storageDateKey = storageKeyPrefix ? `${storageKeyPrefix}_contactReviewCustomDate` : "contactReviewCustomDate";
 
-  // Load persisted filter from localStorage on mount
+  // Load persisted filter from localStorage on mount (only in uncontrolled mode)
   useEffect(() => {
+    if (isControlled) return;
+    
     const savedFilter = localStorage.getItem(storageKey);
     const savedCustomDate = localStorage.getItem(storageDateKey);
     
@@ -547,7 +571,7 @@ export function ContactReviewsList({ agentName, storageKeyPrefix = "" }: Contact
         }
       }
     }
-  }, [storageKey, storageDateKey]);
+  }, [storageKey, storageDateKey, isControlled]);
 
   // Persist filter to localStorage
   const persistFilter = (type: "today" | "yesterday" | "custom", date?: Date) => {
@@ -564,27 +588,27 @@ export function ContactReviewsList({ agentName, storageKeyPrefix = "" }: Contact
     if (agentName && review.agentName !== agentName) return false;
 
     const matchesSearch =
-      review.customerIssue.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      review.whatWentWell.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      review.couldImprove.toLowerCase().includes(searchTerm.toLowerCase());
+      review.customerIssue.toLowerCase().includes(effectiveSearchTerm.toLowerCase()) ||
+      review.whatWentWell.toLowerCase().includes(effectiveSearchTerm.toLowerCase()) ||
+      review.couldImprove.toLowerCase().includes(effectiveSearchTerm.toLowerCase());
 
     const matchesChannel =
-      filterChannel === "all" || review.channel === filterChannel;
+      effectiveFilterChannel === "all" || review.channel === effectiveFilterChannel;
 
     const reviewDate = new Date(review.customer.contactTimestamp);
     const matchesTime =
-      filterTime === "today" ? isToday(reviewDate) :
-      filterTime === "yesterday" ? isYesterday(reviewDate) :
-      filterTime === "custom" && customDate ? isSameDay(reviewDate, customDate) : true;
+      effectiveFilterTime === "today" ? isToday(reviewDate) :
+      effectiveFilterTime === "yesterday" ? isYesterday(reviewDate) :
+      effectiveFilterTime === "custom" && effectiveCustomDate ? isSameDay(reviewDate, effectiveCustomDate) : true;
 
     return matchesSearch && matchesChannel && matchesTime;
   });
 
   const getTimeLabel = () => {
-    if (filterTime === "today") return "Today";
-    if (filterTime === "yesterday") return "Yesterday";
-    if (filterTime === "custom" && customDate) {
-      return format(customDate, "MMM d, yyyy");
+    if (effectiveFilterTime === "today") return "Today";
+    if (effectiveFilterTime === "yesterday") return "Yesterday";
+    if (effectiveFilterTime === "custom" && effectiveCustomDate) {
+      return format(effectiveCustomDate, "MMM d, yyyy");
     }
     return "";
   };
@@ -603,133 +627,135 @@ export function ContactReviewsList({ agentName, storageKeyPrefix = "" }: Contact
         </Badge>
       </div>
 
-      <div className="flex gap-4 items-center">
-        <div className="relative flex-1 max-w-sm">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Search reviews..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10"
-          />
-        </div>
-
-        <Popover 
-          open={isCalendarOpen} 
-          onOpenChange={(open) => {
-            setIsCalendarOpen(open);
-            if (!open) {
-              setPendingCustomDate(undefined);
-            }
-          }}
-        >
-          <PopoverTrigger asChild>
-            <Button
-              variant="outline"
-              className="w-[150px] justify-between"
-            >
-              <span className="truncate">
-                {filterTime === "custom" && customDate
-                  ? `Custom: ${format(customDate, "d MMM")}`
-                  : filterTime === "today"
-                    ? "Today"
-                    : filterTime === "yesterday"
-                      ? "Yesterday"
-                      : "Today"}
-              </span>
-              <Calendar className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" align="start">
-            <div className="p-2 border-b flex gap-1">
-              <Button
-                variant={filterTime === "today" ? "default" : "ghost"}
-                size="sm"
-                onClick={() => {
-                  setFilterTime("today");
-                  setCustomDate(undefined);
-                  setPendingCustomDate(undefined);
-                  persistFilter("today");
-                  setIsCalendarOpen(false);
-                }}
-              >
-                Today
-              </Button>
-              <Button
-                variant={filterTime === "yesterday" ? "default" : "ghost"}
-                size="sm"
-                onClick={() => {
-                  setFilterTime("yesterday");
-                  setCustomDate(undefined);
-                  setPendingCustomDate(undefined);
-                  persistFilter("yesterday");
-                  setIsCalendarOpen(false);
-                }}
-              >
-                Yesterday
-              </Button>
-              <Button
-                variant={filterTime === "custom" || pendingCustomDate ? "default" : "ghost"}
-                size="sm"
-                onClick={() => {
-                  setPendingCustomDate(customDate || new Date());
-                }}
-              >
-                Custom
-              </Button>
-            </div>
-            <CalendarPicker
-              mode="single"
-              selected={pendingCustomDate || customDate}
-              onSelect={(date) => {
-                setPendingCustomDate(date);
-              }}
-              disabled={(date) => date > new Date()}
-              initialFocus
+      {!hideFilters && (
+        <div className="flex gap-4 items-center">
+          <div className="relative flex-1 max-w-sm">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search reviews..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10"
             />
-            <div className="p-2 border-t flex justify-end gap-2">
+          </div>
+
+          <Popover 
+            open={isCalendarOpen} 
+            onOpenChange={(open) => {
+              setIsCalendarOpen(open);
+              if (!open) {
+                setPendingCustomDate(undefined);
+              }
+            }}
+          >
+            <PopoverTrigger asChild>
               <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => {
-                  setPendingCustomDate(undefined);
-                  setIsCalendarOpen(false);
-                }}
+                variant="outline"
+                className="w-[150px] justify-between"
               >
-                Cancel
+                <span className="truncate">
+                  {filterTime === "custom" && customDate
+                    ? `Custom: ${format(customDate, "d MMM")}`
+                    : filterTime === "today"
+                      ? "Today"
+                      : filterTime === "yesterday"
+                        ? "Yesterday"
+                        : "Today"}
+                </span>
+                <Calendar className="ml-2 h-4 w-4 shrink-0 opacity-50" />
               </Button>
-              <Button
-                size="sm"
-                disabled={!pendingCustomDate}
-                onClick={() => {
-                  if (pendingCustomDate) {
-                    setFilterTime("custom");
-                    setCustomDate(pendingCustomDate);
-                    persistFilter("custom", pendingCustomDate);
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <div className="p-2 border-b flex gap-1">
+                <Button
+                  variant={filterTime === "today" ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => {
+                    setFilterTime("today");
+                    setCustomDate(undefined);
+                    setPendingCustomDate(undefined);
+                    persistFilter("today");
+                    setIsCalendarOpen(false);
+                  }}
+                >
+                  Today
+                </Button>
+                <Button
+                  variant={filterTime === "yesterday" ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => {
+                    setFilterTime("yesterday");
+                    setCustomDate(undefined);
+                    setPendingCustomDate(undefined);
+                    persistFilter("yesterday");
+                    setIsCalendarOpen(false);
+                  }}
+                >
+                  Yesterday
+                </Button>
+                <Button
+                  variant={filterTime === "custom" || pendingCustomDate ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => {
+                    setPendingCustomDate(customDate || new Date());
+                  }}
+                >
+                  Custom
+                </Button>
+              </div>
+              <CalendarPicker
+                mode="single"
+                selected={pendingCustomDate || customDate}
+                onSelect={(date) => {
+                  setPendingCustomDate(date);
+                }}
+                disabled={(date) => date > new Date()}
+                initialFocus
+              />
+              <div className="p-2 border-t flex justify-end gap-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
                     setPendingCustomDate(undefined);
                     setIsCalendarOpen(false);
-                  }
-                }}
-              >
-                Apply
-              </Button>
-            </div>
-          </PopoverContent>
-        </Popover>
+                  }}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  size="sm"
+                  disabled={!pendingCustomDate}
+                  onClick={() => {
+                    if (pendingCustomDate) {
+                      setFilterTime("custom");
+                      setCustomDate(pendingCustomDate);
+                      persistFilter("custom", pendingCustomDate);
+                      setPendingCustomDate(undefined);
+                      setIsCalendarOpen(false);
+                    }
+                  }}
+                >
+                  Apply
+                </Button>
+              </div>
+            </PopoverContent>
+          </Popover>
 
-        <Select value={filterChannel} onValueChange={setFilterChannel}>
-          <SelectTrigger className="w-32">
-            <SelectValue placeholder="Channel" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Channels</SelectItem>
-            <SelectItem value="chat">Chat</SelectItem>
-            <SelectItem value="phone">Phone</SelectItem>
-            <SelectItem value="email">Email</SelectItem>
-          </SelectContent>
-        </Select>
+          <Select value={filterChannel} onValueChange={setFilterChannel}>
+            <SelectTrigger className="w-32">
+              <SelectValue placeholder="Channel" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Channels</SelectItem>
+              <SelectItem value="chat">Chat</SelectItem>
+              <SelectItem value="phone">Phone</SelectItem>
+              <SelectItem value="email">Email</SelectItem>
+            </SelectContent>
+          </Select>
 
-      </div>
+        </div>
+      )}
 
       <div className="space-y-4">
         {filteredReviews.map((review) => (

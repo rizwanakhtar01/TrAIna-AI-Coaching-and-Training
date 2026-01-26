@@ -73,6 +73,7 @@ import {
   Play,
   Pause,
   Search,
+  Calendar as CalendarIcon,
 } from "lucide-react";
 
 // Contact Review interface for supervisor view
@@ -214,6 +215,14 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
   const [selectedDailyAgent, setSelectedDailyAgent] = useState<string | null>(
     null,
   );
+  
+  // Agent detail view filters
+  const [agentDetailSearchTerm, setAgentDetailSearchTerm] = useState("");
+  const [agentDetailFilterChannel, setAgentDetailFilterChannel] = useState("all");
+  const [agentDetailFilterTime, setAgentDetailFilterTime] = useState<"today" | "yesterday" | "custom">("today");
+  const [agentDetailCustomDate, setAgentDetailCustomDate] = useState<Date | undefined>(undefined);
+  const [agentDetailCalendarOpen, setAgentDetailCalendarOpen] = useState(false);
+  const [agentDetailPendingDate, setAgentDetailPendingDate] = useState<Date | undefined>(undefined);
 
   // Comprehensive mock data for supervisor dashboard
   const agents: Agent[] = [
@@ -2375,41 +2384,134 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
         </header>
 
         <div className="p-6 space-y-6">
-          {/* Coaching Priority */}
-          {/* <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Target className="h-5 w-5 text-chart-2" />
-                Coaching Priority
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div
-                className={`p-4 rounded-lg border ${getPriorityColor(agentInsight.coaching_priority)}`}
-              >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="font-semibold capitalize">
-                      {agentInsight.coaching_priority} Priority
-                    </h3>
-                    <p className="text-sm mt-1">
-                      {agentInsight.coaching_priority === "high" &&
-                        "Requires immediate attention and focused coaching session"}
-                      {agentInsight.coaching_priority === "medium" &&
-                        "Should be addressed in regular coaching schedule"}
-                      {agentInsight.coaching_priority === "low" &&
-                        "Maintenance coaching with positive reinforcement"}
-                    </p>
-                  </div>
-                  <div className="text-2xl font-bold">
-                    {agentInsight.coaching_priority === "high" && "🔴"}
-                    {agentInsight.coaching_priority === "medium" && "🟡"}
-                    {agentInsight.coaching_priority === "low" && "🟢"}
-                  </div>
+          {/* Search and Filters */}
+          <Card>
+            <CardContent className="pt-4">
+              <div className="flex gap-4 items-center flex-wrap">
+                <div className="relative flex-1 min-w-[200px] max-w-sm">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Search reviews..."
+                    value={agentDetailSearchTerm}
+                    onChange={(e) => setAgentDetailSearchTerm(e.target.value)}
+                    className="pl-10"
+                  />
                 </div>
+
+                <Popover 
+                  open={agentDetailCalendarOpen} 
+                  onOpenChange={(open) => {
+                    setAgentDetailCalendarOpen(open);
+                    if (!open) {
+                      setAgentDetailPendingDate(undefined);
+                    }
+                  }}
+                >
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className="w-[150px] justify-between"
+                    >
+                      <span className="truncate">
+                        {agentDetailFilterTime === "custom" && agentDetailCustomDate
+                          ? `Custom: ${format(agentDetailCustomDate, "d MMM")}`
+                          : agentDetailFilterTime === "today"
+                            ? "Today"
+                            : agentDetailFilterTime === "yesterday"
+                              ? "Yesterday"
+                              : "Today"}
+                      </span>
+                      <CalendarIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <div className="p-2 border-b flex gap-1">
+                      <Button
+                        variant={agentDetailFilterTime === "today" ? "default" : "ghost"}
+                        size="sm"
+                        onClick={() => {
+                          setAgentDetailFilterTime("today");
+                          setAgentDetailCustomDate(undefined);
+                          setAgentDetailPendingDate(undefined);
+                          setAgentDetailCalendarOpen(false);
+                        }}
+                      >
+                        Today
+                      </Button>
+                      <Button
+                        variant={agentDetailFilterTime === "yesterday" ? "default" : "ghost"}
+                        size="sm"
+                        onClick={() => {
+                          setAgentDetailFilterTime("yesterday");
+                          setAgentDetailCustomDate(undefined);
+                          setAgentDetailPendingDate(undefined);
+                          setAgentDetailCalendarOpen(false);
+                        }}
+                      >
+                        Yesterday
+                      </Button>
+                      <Button
+                        variant={agentDetailFilterTime === "custom" || agentDetailPendingDate ? "default" : "ghost"}
+                        size="sm"
+                        onClick={() => {
+                          setAgentDetailPendingDate(agentDetailCustomDate || new Date());
+                        }}
+                      >
+                        Custom
+                      </Button>
+                    </div>
+                    <CalendarPicker
+                      mode="single"
+                      selected={agentDetailPendingDate || agentDetailCustomDate}
+                      onSelect={(date) => {
+                        setAgentDetailPendingDate(date);
+                      }}
+                      disabled={(date: Date) => date > new Date()}
+                      initialFocus
+                    />
+                    <div className="p-2 border-t flex justify-end gap-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          setAgentDetailPendingDate(undefined);
+                          setAgentDetailCalendarOpen(false);
+                        }}
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        size="sm"
+                        disabled={!agentDetailPendingDate}
+                        onClick={() => {
+                          if (agentDetailPendingDate) {
+                            setAgentDetailFilterTime("custom");
+                            setAgentDetailCustomDate(agentDetailPendingDate);
+                            setAgentDetailPendingDate(undefined);
+                            setAgentDetailCalendarOpen(false);
+                          }
+                        }}
+                      >
+                        Apply
+                      </Button>
+                    </div>
+                  </PopoverContent>
+                </Popover>
+
+                <Select value={agentDetailFilterChannel} onValueChange={setAgentDetailFilterChannel}>
+                  <SelectTrigger className="w-32">
+                    <SelectValue placeholder="Channel" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Channels</SelectItem>
+                    <SelectItem value="chat">Chat</SelectItem>
+                    <SelectItem value="phone">Phone</SelectItem>
+                    <SelectItem value="email">Email</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </CardContent>
-          </Card> */}
+          </Card>
 
           {/* AI Coaching Feedback - What agent sees in their widget */}
           {agentInsight.ai_coaching_feedback && (
@@ -2418,18 +2520,27 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
                 <CardTitle className="flex items-center gap-2">
                   <MessageSquare className="h-5 w-5 text-blue-600" />
                   AI Coaching Feedback
+                  <Badge variant="secondary" className="ml-2 bg-blue-100 text-blue-700">
+                    {agentDetailFilterTime === "today" 
+                      ? "Today" 
+                      : agentDetailFilterTime === "yesterday" 
+                        ? "Yesterday" 
+                        : agentDetailCustomDate 
+                          ? format(agentDetailCustomDate, "MMM d, yyyy") 
+                          : "Today"}
+                  </Badge>
                 </CardTitle>
                 <p className="text-sm text-muted-foreground">
-                  This is the feedback {agentInsight.agent} sees in their TrAIna coaching widget
+                  This is the feedback {agentInsight.agent} {agentDetailFilterTime === "today" ? "sees" : "saw"} in their TrAIna coaching widget
                 </p>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid md:grid-cols-2 gap-4">
-                  {/* Yesterday's Wins */}
+                  {/* Prior Day Wins */}
                   <div className="space-y-2">
                     <h4 className="font-semibold text-sm flex items-center gap-2">
                       <Award className="h-4 w-4 text-green-500" />
-                      Yesterday's Wins
+                      {agentDetailFilterTime === "today" ? "Yesterday's" : "Prior Day"} Wins
                     </h4>
                     <ul className="space-y-1">
                       {agentInsight.ai_coaching_feedback.yesterdaysWins.map((win, index) => (
@@ -2462,11 +2573,11 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
                   </div>
                 </div>
 
-                {/* Today's Focus Areas */}
+                {/* Focus Areas */}
                 <div className="space-y-2">
                   <h4 className="font-semibold text-sm flex items-center gap-2">
                     <Star className="h-4 w-4 text-blue-500" />
-                    Today's Focus Areas
+                    {agentDetailFilterTime === "today" ? "Today's" : "Daily"} Focus Areas
                   </h4>
                   <ul className="space-y-1">
                     {agentInsight.ai_coaching_feedback.focusAreas.map((area, index) => (
@@ -2484,7 +2595,7 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
                 <div className="p-3 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-md border border-blue-200">
                   <h4 className="font-semibold text-sm mb-2 flex items-center gap-2">
                     <MessageSquare className="h-4 w-4 text-blue-600" />
-                    Pro Tip for Today
+                    Pro Tip {agentDetailFilterTime === "today" ? "for Today" : ""}
                   </h4>
                   <p className="text-sm text-muted-foreground italic">
                     {agentInsight.ai_coaching_feedback.proTip}
@@ -2497,7 +2608,12 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
           {/* Contact Reviews Section */}
           <ContactReviewsList 
             agentName={agentInsight.agent} 
-            storageKeyPrefix={`agent_${agentInsight.agent.replace(/\s+/g, '_')}`} 
+            storageKeyPrefix={`agent_${agentInsight.agent.replace(/\s+/g, '_')}`}
+            controlledSearchTerm={agentDetailSearchTerm}
+            controlledFilterChannel={agentDetailFilterChannel}
+            controlledFilterTime={agentDetailFilterTime}
+            controlledCustomDate={agentDetailCustomDate}
+            hideFilters={true}
           />
 
           {/* Coaching Preparation */}
