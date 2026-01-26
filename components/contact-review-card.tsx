@@ -388,38 +388,6 @@ function ContactReviewCard({ review }: ContactReviewCardProps) {
             {review.contactSummary}
           </p>
         </div>
-        <div className="bg-card border rounded-md p-3">
-          <div className="flex items-center gap-2 mb-2">
-            <User className="h-4 w-4 text-primary" />
-            <span className="text-sm font-medium">Customer Information</span>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
-            <div>
-              <span className="text-muted-foreground">Name:</span>
-              <span className="ml-2 font-medium">{review.customer.name}</span>
-            </div>
-            <div>
-              <span className="text-muted-foreground">Email:</span>
-              <span className="ml-2 font-medium">{review.customer.email}</span>
-            </div>
-            {review.customer.phone && (
-              <div>
-                <span className="text-muted-foreground">Phone:</span>
-                <span className="ml-2 font-medium">
-                  {review.customer.phone}
-                </span>
-              </div>
-            )}
-
-            <div className="md:col-span-2">
-              <span className="text-muted-foreground">Contact Time:</span>
-              <span className="ml-2 font-medium flex items-center gap-1">
-                <Calendar className="h-3 w-3" />
-                {review.customer.contactTimestamp}
-              </span>
-            </div>
-          </div>
-        </div>
       </CardHeader>
 
       <CardContent className="space-y-4">
