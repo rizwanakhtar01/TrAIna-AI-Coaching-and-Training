@@ -337,6 +337,21 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
           suggested_duration: "15 minutes",
           focus_area: "efficiency_improvement",
         },
+        ai_coaching_feedback: {
+          yesterdaysWins: [
+            "Maintained positive tone across all interactions",
+            "Resolved 85% of issues on first call",
+          ],
+          challengingAreas: [
+            "Managing average handle time on complex calls",
+            "Balancing thoroughness with efficiency",
+          ],
+          focusAreas: [
+            "Practice streamlined troubleshooting workflows",
+            "Review quick resolution templates in Knowledge Base",
+          ],
+          proTip: "Try setting micro time goals for each call phase - greeting (30s), discovery (2min), resolution (3min). This helps maintain efficiency without sacrificing quality.",
+        },
       },
       {
         agent: "John Davis",
@@ -353,6 +368,23 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
           ],
           suggested_duration: "30 minutes",
           focus_area: "compliance_and_soft_skills",
+        },
+        ai_coaching_feedback: {
+          yesterdaysWins: [
+            "Demonstrated strong technical knowledge on product issues",
+            "Quickly identified root causes of technical problems",
+          ],
+          challengingAreas: [
+            "Showing empathy in tough conversations",
+            "Following compliance verification steps",
+            "Acknowledging customer frustrations before troubleshooting",
+          ],
+          focusAreas: [
+            "Review identity verification checklist before each call",
+            "Practice empathy phrases: 'I understand how frustrating this must be'",
+            "Complete compliance refresher module",
+          ],
+          proTip: "Start each interaction by acknowledging the customer's situation before diving into solutions. A simple 'I can see why that would be frustrating' builds trust quickly.",
         },
       },
       {
@@ -371,6 +403,21 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
           suggested_duration: "10 minutes",
           focus_area: "mentoring_development",
         },
+        ai_coaching_feedback: {
+          yesterdaysWins: [
+            "Exceptional empathy scores - customers felt truly heard",
+            "Perfect compliance adherence on all calls",
+            "Resolved complex billing disputes efficiently",
+          ],
+          challengingAreas: [
+            "Response times slightly above target on chat channels",
+          ],
+          focusAreas: [
+            "Practice using canned responses for common inquiries",
+            "Review keyboard shortcuts for faster navigation",
+          ],
+          proTip: "You're doing amazing! Consider sharing your empathy techniques with the team during the next huddle. Your approach to difficult customers could help others improve.",
+        },
       },
       {
         agent: "Mike Rodriguez",
@@ -387,6 +434,21 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
           ],
           suggested_duration: "20 minutes",
           focus_area: "soft_skills_development",
+        },
+        ai_coaching_feedback: {
+          yesterdaysWins: [
+            "Great product knowledge application on subscription questions",
+            "Improved from last week's scores",
+          ],
+          challengingAreas: [
+            "Active listening - sometimes jumping to solutions too quickly",
+            "Resolution times above target on complex issues",
+          ],
+          focusAreas: [
+            "Practice repeating back customer concerns before offering solutions",
+            "Review the 5-step troubleshooting guide for faster resolutions",
+          ],
+          proTip: "Try the 'pause and reflect' technique - after the customer finishes speaking, pause for 2 seconds before responding. This helps ensure you've fully understood their concern.",
         },
       },
       {
@@ -405,6 +467,22 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
           suggested_duration: "25 minutes",
           focus_area: "technical_skills_building",
         },
+        ai_coaching_feedback: {
+          yesterdaysWins: [
+            "Clear and friendly communication style",
+            "Customers appreciated the patience shown",
+          ],
+          challengingAreas: [
+            "Technical troubleshooting for advanced product features",
+            "Confidence when handling escalation requests",
+          ],
+          focusAreas: [
+            "Complete the Advanced Features training module",
+            "Practice escalation scenarios with a buddy",
+            "Review the escalation decision tree",
+          ],
+          proTip: "It's okay to say 'Let me look that up for you' - customers appreciate honesty. Use the Knowledge Base search while on calls to build your technical confidence.",
+        },
       },
       {
         agent: "David Chen",
@@ -421,6 +499,21 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
           ],
           suggested_duration: "15 minutes",
           focus_area: "empathy_enhancement",
+        },
+        ai_coaching_feedback: {
+          yesterdaysWins: [
+            "Excellent efficiency - consistently under target handle time",
+            "Strong problem-solving on complex technical issues",
+          ],
+          challengingAreas: [
+            "Recognizing when customers need emotional support vs quick solutions",
+            "Pacing conversations to match customer comfort level",
+          ],
+          focusAreas: [
+            "Practice identifying emotional cues in customer language",
+            "Review empathy response templates",
+          ],
+          proTip: "When a customer sounds frustrated, try acknowledging their feelings first: 'I can hear this has been really frustrating for you.' Then proceed with the solution.",
         },
       },
     ],
@@ -2317,6 +2410,89 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
               </div>
             </CardContent>
           </Card> */}
+
+          {/* AI Coaching Feedback - What agent sees in their widget */}
+          {agentInsight.ai_coaching_feedback && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <MessageSquare className="h-5 w-5 text-blue-600" />
+                  AI Coaching Feedback
+                </CardTitle>
+                <p className="text-sm text-muted-foreground">
+                  This is the feedback {agentInsight.agent} sees in their TrAIna coaching widget
+                </p>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid md:grid-cols-2 gap-4">
+                  {/* Yesterday's Wins */}
+                  <div className="space-y-2">
+                    <h4 className="font-semibold text-sm flex items-center gap-2">
+                      <Award className="h-4 w-4 text-green-500" />
+                      Yesterday's Wins
+                    </h4>
+                    <ul className="space-y-1">
+                      {agentInsight.ai_coaching_feedback.yesterdaysWins.map((win, index) => (
+                        <li
+                          key={index}
+                          className="text-sm text-muted-foreground pl-4 border-l-2 border-green-200"
+                        >
+                          • {win}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  {/* Challenging Areas */}
+                  <div className="space-y-2">
+                    <h4 className="font-semibold text-sm flex items-center gap-2">
+                      <AlertTriangle className="h-4 w-4 text-orange-500" />
+                      Challenging Areas
+                    </h4>
+                    <ul className="space-y-1">
+                      {agentInsight.ai_coaching_feedback.challengingAreas.map((area, index) => (
+                        <li
+                          key={index}
+                          className="text-sm text-muted-foreground pl-4 border-l-2 border-orange-200"
+                        >
+                          • {area}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+
+                {/* Today's Focus Areas */}
+                <div className="space-y-2">
+                  <h4 className="font-semibold text-sm flex items-center gap-2">
+                    <Star className="h-4 w-4 text-blue-500" />
+                    Today's Focus Areas
+                  </h4>
+                  <ul className="space-y-1">
+                    {agentInsight.ai_coaching_feedback.focusAreas.map((area, index) => (
+                      <li
+                        key={index}
+                        className="text-sm text-muted-foreground pl-4 border-l-2 border-blue-200"
+                      >
+                        • {area}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* Pro Tip */}
+                <div className="p-3 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-md border border-blue-200">
+                  <h4 className="font-semibold text-sm mb-2 flex items-center gap-2">
+                    <MessageSquare className="h-4 w-4 text-blue-600" />
+                    Pro Tip for Today
+                  </h4>
+                  <p className="text-sm text-muted-foreground italic">
+                    {agentInsight.ai_coaching_feedback.proTip}
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Contact Reviews Section */}
           <ContactReviewsList 
