@@ -59,14 +59,16 @@ interface SuperAdminDashboardProps {
 interface Customer {
   id: string;
   companyName: string;
-  tenantId: string;
+  amazonConnectId: string;
   status: "active" | "inactive";
   primaryAdminEmail: string;
   region: string;
+  numberOfAgents: number;
+  licenseEndDate: string;
   enabledModules: {
-    training: boolean;
     aiCoaching: boolean;
     knowledgeBase: boolean;
+    training: boolean;
   };
   onboarding: {
     adminCreated: boolean;
@@ -83,14 +85,16 @@ const mockCustomers: Customer[] = [
   {
     id: "1",
     companyName: "Acme Corp",
-    tenantId: "TENANT-ACME-001",
+    amazonConnectId: "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
     status: "active",
     primaryAdminEmail: "admin@acmecorp.com",
-    region: "North America",
+    region: "us-east-1",
+    numberOfAgents: 45,
+    licenseEndDate: "2025-12-31",
     enabledModules: {
-      training: true,
       aiCoaching: true,
       knowledgeBase: true,
+      training: true,
     },
     onboarding: {
       adminCreated: true,
@@ -105,14 +109,16 @@ const mockCustomers: Customer[] = [
   {
     id: "2",
     companyName: "Nova Support",
-    tenantId: "TENANT-NOVA-002",
+    amazonConnectId: "b2c3d4e5-f6a7-8901-bcde-f23456789012",
     status: "active",
     primaryAdminEmail: "admin@novasupport.io",
-    region: "Europe",
+    region: "eu-west-2",
+    numberOfAgents: 28,
+    licenseEndDate: "2025-09-30",
     enabledModules: {
-      training: true,
       aiCoaching: true,
       knowledgeBase: false,
+      training: true,
     },
     onboarding: {
       adminCreated: true,
@@ -127,14 +133,16 @@ const mockCustomers: Customer[] = [
   {
     id: "3",
     companyName: "ZenRetail",
-    tenantId: "TENANT-ZEN-003",
+    amazonConnectId: "c3d4e5f6-a7b8-9012-cdef-345678901234",
     status: "inactive",
     primaryAdminEmail: "admin@zenretail.com",
-    region: "Asia Pacific",
+    region: "ap-southeast-1",
+    numberOfAgents: 15,
+    licenseEndDate: "2024-06-30",
     enabledModules: {
-      training: true,
       aiCoaching: false,
       knowledgeBase: true,
+      training: true,
     },
     onboarding: {
       adminCreated: true,
@@ -149,14 +157,16 @@ const mockCustomers: Customer[] = [
   {
     id: "4",
     companyName: "TechFlow Solutions",
-    tenantId: "TENANT-TECH-004",
+    amazonConnectId: "d4e5f6a7-b8c9-0123-defa-456789012345",
     status: "active",
     primaryAdminEmail: "admin@techflow.com",
-    region: "North America",
+    region: "us-west-2",
+    numberOfAgents: 62,
+    licenseEndDate: "2026-03-15",
     enabledModules: {
-      training: true,
       aiCoaching: true,
       knowledgeBase: true,
+      training: true,
     },
     onboarding: {
       adminCreated: true,
@@ -171,14 +181,16 @@ const mockCustomers: Customer[] = [
   {
     id: "5",
     companyName: "Global Services Inc",
-    tenantId: "TENANT-GLOB-005",
+    amazonConnectId: "e5f6a7b8-c9d0-1234-efab-567890123456",
     status: "active",
     primaryAdminEmail: "admin@globalservices.com",
-    region: "Europe",
+    region: "eu-central-1",
+    numberOfAgents: 35,
+    licenseEndDate: "2025-08-20",
     enabledModules: {
-      training: true,
       aiCoaching: false,
       knowledgeBase: true,
+      training: true,
     },
     onboarding: {
       adminCreated: true,
@@ -208,6 +220,8 @@ export function SuperAdminDashboard({ onLogout }: SuperAdminDashboardProps) {
   const [showCreateCustomer, setShowCreateCustomer] = useState(false);
   const [showCustomerProfile, setShowCustomerProfile] = useState<Customer | null>(null);
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
+  const [showEditCustomer, setShowEditCustomer] = useState<Customer | null>(null);
+  const [showStatusConfirm, setShowStatusConfirm] = useState<Customer | null>(null);
 
   const [newCustomer, setNewCustomer] = useState({
     companyName: "",
@@ -235,10 +249,12 @@ export function SuperAdminDashboard({ onLogout }: SuperAdminDashboardProps) {
     const customer: Customer = {
       id: newId,
       companyName: newCustomer.companyName,
-      tenantId: `TENANT-${newCustomer.companyName.toUpperCase().replace(/\s+/g, "").slice(0, 4)}-00${newId}`,
+      amazonConnectId: newCustomer.amazonConnectInstanceId,
       status: "active",
       primaryAdminEmail: newCustomer.primaryAdminEmail,
       region: newCustomer.region,
+      numberOfAgents: parseInt(newCustomer.numberOfAgents) || 0,
+      licenseEndDate: newCustomer.licenseEndDate,
       enabledModules: newCustomer.enabledModules,
       onboarding: {
         adminCreated: false,
@@ -247,7 +263,7 @@ export function SuperAdminDashboard({ onLogout }: SuperAdminDashboardProps) {
         agentsOnboarded: false,
         firstTrainingCompleted: false,
       },
-      agentsCount: 0,
+      agentsCount: parseInt(newCustomer.numberOfAgents) || 0,
       trainingModulesCount: 0,
     };
     setCustomers([...customers, customer]);
@@ -264,10 +280,22 @@ export function SuperAdminDashboard({ onLogout }: SuperAdminDashboardProps) {
     setShowSuccessDialog(true);
   };
 
-  const handleSuspendCustomer = (customerId: string) => {
-    setCustomers(customers.map(c => 
-      c.id === customerId ? { ...c, status: c.status === "active" ? "inactive" : "active" } : c
-    ));
+  const handleConfirmStatusChange = () => {
+    if (showStatusConfirm) {
+      setCustomers(customers.map(c => 
+        c.id === showStatusConfirm.id ? { ...c, status: c.status === "active" ? "inactive" : "active" } : c
+      ));
+      setShowStatusConfirm(null);
+    }
+  };
+
+  const handleEditCustomer = () => {
+    if (showEditCustomer) {
+      setCustomers(customers.map(c => 
+        c.id === showEditCustomer.id ? showEditCustomer : c
+      ));
+      setShowEditCustomer(null);
+    }
   };
 
   const sidebarItems = [
@@ -483,7 +511,7 @@ export function SuperAdminDashboard({ onLogout }: SuperAdminDashboardProps) {
                   <TableHeader>
                     <TableRow>
                       <TableHead>Company Name</TableHead>
-                      <TableHead>Tenant ID</TableHead>
+                      <TableHead>Amazon Connect ID</TableHead>
                       <TableHead>Status</TableHead>
                       <TableHead>Enabled Modules</TableHead>
                       <TableHead className="text-right">Actions</TableHead>
@@ -493,22 +521,22 @@ export function SuperAdminDashboard({ onLogout }: SuperAdminDashboardProps) {
                     {customers.map((customer) => (
                       <TableRow key={customer.id}>
                         <TableCell className="font-medium">{customer.companyName}</TableCell>
-                        <TableCell className="text-muted-foreground text-sm">{customer.tenantId}</TableCell>
+                        <TableCell className="text-muted-foreground text-sm font-mono text-xs">{customer.amazonConnectId}</TableCell>
                         <TableCell>
                           <Badge variant={customer.status === "active" ? "default" : "secondary"}>
                             {customer.status}
                           </Badge>
                         </TableCell>
                         <TableCell>
-                          <div className="flex gap-1">
-                            {customer.enabledModules.training && (
-                              <Badge variant="outline" className="text-xs">Training</Badge>
-                            )}
+                          <div className="flex gap-1 flex-wrap">
                             {customer.enabledModules.aiCoaching && (
                               <Badge variant="outline" className="text-xs">AI Coaching</Badge>
                             )}
                             {customer.enabledModules.knowledgeBase && (
-                              <Badge variant="outline" className="text-xs">KB</Badge>
+                              <Badge variant="outline" className="text-xs">Knowledge Base</Badge>
+                            )}
+                            {customer.enabledModules.training && (
+                              <Badge variant="outline" className="text-xs">AI Training</Badge>
                             )}
                           </div>
                         </TableCell>
@@ -521,13 +549,17 @@ export function SuperAdminDashboard({ onLogout }: SuperAdminDashboardProps) {
                             >
                               <Eye className="h-4 w-4" />
                             </Button>
-                            <Button variant="ghost" size="sm">
+                            <Button 
+                              variant="ghost" 
+                              size="sm"
+                              onClick={() => setShowEditCustomer(customer)}
+                            >
                               <Edit3 className="h-4 w-4" />
                             </Button>
                             <Button
                               variant="ghost"
                               size="sm"
-                              onClick={() => handleSuspendCustomer(customer.id)}
+                              onClick={() => setShowStatusConfirm(customer)}
                             >
                               <Ban className="h-4 w-4" />
                             </Button>
@@ -567,8 +599,8 @@ export function SuperAdminDashboard({ onLogout }: SuperAdminDashboardProps) {
                         <p className="font-medium">{showCustomerProfile.companyName}</p>
                       </div>
                       <div>
-                        <Label className="text-muted-foreground">Tenant ID</Label>
-                        <p className="font-mono text-sm">{showCustomerProfile.tenantId}</p>
+                        <Label className="text-muted-foreground">Amazon Connect ID</Label>
+                        <p className="font-mono text-sm">{showCustomerProfile.amazonConnectId}</p>
                       </div>
                       <div>
                         <Label className="text-muted-foreground">Primary Admin</Label>
@@ -590,24 +622,14 @@ export function SuperAdminDashboard({ onLogout }: SuperAdminDashboardProps) {
 
                 <Card>
                   <CardHeader>
-                    <CardTitle>Enabled Modules</CardTitle>
+                    <CardTitle>Subscribed Modules</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-3">
                     <div className="flex items-center gap-3 p-3 border rounded-lg">
-                      <BookOpen className={`h-5 w-5 ${showCustomerProfile.enabledModules.training ? "text-green-500" : "text-gray-300"}`} />
-                      <div className="flex-1">
-                        <p className="font-medium">Agent Training</p>
-                        <p className="text-sm text-muted-foreground">Interactive training modules</p>
-                      </div>
-                      <Badge variant={showCustomerProfile.enabledModules.training ? "default" : "secondary"}>
-                        {showCustomerProfile.enabledModules.training ? "Enabled" : "Disabled"}
-                      </Badge>
-                    </div>
-                    <div className="flex items-center gap-3 p-3 border rounded-lg">
                       <Brain className={`h-5 w-5 ${showCustomerProfile.enabledModules.aiCoaching ? "text-green-500" : "text-gray-300"}`} />
                       <div className="flex-1">
-                        <p className="font-medium">AI Coaching</p>
-                        <p className="text-sm text-muted-foreground">Real-time AI feedback</p>
+                        <p className="font-medium">AI based Coaching Feedback</p>
+                        <p className="text-sm text-muted-foreground">Real-time AI coaching for agents</p>
                       </div>
                       <Badge variant={showCustomerProfile.enabledModules.aiCoaching ? "default" : "secondary"}>
                         {showCustomerProfile.enabledModules.aiCoaching ? "Enabled" : "Disabled"}
@@ -616,11 +638,21 @@ export function SuperAdminDashboard({ onLogout }: SuperAdminDashboardProps) {
                     <div className="flex items-center gap-3 p-3 border rounded-lg">
                       <Database className={`h-5 w-5 ${showCustomerProfile.enabledModules.knowledgeBase ? "text-green-500" : "text-gray-300"}`} />
                       <div className="flex-1">
-                        <p className="font-medium">Knowledge Base</p>
-                        <p className="text-sm text-muted-foreground">Document repository</p>
+                        <p className="font-medium">Upload Knowledge Base</p>
+                        <p className="text-sm text-muted-foreground">For detailed feedback with information accuracy check</p>
                       </div>
                       <Badge variant={showCustomerProfile.enabledModules.knowledgeBase ? "default" : "secondary"}>
                         {showCustomerProfile.enabledModules.knowledgeBase ? "Enabled" : "Disabled"}
+                      </Badge>
+                    </div>
+                    <div className="flex items-center gap-3 p-3 border rounded-lg">
+                      <BookOpen className={`h-5 w-5 ${showCustomerProfile.enabledModules.training ? "text-green-500" : "text-gray-300"}`} />
+                      <div className="flex-1">
+                        <p className="font-medium">AI based Agent Training</p>
+                        <p className="text-sm text-muted-foreground">Interactive training modules</p>
+                      </div>
+                      <Badge variant={showCustomerProfile.enabledModules.training ? "default" : "secondary"}>
+                        {showCustomerProfile.enabledModules.training ? "Enabled" : "Disabled"}
                       </Badge>
                     </div>
                   </CardContent>
@@ -918,6 +950,205 @@ export function SuperAdminDashboard({ onLogout }: SuperAdminDashboardProps) {
           <DialogFooter>
             <Button onClick={() => setShowSuccessDialog(false)}>
               Done
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!showStatusConfirm} onOpenChange={() => setShowStatusConfirm(null)}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Confirm Status Change</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to {showStatusConfirm?.status === "active" ? "deactivate" : "activate"} <span className="font-semibold">{showStatusConfirm?.companyName}</span>?
+              {showStatusConfirm?.status === "active" 
+                ? " This will suspend their access to the platform."
+                : " This will restore their access to the platform."}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowStatusConfirm(null)}>
+              Cancel
+            </Button>
+            <Button 
+              variant={showStatusConfirm?.status === "active" ? "destructive" : "default"}
+              onClick={handleConfirmStatusChange}
+            >
+              {showStatusConfirm?.status === "active" ? "Deactivate" : "Activate"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!showEditCustomer} onOpenChange={() => setShowEditCustomer(null)}>
+        <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Edit Customer</DialogTitle>
+            <DialogDescription>Update customer information</DialogDescription>
+          </DialogHeader>
+          {showEditCustomer && (
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <Label htmlFor="editCompanyName">Business Name</Label>
+                <Input
+                  id="editCompanyName"
+                  value={showEditCustomer.companyName}
+                  onChange={(e) => setShowEditCustomer({ ...showEditCustomer, companyName: e.target.value })}
+                  placeholder="Enter business name"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="editAdminEmail">Email Address</Label>
+                <Input
+                  id="editAdminEmail"
+                  type="email"
+                  value={showEditCustomer.primaryAdminEmail}
+                  onChange={(e) => setShowEditCustomer({ ...showEditCustomer, primaryAdminEmail: e.target.value })}
+                  placeholder="admin@company.com"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="editConnectInstanceId">Amazon Connect Instance ID</Label>
+                <Input
+                  id="editConnectInstanceId"
+                  value={showEditCustomer.amazonConnectId}
+                  onChange={(e) => setShowEditCustomer({ ...showEditCustomer, amazonConnectId: e.target.value })}
+                  placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="editNumberOfAgents">No. of Agents</Label>
+                  <Input
+                    id="editNumberOfAgents"
+                    type="number"
+                    value={showEditCustomer.numberOfAgents}
+                    onChange={(e) => setShowEditCustomer({ ...showEditCustomer, numberOfAgents: parseInt(e.target.value) || 0 })}
+                    placeholder="e.g., 50"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="editRegion">Region (Amazon Connect)</Label>
+                  <Select
+                    value={showEditCustomer.region}
+                    onValueChange={(value) => setShowEditCustomer({ ...showEditCustomer, region: value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select region" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="us-east-1">US East (N. Virginia)</SelectItem>
+                      <SelectItem value="us-west-2">US West (Oregon)</SelectItem>
+                      <SelectItem value="eu-west-2">Europe (London)</SelectItem>
+                      <SelectItem value="eu-central-1">Europe (Frankfurt)</SelectItem>
+                      <SelectItem value="ap-southeast-1">Asia Pacific (Singapore)</SelectItem>
+                      <SelectItem value="ap-southeast-2">Asia Pacific (Sydney)</SelectItem>
+                      <SelectItem value="ap-northeast-1">Asia Pacific (Tokyo)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="editLicenseEndDate">License End Date</Label>
+                <Input
+                  id="editLicenseEndDate"
+                  type="date"
+                  value={showEditCustomer.licenseEndDate}
+                  onChange={(e) => setShowEditCustomer({ ...showEditCustomer, licenseEndDate: e.target.value })}
+                />
+              </div>
+              <div className="space-y-3">
+                <Label>Subscribed Modules</Label>
+                <div className="space-y-3 border rounded-lg p-3">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <Label className="text-sm font-medium">AI based Coaching Feedback</Label>
+                    </div>
+                    <button
+                      type="button"
+                      role="switch"
+                      aria-checked={showEditCustomer.enabledModules.aiCoaching}
+                      onClick={() =>
+                        setShowEditCustomer({
+                          ...showEditCustomer,
+                          enabledModules: { ...showEditCustomer.enabledModules, aiCoaching: !showEditCustomer.enabledModules.aiCoaching },
+                        })
+                      }
+                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                        showEditCustomer.enabledModules.aiCoaching ? "bg-primary" : "bg-gray-200"
+                      }`}
+                    >
+                      <span
+                        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                          showEditCustomer.enabledModules.aiCoaching ? "translate-x-6" : "translate-x-1"
+                        }`}
+                      />
+                    </button>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <Label className="text-sm font-medium">Upload Knowledge Base</Label>
+                      <p className="text-xs text-muted-foreground">For detailed feedback with information accuracy check</p>
+                    </div>
+                    <button
+                      type="button"
+                      role="switch"
+                      aria-checked={showEditCustomer.enabledModules.knowledgeBase}
+                      onClick={() =>
+                        setShowEditCustomer({
+                          ...showEditCustomer,
+                          enabledModules: { ...showEditCustomer.enabledModules, knowledgeBase: !showEditCustomer.enabledModules.knowledgeBase },
+                        })
+                      }
+                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                        showEditCustomer.enabledModules.knowledgeBase ? "bg-primary" : "bg-gray-200"
+                      }`}
+                    >
+                      <span
+                        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                          showEditCustomer.enabledModules.knowledgeBase ? "translate-x-6" : "translate-x-1"
+                        }`}
+                      />
+                    </button>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <Label className="text-sm font-medium">AI based Agent Training</Label>
+                    </div>
+                    <button
+                      type="button"
+                      role="switch"
+                      aria-checked={showEditCustomer.enabledModules.training}
+                      onClick={() =>
+                        setShowEditCustomer({
+                          ...showEditCustomer,
+                          enabledModules: { ...showEditCustomer.enabledModules, training: !showEditCustomer.enabledModules.training },
+                        })
+                      }
+                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                        showEditCustomer.enabledModules.training ? "bg-primary" : "bg-gray-200"
+                      }`}
+                    >
+                      <span
+                        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                          showEditCustomer.enabledModules.training ? "translate-x-6" : "translate-x-1"
+                        }`}
+                      />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowEditCustomer(null)}>
+              Cancel
+            </Button>
+            <Button
+              onClick={handleEditCustomer}
+              disabled={!showEditCustomer?.companyName || !showEditCustomer?.primaryAdminEmail || !showEditCustomer?.region || !showEditCustomer?.amazonConnectId}
+            >
+              Save Changes
             </Button>
           </DialogFooter>
         </DialogContent>
