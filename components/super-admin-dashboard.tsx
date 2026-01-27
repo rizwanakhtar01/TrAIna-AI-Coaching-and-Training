@@ -212,11 +212,14 @@ export function SuperAdminDashboard({ onLogout }: SuperAdminDashboardProps) {
   const [newCustomer, setNewCustomer] = useState({
     companyName: "",
     primaryAdminEmail: "",
+    amazonConnectInstanceId: "",
+    numberOfAgents: "",
     region: "",
+    licenseEndDate: "",
     enabledModules: {
-      training: false,
       aiCoaching: false,
       knowledgeBase: false,
+      training: false,
     },
   });
 
@@ -251,8 +254,11 @@ export function SuperAdminDashboard({ onLogout }: SuperAdminDashboardProps) {
     setNewCustomer({
       companyName: "",
       primaryAdminEmail: "",
+      amazonConnectInstanceId: "",
+      numberOfAgents: "",
       region: "",
-      enabledModules: { training: false, aiCoaching: false, knowledgeBase: false },
+      licenseEndDate: "",
+      enabledModules: { aiCoaching: false, knowledgeBase: false, training: false },
     });
     setShowCreateCustomer(false);
     setShowSuccessDialog(true);
@@ -726,23 +732,23 @@ export function SuperAdminDashboard({ onLogout }: SuperAdminDashboardProps) {
       </main>
 
       <Dialog open={showCreateCustomer} onOpenChange={setShowCreateCustomer}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Create New Customer</DialogTitle>
             <DialogDescription>Add a new tenant organization to the platform</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="companyName">Company Name</Label>
+              <Label htmlFor="companyName">Business Name</Label>
               <Input
                 id="companyName"
                 value={newCustomer.companyName}
                 onChange={(e) => setNewCustomer({ ...newCustomer, companyName: e.target.value })}
-                placeholder="Enter company name"
+                placeholder="Enter business name"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="adminEmail">Primary Admin Email</Label>
+              <Label htmlFor="adminEmail">Email Address</Label>
               <Input
                 id="adminEmail"
                 type="email"
@@ -750,65 +756,136 @@ export function SuperAdminDashboard({ onLogout }: SuperAdminDashboardProps) {
                 onChange={(e) => setNewCustomer({ ...newCustomer, primaryAdminEmail: e.target.value })}
                 placeholder="admin@company.com"
               />
+              <p className="text-xs text-muted-foreground">An email will be sent with Admin Portal Credentials</p>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="region">Region</Label>
-              <Select
-                value={newCustomer.region}
-                onValueChange={(value) => setNewCustomer({ ...newCustomer, region: value })}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select region" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="North America">North America</SelectItem>
-                  <SelectItem value="Europe">Europe</SelectItem>
-                  <SelectItem value="Asia Pacific">Asia Pacific</SelectItem>
-                  <SelectItem value="Latin America">Latin America</SelectItem>
-                </SelectContent>
-              </Select>
+              <Label htmlFor="connectInstanceId">Amazon Connect Instance ID</Label>
+              <Input
+                id="connectInstanceId"
+                value={newCustomer.amazonConnectInstanceId}
+                onChange={(e) => setNewCustomer({ ...newCustomer, amazonConnectInstanceId: e.target.value })}
+                placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+              />
             </div>
-            <div className="space-y-2">
-              <Label>Enabled Modules</Label>
+            <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="training"
-                    checked={newCustomer.enabledModules.training}
-                    onCheckedChange={(checked) =>
+                <Label htmlFor="numberOfAgents">No. of Agents</Label>
+                <Input
+                  id="numberOfAgents"
+                  type="number"
+                  value={newCustomer.numberOfAgents}
+                  onChange={(e) => setNewCustomer({ ...newCustomer, numberOfAgents: e.target.value })}
+                  placeholder="e.g., 50"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="region">Region (Amazon Connect)</Label>
+                <Select
+                  value={newCustomer.region}
+                  onValueChange={(value) => setNewCustomer({ ...newCustomer, region: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select region" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="us-east-1">US East (N. Virginia)</SelectItem>
+                    <SelectItem value="us-west-2">US West (Oregon)</SelectItem>
+                    <SelectItem value="eu-west-2">Europe (London)</SelectItem>
+                    <SelectItem value="eu-central-1">Europe (Frankfurt)</SelectItem>
+                    <SelectItem value="ap-southeast-1">Asia Pacific (Singapore)</SelectItem>
+                    <SelectItem value="ap-southeast-2">Asia Pacific (Sydney)</SelectItem>
+                    <SelectItem value="ap-northeast-1">Asia Pacific (Tokyo)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="licenseEndDate">License End Date</Label>
+              <Input
+                id="licenseEndDate"
+                type="date"
+                value={newCustomer.licenseEndDate}
+                onChange={(e) => setNewCustomer({ ...newCustomer, licenseEndDate: e.target.value })}
+              />
+            </div>
+            <div className="space-y-3">
+              <Label>Subscribed Modules</Label>
+              <div className="space-y-3 border rounded-lg p-3">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label htmlFor="aiCoaching" className="text-sm font-medium">AI based Coaching Feedback</Label>
+                  </div>
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={newCustomer.enabledModules.aiCoaching}
+                    onClick={() =>
                       setNewCustomer({
                         ...newCustomer,
-                        enabledModules: { ...newCustomer.enabledModules, training: checked as boolean },
+                        enabledModules: { ...newCustomer.enabledModules, aiCoaching: !newCustomer.enabledModules.aiCoaching },
                       })
                     }
-                  />
-                  <Label htmlFor="training" className="text-sm font-normal">Agent Training</Label>
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                      newCustomer.enabledModules.aiCoaching ? "bg-primary" : "bg-gray-200"
+                    }`}
+                  >
+                    <span
+                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                        newCustomer.enabledModules.aiCoaching ? "translate-x-6" : "translate-x-1"
+                      }`}
+                    />
+                  </button>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="aiCoaching"
-                    checked={newCustomer.enabledModules.aiCoaching}
-                    onCheckedChange={(checked) =>
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label htmlFor="knowledgeBase" className="text-sm font-medium">Upload Knowledge Base</Label>
+                    <p className="text-xs text-muted-foreground">For detailed feedback with information accuracy check</p>
+                  </div>
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={newCustomer.enabledModules.knowledgeBase}
+                    onClick={() =>
                       setNewCustomer({
                         ...newCustomer,
-                        enabledModules: { ...newCustomer.enabledModules, aiCoaching: checked as boolean },
+                        enabledModules: { ...newCustomer.enabledModules, knowledgeBase: !newCustomer.enabledModules.knowledgeBase },
                       })
                     }
-                  />
-                  <Label htmlFor="aiCoaching" className="text-sm font-normal">AI Coaching</Label>
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                      newCustomer.enabledModules.knowledgeBase ? "bg-primary" : "bg-gray-200"
+                    }`}
+                  >
+                    <span
+                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                        newCustomer.enabledModules.knowledgeBase ? "translate-x-6" : "translate-x-1"
+                      }`}
+                    />
+                  </button>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="knowledgeBase"
-                    checked={newCustomer.enabledModules.knowledgeBase}
-                    onCheckedChange={(checked) =>
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label htmlFor="training" className="text-sm font-medium">AI based Agent Training</Label>
+                  </div>
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={newCustomer.enabledModules.training}
+                    onClick={() =>
                       setNewCustomer({
                         ...newCustomer,
-                        enabledModules: { ...newCustomer.enabledModules, knowledgeBase: checked as boolean },
+                        enabledModules: { ...newCustomer.enabledModules, training: !newCustomer.enabledModules.training },
                       })
                     }
-                  />
-                  <Label htmlFor="knowledgeBase" className="text-sm font-normal">Knowledge Base</Label>
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                      newCustomer.enabledModules.training ? "bg-primary" : "bg-gray-200"
+                    }`}
+                  >
+                    <span
+                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                        newCustomer.enabledModules.training ? "translate-x-6" : "translate-x-1"
+                      }`}
+                    />
+                  </button>
                 </div>
               </div>
             </div>
@@ -819,7 +896,7 @@ export function SuperAdminDashboard({ onLogout }: SuperAdminDashboardProps) {
             </Button>
             <Button
               onClick={handleCreateCustomer}
-              disabled={!newCustomer.companyName || !newCustomer.primaryAdminEmail || !newCustomer.region}
+              disabled={!newCustomer.companyName || !newCustomer.primaryAdminEmail || !newCustomer.region || !newCustomer.amazonConnectInstanceId}
             >
               Create Customer
             </Button>
