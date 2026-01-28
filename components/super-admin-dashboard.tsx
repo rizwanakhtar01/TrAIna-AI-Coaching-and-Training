@@ -773,7 +773,7 @@ export function SuperAdminDashboard({ onLogout }: SuperAdminDashboardProps) {
       </main>
 
       <Dialog open={showCreateCustomer} onOpenChange={setShowCreateCustomer}>
-        <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Create New Customer</DialogTitle>
             <DialogDescription>Add a new tenant organization to the platform</DialogDescription>
@@ -1000,7 +1000,7 @@ export function SuperAdminDashboard({ onLogout }: SuperAdminDashboardProps) {
       </Dialog>
 
       <Dialog open={!!showEditCustomer} onOpenChange={() => setShowEditCustomer(null)}>
-        <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Edit Customer</DialogTitle>
             <DialogDescription>Update customer information</DialogDescription>
