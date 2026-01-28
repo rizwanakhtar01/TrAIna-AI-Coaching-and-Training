@@ -60,6 +60,7 @@ interface Customer {
   id: string;
   companyName: string;
   amazonConnectId: string;
+  llmApiKey: string;
   status: "active" | "inactive";
   primaryAdminEmail: string;
   region: string;
@@ -86,6 +87,7 @@ const mockCustomers: Customer[] = [
     id: "1",
     companyName: "Acme Corp",
     amazonConnectId: "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    llmApiKey: "sk-acme-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
     status: "active",
     primaryAdminEmail: "admin@acmecorp.com",
     region: "us-east-1",
@@ -110,6 +112,7 @@ const mockCustomers: Customer[] = [
     id: "2",
     companyName: "Nova Support",
     amazonConnectId: "b2c3d4e5-f6a7-8901-bcde-f23456789012",
+    llmApiKey: "sk-nova-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
     status: "active",
     primaryAdminEmail: "admin@novasupport.io",
     region: "eu-west-2",
@@ -134,6 +137,7 @@ const mockCustomers: Customer[] = [
     id: "3",
     companyName: "ZenRetail",
     amazonConnectId: "c3d4e5f6-a7b8-9012-cdef-345678901234",
+    llmApiKey: "sk-zen-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
     status: "inactive",
     primaryAdminEmail: "admin@zenretail.com",
     region: "ap-southeast-1",
@@ -158,6 +162,7 @@ const mockCustomers: Customer[] = [
     id: "4",
     companyName: "TechFlow Solutions",
     amazonConnectId: "d4e5f6a7-b8c9-0123-defa-456789012345",
+    llmApiKey: "sk-tech-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
     status: "active",
     primaryAdminEmail: "admin@techflow.com",
     region: "us-west-2",
@@ -182,6 +187,7 @@ const mockCustomers: Customer[] = [
     id: "5",
     companyName: "Global Services Inc",
     amazonConnectId: "e5f6a7b8-c9d0-1234-efab-567890123456",
+    llmApiKey: "sk-global-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
     status: "active",
     primaryAdminEmail: "admin@globalservices.com",
     region: "eu-central-1",
@@ -227,6 +233,7 @@ export function SuperAdminDashboard({ onLogout }: SuperAdminDashboardProps) {
     companyName: "",
     primaryAdminEmail: "",
     amazonConnectInstanceId: "",
+    llmApiKey: "",
     numberOfAgents: "",
     region: "",
     licenseEndDate: "",
@@ -250,6 +257,7 @@ export function SuperAdminDashboard({ onLogout }: SuperAdminDashboardProps) {
       id: newId,
       companyName: newCustomer.companyName,
       amazonConnectId: newCustomer.amazonConnectInstanceId,
+      llmApiKey: newCustomer.llmApiKey,
       status: "active",
       primaryAdminEmail: newCustomer.primaryAdminEmail,
       region: newCustomer.region,
@@ -271,6 +279,7 @@ export function SuperAdminDashboard({ onLogout }: SuperAdminDashboardProps) {
       companyName: "",
       primaryAdminEmail: "",
       amazonConnectInstanceId: "",
+      llmApiKey: "",
       numberOfAgents: "",
       region: "",
       licenseEndDate: "",
@@ -638,7 +647,7 @@ export function SuperAdminDashboard({ onLogout }: SuperAdminDashboardProps) {
                     <div className="flex items-center gap-3 p-3 border rounded-lg">
                       <Database className={`h-5 w-5 ${showCustomerProfile.enabledModules.knowledgeBase ? "text-green-500" : "text-gray-300"}`} />
                       <div className="flex-1">
-                        <p className="font-medium">Upload Knowledge Base</p>
+                        <p className="font-medium">Knowledge Base Management</p>
                         <p className="text-sm text-muted-foreground">For detailed feedback with information accuracy check</p>
                       </div>
                       <Badge variant={showCustomerProfile.enabledModules.knowledgeBase ? "default" : "secondary"}>
@@ -799,6 +808,16 @@ export function SuperAdminDashboard({ onLogout }: SuperAdminDashboardProps) {
                 placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
               />
             </div>
+            <div className="space-y-2">
+              <Label htmlFor="llmApiKey">LLM API Key</Label>
+              <Input
+                id="llmApiKey"
+                type="password"
+                value={newCustomer.llmApiKey}
+                onChange={(e) => setNewCustomer({ ...newCustomer, llmApiKey: e.target.value })}
+                placeholder="sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+              />
+            </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="numberOfAgents">No. of Agents</Label>
@@ -870,7 +889,7 @@ export function SuperAdminDashboard({ onLogout }: SuperAdminDashboardProps) {
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <Label htmlFor="knowledgeBase" className="text-sm font-medium">Upload Knowledge Base</Label>
+                    <Label htmlFor="knowledgeBase" className="text-sm font-medium">Knowledge Base Management</Label>
                     <p className="text-xs text-muted-foreground">For detailed feedback with information accuracy check</p>
                   </div>
                   <button
@@ -1016,6 +1035,16 @@ export function SuperAdminDashboard({ onLogout }: SuperAdminDashboardProps) {
                   placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
                 />
               </div>
+              <div className="space-y-2">
+                <Label htmlFor="editLlmApiKey">LLM API Key</Label>
+                <Input
+                  id="editLlmApiKey"
+                  type="password"
+                  value={showEditCustomer.llmApiKey}
+                  onChange={(e) => setShowEditCustomer({ ...showEditCustomer, llmApiKey: e.target.value })}
+                  placeholder="sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+                />
+              </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="editNumberOfAgents">No. of Agents</Label>
@@ -1087,7 +1116,7 @@ export function SuperAdminDashboard({ onLogout }: SuperAdminDashboardProps) {
                   </div>
                   <div className="flex items-center justify-between">
                     <div className="space-y-0.5">
-                      <Label className="text-sm font-medium">Upload Knowledge Base</Label>
+                      <Label className="text-sm font-medium">Knowledge Base Management</Label>
                       <p className="text-xs text-muted-foreground">For detailed feedback with information accuracy check</p>
                     </div>
                     <button
