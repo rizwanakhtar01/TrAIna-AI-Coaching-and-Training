@@ -629,9 +629,9 @@ export function SuperAdminDashboard({ onLogout }: SuperAdminDashboardProps) {
                       <div className="flex-1">
                         <p className="font-medium">AI Coaching</p>
                         <p className="text-sm text-muted-foreground">
-                          {showCustomerProfile.enabledModules.aiCoachingTier === "base" && "Consolidated daily feedback, message-by-message coaching, KB accuracy checks"}
-                          {showCustomerProfile.enabledModules.aiCoachingTier === "standard" && "Base features + Advanced insights and recommendations"}
-                          {showCustomerProfile.enabledModules.aiCoachingTier === "advanced" && "Standard features + Personalized coaching plans"}
+                          {showCustomerProfile.enabledModules.aiCoachingTier === "base" && "Consolidated AI-generated feedback, behavioral assessment, high-level coaching insights"}
+                          {showCustomerProfile.enabledModules.aiCoachingTier === "standard" && "Consolidated feedback, message-by-message coaching, behavioral and tone evaluation"}
+                          {showCustomerProfile.enabledModules.aiCoachingTier === "advanced" && "Daily feedback, message-level coaching, knowledge base validation"}
                           {showCustomerProfile.enabledModules.aiCoachingTier === "none" && "No AI coaching features enabled"}
                         </p>
                       </div>
@@ -859,9 +859,9 @@ export function SuperAdminDashboard({ onLogout }: SuperAdminDashboardProps) {
                   <div className="flex-1">
                     <p className="font-medium">Base</p>
                     <ul className="text-xs text-muted-foreground mt-1 space-y-0.5">
-                      <li>• Consolidated daily feedback per agent</li>
-                      <li>• Message-by-message coaching: Included</li>
-                      <li>• Knowledge Base accuracy checks: Included</li>
+                      <li>• Consolidated AI-generated feedback per agent</li>
+                      <li>• Behavioral and communication quality assessment based on defined evaluation criteria</li>
+                      <li>• High-level coaching insights without message-level breakdown</li>
                     </ul>
                   </div>
                 </label>
@@ -877,8 +877,9 @@ export function SuperAdminDashboard({ onLogout }: SuperAdminDashboardProps) {
                   <div className="flex-1">
                     <p className="font-medium">Standard</p>
                     <ul className="text-xs text-muted-foreground mt-1 space-y-0.5">
-                      <li>• All Base features included</li>
-                      <li>• Advanced insights and recommendations</li>
+                      <li>• Consolidated AI-generated feedback per agent</li>
+                      <li>• Message-by-message coaching on agent responses</li>
+                      <li>• Behavioral, tone, and communication quality evaluation for every interaction</li>
                     </ul>
                   </div>
                 </label>
@@ -894,8 +895,9 @@ export function SuperAdminDashboard({ onLogout }: SuperAdminDashboardProps) {
                   <div className="flex-1">
                     <p className="font-medium">Advanced</p>
                     <ul className="text-xs text-muted-foreground mt-1 space-y-0.5">
-                      <li>• All Standard features included</li>
-                      <li>• Personalized coaching plans</li>
+                      <li>• Consolidated daily feedback covering agent behavior and performance</li>
+                      <li>• Message-level coaching to improve clarity, tone, and empathy</li>
+                      <li>• Validation of agent responses against uploaded knowledge base to flag incorrect information</li>
                     </ul>
                   </div>
                 </label>
@@ -1098,9 +1100,9 @@ export function SuperAdminDashboard({ onLogout }: SuperAdminDashboardProps) {
                     <div className="flex-1">
                       <p className="font-medium">Base</p>
                       <ul className="text-xs text-muted-foreground mt-1 space-y-0.5">
-                        <li>• Consolidated daily feedback per agent</li>
-                        <li>• Message-by-message coaching: Included</li>
-                        <li>• Knowledge Base accuracy checks: Included</li>
+                        <li>• Consolidated AI-generated feedback per agent</li>
+                        <li>• Behavioral and communication quality assessment based on defined evaluation criteria</li>
+                        <li>• High-level coaching insights without message-level breakdown</li>
                       </ul>
                     </div>
                   </label>
@@ -1116,8 +1118,9 @@ export function SuperAdminDashboard({ onLogout }: SuperAdminDashboardProps) {
                     <div className="flex-1">
                       <p className="font-medium">Standard</p>
                       <ul className="text-xs text-muted-foreground mt-1 space-y-0.5">
-                        <li>• All Base features included</li>
-                        <li>• Advanced insights and recommendations</li>
+                        <li>• Consolidated AI-generated feedback per agent</li>
+                        <li>• Message-by-message coaching on agent responses</li>
+                        <li>• Behavioral, tone, and communication quality evaluation for every interaction</li>
                       </ul>
                     </div>
                   </label>
@@ -1133,8 +1136,9 @@ export function SuperAdminDashboard({ onLogout }: SuperAdminDashboardProps) {
                     <div className="flex-1">
                       <p className="font-medium">Advanced</p>
                       <ul className="text-xs text-muted-foreground mt-1 space-y-0.5">
-                        <li>• All Standard features included</li>
-                        <li>• Personalized coaching plans</li>
+                        <li>• Consolidated daily feedback covering agent behavior and performance</li>
+                        <li>• Message-level coaching to improve clarity, tone, and empathy</li>
+                        <li>• Validation of agent responses against uploaded knowledge base to flag incorrect information</li>
                       </ul>
                     </div>
                   </label>
