@@ -67,8 +67,7 @@ interface Customer {
   numberOfAgents: number;
   licenseEndDate: string;
   enabledModules: {
-    aiCoaching: boolean;
-    knowledgeBase: boolean;
+    aiCoachingTier: "none" | "base" | "standard" | "advanced";
     training: boolean;
   };
   onboarding: {
@@ -94,8 +93,7 @@ const mockCustomers: Customer[] = [
     numberOfAgents: 45,
     licenseEndDate: "2025-12-31",
     enabledModules: {
-      aiCoaching: true,
-      knowledgeBase: true,
+      aiCoachingTier: "advanced",
       training: true,
     },
     onboarding: {
@@ -119,8 +117,7 @@ const mockCustomers: Customer[] = [
     numberOfAgents: 28,
     licenseEndDate: "2025-09-30",
     enabledModules: {
-      aiCoaching: true,
-      knowledgeBase: false,
+      aiCoachingTier: "standard",
       training: true,
     },
     onboarding: {
@@ -144,8 +141,7 @@ const mockCustomers: Customer[] = [
     numberOfAgents: 15,
     licenseEndDate: "2024-06-30",
     enabledModules: {
-      aiCoaching: false,
-      knowledgeBase: true,
+      aiCoachingTier: "base",
       training: true,
     },
     onboarding: {
@@ -169,8 +165,7 @@ const mockCustomers: Customer[] = [
     numberOfAgents: 62,
     licenseEndDate: "2026-03-15",
     enabledModules: {
-      aiCoaching: true,
-      knowledgeBase: true,
+      aiCoachingTier: "advanced",
       training: true,
     },
     onboarding: {
@@ -194,8 +189,7 @@ const mockCustomers: Customer[] = [
     numberOfAgents: 35,
     licenseEndDate: "2025-08-20",
     enabledModules: {
-      aiCoaching: false,
-      knowledgeBase: true,
+      aiCoachingTier: "none",
       training: true,
     },
     onboarding: {
@@ -238,8 +232,7 @@ export function SuperAdminDashboard({ onLogout }: SuperAdminDashboardProps) {
     region: "",
     licenseEndDate: "",
     enabledModules: {
-      aiCoaching: false,
-      knowledgeBase: false,
+      aiCoachingTier: "none" as "none" | "base" | "standard" | "advanced",
       training: false,
     },
   });
@@ -283,7 +276,7 @@ export function SuperAdminDashboard({ onLogout }: SuperAdminDashboardProps) {
       numberOfAgents: "",
       region: "",
       licenseEndDate: "",
-      enabledModules: { aiCoaching: false, knowledgeBase: false, training: false },
+      enabledModules: { aiCoachingTier: "none" as "none" | "base" | "standard" | "advanced", training: false },
     });
     setShowCreateCustomer(false);
     setShowSuccessDialog(true);
@@ -538,11 +531,8 @@ export function SuperAdminDashboard({ onLogout }: SuperAdminDashboardProps) {
                         </TableCell>
                         <TableCell>
                           <div className="flex gap-1 flex-wrap">
-                            {customer.enabledModules.aiCoaching && (
-                              <Badge variant="outline" className="text-xs">AI Coaching</Badge>
-                            )}
-                            {customer.enabledModules.knowledgeBase && (
-                              <Badge variant="outline" className="text-xs">Knowledge Base</Badge>
+                            {customer.enabledModules.aiCoachingTier !== "none" && (
+                              <Badge variant="outline" className="text-xs capitalize">AI Coaching ({customer.enabledModules.aiCoachingTier})</Badge>
                             )}
                             {customer.enabledModules.training && (
                               <Badge variant="outline" className="text-xs">AI Training</Badge>
@@ -635,30 +625,25 @@ export function SuperAdminDashboard({ onLogout }: SuperAdminDashboardProps) {
                   </CardHeader>
                   <CardContent className="space-y-3">
                     <div className="flex items-center gap-3 p-3 border rounded-lg">
-                      <Brain className={`h-5 w-5 ${showCustomerProfile.enabledModules.aiCoaching ? "text-green-500" : "text-gray-300"}`} />
+                      <Brain className={`h-5 w-5 ${showCustomerProfile.enabledModules.aiCoachingTier !== "none" ? "text-green-500" : "text-gray-300"}`} />
                       <div className="flex-1">
-                        <p className="font-medium">AI based Coaching Feedback</p>
-                        <p className="text-sm text-muted-foreground">Real-time AI coaching for agents</p>
+                        <p className="font-medium">AI Coaching</p>
+                        <p className="text-sm text-muted-foreground">
+                          {showCustomerProfile.enabledModules.aiCoachingTier === "base" && "Consolidated daily feedback, message-by-message coaching, KB accuracy checks"}
+                          {showCustomerProfile.enabledModules.aiCoachingTier === "standard" && "Base features + Advanced insights and recommendations"}
+                          {showCustomerProfile.enabledModules.aiCoachingTier === "advanced" && "Standard features + Personalized coaching plans"}
+                          {showCustomerProfile.enabledModules.aiCoachingTier === "none" && "No AI coaching features enabled"}
+                        </p>
                       </div>
-                      <Badge variant={showCustomerProfile.enabledModules.aiCoaching ? "default" : "secondary"}>
-                        {showCustomerProfile.enabledModules.aiCoaching ? "Enabled" : "Disabled"}
-                      </Badge>
-                    </div>
-                    <div className="flex items-center gap-3 p-3 border rounded-lg">
-                      <Database className={`h-5 w-5 ${showCustomerProfile.enabledModules.knowledgeBase ? "text-green-500" : "text-gray-300"}`} />
-                      <div className="flex-1">
-                        <p className="font-medium">Knowledge Base Management</p>
-                        <p className="text-sm text-muted-foreground">For detailed feedback with information accuracy check</p>
-                      </div>
-                      <Badge variant={showCustomerProfile.enabledModules.knowledgeBase ? "default" : "secondary"}>
-                        {showCustomerProfile.enabledModules.knowledgeBase ? "Enabled" : "Disabled"}
+                      <Badge variant={showCustomerProfile.enabledModules.aiCoachingTier !== "none" ? "default" : "secondary"} className="capitalize">
+                        {showCustomerProfile.enabledModules.aiCoachingTier === "none" ? "Disabled" : showCustomerProfile.enabledModules.aiCoachingTier}
                       </Badge>
                     </div>
                     <div className="flex items-center gap-3 p-3 border rounded-lg">
                       <BookOpen className={`h-5 w-5 ${showCustomerProfile.enabledModules.training ? "text-green-500" : "text-gray-300"}`} />
                       <div className="flex-1">
                         <p className="font-medium">AI based Agent Training</p>
-                        <p className="text-sm text-muted-foreground">Interactive training modules</p>
+                        <p className="text-sm text-muted-foreground">Interactive training modules and assessments</p>
                       </div>
                       <Badge variant={showCustomerProfile.enabledModules.training ? "default" : "secondary"}>
                         {showCustomerProfile.enabledModules.training ? "Enabled" : "Disabled"}
@@ -860,86 +845,104 @@ export function SuperAdminDashboard({ onLogout }: SuperAdminDashboardProps) {
               />
             </div>
             <div className="space-y-3">
-              <Label>Subscribed Modules</Label>
+              <Label>AI Coaching (select one)</Label>
               <div className="space-y-3 border rounded-lg p-3">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label htmlFor="aiCoaching" className="text-sm font-medium">AI based Coaching Feedback</Label>
+                <label className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${newCustomer.enabledModules.aiCoachingTier === "base" ? "border-primary bg-primary/5" : "border-gray-200 hover:bg-gray-50"}`}>
+                  <input
+                    type="radio"
+                    name="aiCoachingTier"
+                    value="base"
+                    checked={newCustomer.enabledModules.aiCoachingTier === "base"}
+                    onChange={() => setNewCustomer({ ...newCustomer, enabledModules: { ...newCustomer.enabledModules, aiCoachingTier: "base" } })}
+                    className="mt-1"
+                  />
+                  <div className="flex-1">
+                    <p className="font-medium">Base</p>
+                    <ul className="text-xs text-muted-foreground mt-1 space-y-0.5">
+                      <li>• Consolidated daily feedback per agent</li>
+                      <li>• Message-by-message coaching: Included</li>
+                      <li>• Knowledge Base accuracy checks: Included</li>
+                    </ul>
                   </div>
-                  <button
-                    type="button"
-                    role="switch"
-                    aria-checked={newCustomer.enabledModules.aiCoaching}
-                    onClick={() =>
-                      setNewCustomer({
-                        ...newCustomer,
-                        enabledModules: { ...newCustomer.enabledModules, aiCoaching: !newCustomer.enabledModules.aiCoaching },
-                      })
-                    }
-                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                      newCustomer.enabledModules.aiCoaching ? "bg-primary" : "bg-gray-200"
-                    }`}
-                  >
-                    <span
-                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                        newCustomer.enabledModules.aiCoaching ? "translate-x-6" : "translate-x-1"
-                      }`}
-                    />
-                  </button>
-                </div>
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label htmlFor="knowledgeBase" className="text-sm font-medium">Knowledge Base Management</Label>
-                    <p className="text-xs text-muted-foreground">For detailed feedback with information accuracy check</p>
+                </label>
+                <label className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${newCustomer.enabledModules.aiCoachingTier === "standard" ? "border-primary bg-primary/5" : "border-gray-200 hover:bg-gray-50"}`}>
+                  <input
+                    type="radio"
+                    name="aiCoachingTier"
+                    value="standard"
+                    checked={newCustomer.enabledModules.aiCoachingTier === "standard"}
+                    onChange={() => setNewCustomer({ ...newCustomer, enabledModules: { ...newCustomer.enabledModules, aiCoachingTier: "standard" } })}
+                    className="mt-1"
+                  />
+                  <div className="flex-1">
+                    <p className="font-medium">Standard</p>
+                    <ul className="text-xs text-muted-foreground mt-1 space-y-0.5">
+                      <li>• All Base features included</li>
+                      <li>• Advanced insights and recommendations</li>
+                    </ul>
                   </div>
-                  <button
-                    type="button"
-                    role="switch"
-                    aria-checked={newCustomer.enabledModules.knowledgeBase}
-                    onClick={() =>
-                      setNewCustomer({
-                        ...newCustomer,
-                        enabledModules: { ...newCustomer.enabledModules, knowledgeBase: !newCustomer.enabledModules.knowledgeBase },
-                      })
-                    }
-                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                      newCustomer.enabledModules.knowledgeBase ? "bg-primary" : "bg-gray-200"
-                    }`}
-                  >
-                    <span
-                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                        newCustomer.enabledModules.knowledgeBase ? "translate-x-6" : "translate-x-1"
-                      }`}
-                    />
-                  </button>
-                </div>
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label htmlFor="training" className="text-sm font-medium">AI based Agent Training</Label>
+                </label>
+                <label className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${newCustomer.enabledModules.aiCoachingTier === "advanced" ? "border-primary bg-primary/5" : "border-gray-200 hover:bg-gray-50"}`}>
+                  <input
+                    type="radio"
+                    name="aiCoachingTier"
+                    value="advanced"
+                    checked={newCustomer.enabledModules.aiCoachingTier === "advanced"}
+                    onChange={() => setNewCustomer({ ...newCustomer, enabledModules: { ...newCustomer.enabledModules, aiCoachingTier: "advanced" } })}
+                    className="mt-1"
+                  />
+                  <div className="flex-1">
+                    <p className="font-medium">Advanced</p>
+                    <ul className="text-xs text-muted-foreground mt-1 space-y-0.5">
+                      <li>• All Standard features included</li>
+                      <li>• Personalized coaching plans</li>
+                    </ul>
                   </div>
-                  <button
-                    type="button"
-                    role="switch"
-                    aria-checked={newCustomer.enabledModules.training}
-                    onClick={() =>
-                      setNewCustomer({
-                        ...newCustomer,
-                        enabledModules: { ...newCustomer.enabledModules, training: !newCustomer.enabledModules.training },
-                      })
-                    }
-                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                      newCustomer.enabledModules.training ? "bg-primary" : "bg-gray-200"
-                    }`}
-                  >
-                    <span
-                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                        newCustomer.enabledModules.training ? "translate-x-6" : "translate-x-1"
-                      }`}
-                    />
-                  </button>
-                </div>
+                </label>
+                <label className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${newCustomer.enabledModules.aiCoachingTier === "none" ? "border-primary bg-primary/5" : "border-gray-200 hover:bg-gray-50"}`}>
+                  <input
+                    type="radio"
+                    name="aiCoachingTier"
+                    value="none"
+                    checked={newCustomer.enabledModules.aiCoachingTier === "none"}
+                    onChange={() => setNewCustomer({ ...newCustomer, enabledModules: { ...newCustomer.enabledModules, aiCoachingTier: "none" } })}
+                    className="mt-1"
+                  />
+                  <div className="flex-1">
+                    <p className="font-medium">None</p>
+                    <p className="text-xs text-muted-foreground mt-1">No AI Coaching features</p>
+                  </div>
+                </label>
               </div>
             </div>
+            <div className="space-y-3">
+              <Label>Additional Modules</Label>
+              <div className="border rounded-lg p-3">
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={newCustomer.enabledModules.training}
+                    onChange={() => setNewCustomer({ ...newCustomer, enabledModules: { ...newCustomer.enabledModules, training: !newCustomer.enabledModules.training } })}
+                    className="h-4 w-4 rounded border-gray-300"
+                  />
+                  <div>
+                    <p className="font-medium text-sm">AI based Agent Training</p>
+                    <p className="text-xs text-muted-foreground">Interactive training modules and assessments</p>
+                  </div>
+                </label>
+              </div>
+            </div>
+            {(newCustomer.enabledModules.aiCoachingTier !== "none" || newCustomer.enabledModules.training) && (
+              <div className="bg-muted/50 rounded-lg p-3 space-y-1">
+                <p className="text-sm font-medium">Selection Summary</p>
+                <p className="text-sm text-muted-foreground">
+                  AI Coaching: <span className="font-medium text-foreground capitalize">{newCustomer.enabledModules.aiCoachingTier === "none" ? "Not selected" : newCustomer.enabledModules.aiCoachingTier}</span>
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  Training: <span className="font-medium text-foreground">{newCustomer.enabledModules.training ? "Enabled" : "Not selected"}</span>
+                </p>
+              </div>
+            )}
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowCreateCustomer(false)}>
@@ -1087,86 +1090,104 @@ export function SuperAdminDashboard({ onLogout }: SuperAdminDashboardProps) {
                 />
               </div>
               <div className="space-y-3">
-                <Label>Subscribed Modules</Label>
+                <Label>AI Coaching (select one)</Label>
                 <div className="space-y-3 border rounded-lg p-3">
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-0.5">
-                      <Label className="text-sm font-medium">AI based Coaching Feedback</Label>
+                  <label className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${showEditCustomer.enabledModules.aiCoachingTier === "base" ? "border-primary bg-primary/5" : "border-gray-200 hover:bg-gray-50"}`}>
+                    <input
+                      type="radio"
+                      name="editAiCoachingTier"
+                      value="base"
+                      checked={showEditCustomer.enabledModules.aiCoachingTier === "base"}
+                      onChange={() => setShowEditCustomer({ ...showEditCustomer, enabledModules: { ...showEditCustomer.enabledModules, aiCoachingTier: "base" } })}
+                      className="mt-1"
+                    />
+                    <div className="flex-1">
+                      <p className="font-medium">Base</p>
+                      <ul className="text-xs text-muted-foreground mt-1 space-y-0.5">
+                        <li>• Consolidated daily feedback per agent</li>
+                        <li>• Message-by-message coaching: Included</li>
+                        <li>• Knowledge Base accuracy checks: Included</li>
+                      </ul>
                     </div>
-                    <button
-                      type="button"
-                      role="switch"
-                      aria-checked={showEditCustomer.enabledModules.aiCoaching}
-                      onClick={() =>
-                        setShowEditCustomer({
-                          ...showEditCustomer,
-                          enabledModules: { ...showEditCustomer.enabledModules, aiCoaching: !showEditCustomer.enabledModules.aiCoaching },
-                        })
-                      }
-                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                        showEditCustomer.enabledModules.aiCoaching ? "bg-primary" : "bg-gray-200"
-                      }`}
-                    >
-                      <span
-                        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                          showEditCustomer.enabledModules.aiCoaching ? "translate-x-6" : "translate-x-1"
-                        }`}
-                      />
-                    </button>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-0.5">
-                      <Label className="text-sm font-medium">Knowledge Base Management</Label>
-                      <p className="text-xs text-muted-foreground">For detailed feedback with information accuracy check</p>
+                  </label>
+                  <label className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${showEditCustomer.enabledModules.aiCoachingTier === "standard" ? "border-primary bg-primary/5" : "border-gray-200 hover:bg-gray-50"}`}>
+                    <input
+                      type="radio"
+                      name="editAiCoachingTier"
+                      value="standard"
+                      checked={showEditCustomer.enabledModules.aiCoachingTier === "standard"}
+                      onChange={() => setShowEditCustomer({ ...showEditCustomer, enabledModules: { ...showEditCustomer.enabledModules, aiCoachingTier: "standard" } })}
+                      className="mt-1"
+                    />
+                    <div className="flex-1">
+                      <p className="font-medium">Standard</p>
+                      <ul className="text-xs text-muted-foreground mt-1 space-y-0.5">
+                        <li>• All Base features included</li>
+                        <li>• Advanced insights and recommendations</li>
+                      </ul>
                     </div>
-                    <button
-                      type="button"
-                      role="switch"
-                      aria-checked={showEditCustomer.enabledModules.knowledgeBase}
-                      onClick={() =>
-                        setShowEditCustomer({
-                          ...showEditCustomer,
-                          enabledModules: { ...showEditCustomer.enabledModules, knowledgeBase: !showEditCustomer.enabledModules.knowledgeBase },
-                        })
-                      }
-                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                        showEditCustomer.enabledModules.knowledgeBase ? "bg-primary" : "bg-gray-200"
-                      }`}
-                    >
-                      <span
-                        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                          showEditCustomer.enabledModules.knowledgeBase ? "translate-x-6" : "translate-x-1"
-                        }`}
-                      />
-                    </button>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-0.5">
-                      <Label className="text-sm font-medium">AI based Agent Training</Label>
+                  </label>
+                  <label className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${showEditCustomer.enabledModules.aiCoachingTier === "advanced" ? "border-primary bg-primary/5" : "border-gray-200 hover:bg-gray-50"}`}>
+                    <input
+                      type="radio"
+                      name="editAiCoachingTier"
+                      value="advanced"
+                      checked={showEditCustomer.enabledModules.aiCoachingTier === "advanced"}
+                      onChange={() => setShowEditCustomer({ ...showEditCustomer, enabledModules: { ...showEditCustomer.enabledModules, aiCoachingTier: "advanced" } })}
+                      className="mt-1"
+                    />
+                    <div className="flex-1">
+                      <p className="font-medium">Advanced</p>
+                      <ul className="text-xs text-muted-foreground mt-1 space-y-0.5">
+                        <li>• All Standard features included</li>
+                        <li>• Personalized coaching plans</li>
+                      </ul>
                     </div>
-                    <button
-                      type="button"
-                      role="switch"
-                      aria-checked={showEditCustomer.enabledModules.training}
-                      onClick={() =>
-                        setShowEditCustomer({
-                          ...showEditCustomer,
-                          enabledModules: { ...showEditCustomer.enabledModules, training: !showEditCustomer.enabledModules.training },
-                        })
-                      }
-                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                        showEditCustomer.enabledModules.training ? "bg-primary" : "bg-gray-200"
-                      }`}
-                    >
-                      <span
-                        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                          showEditCustomer.enabledModules.training ? "translate-x-6" : "translate-x-1"
-                        }`}
-                      />
-                    </button>
-                  </div>
+                  </label>
+                  <label className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${showEditCustomer.enabledModules.aiCoachingTier === "none" ? "border-primary bg-primary/5" : "border-gray-200 hover:bg-gray-50"}`}>
+                    <input
+                      type="radio"
+                      name="editAiCoachingTier"
+                      value="none"
+                      checked={showEditCustomer.enabledModules.aiCoachingTier === "none"}
+                      onChange={() => setShowEditCustomer({ ...showEditCustomer, enabledModules: { ...showEditCustomer.enabledModules, aiCoachingTier: "none" } })}
+                      className="mt-1"
+                    />
+                    <div className="flex-1">
+                      <p className="font-medium">None</p>
+                      <p className="text-xs text-muted-foreground mt-1">No AI Coaching features</p>
+                    </div>
+                  </label>
                 </div>
               </div>
+              <div className="space-y-3">
+                <Label>Additional Modules</Label>
+                <div className="border rounded-lg p-3">
+                  <label className="flex items-center gap-3 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={showEditCustomer.enabledModules.training}
+                      onChange={() => setShowEditCustomer({ ...showEditCustomer, enabledModules: { ...showEditCustomer.enabledModules, training: !showEditCustomer.enabledModules.training } })}
+                      className="h-4 w-4 rounded border-gray-300"
+                    />
+                    <div>
+                      <p className="font-medium text-sm">AI based Agent Training</p>
+                      <p className="text-xs text-muted-foreground">Interactive training modules and assessments</p>
+                    </div>
+                  </label>
+                </div>
+              </div>
+              {(showEditCustomer.enabledModules.aiCoachingTier !== "none" || showEditCustomer.enabledModules.training) && (
+                <div className="bg-muted/50 rounded-lg p-3 space-y-1">
+                  <p className="text-sm font-medium">Selection Summary</p>
+                  <p className="text-sm text-muted-foreground">
+                    AI Coaching: <span className="font-medium text-foreground capitalize">{showEditCustomer.enabledModules.aiCoachingTier === "none" ? "Not selected" : showEditCustomer.enabledModules.aiCoachingTier}</span>
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    Training: <span className="font-medium text-foreground">{showEditCustomer.enabledModules.training ? "Enabled" : "Not selected"}</span>
+                  </p>
+                </div>
+              )}
             </div>
           )}
           <DialogFooter>
