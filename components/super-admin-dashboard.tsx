@@ -652,39 +652,6 @@ export function SuperAdminDashboard({ onLogout }: SuperAdminDashboardProps) {
                   </CardContent>
                 </Card>
 
-                <Card className="md:col-span-2">
-                  <CardHeader>
-                    <CardTitle>Onboarding Readiness Checklist</CardTitle>
-                    <CardDescription>Track customer setup progress</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid gap-4 md:grid-cols-5">
-                      {[
-                        { label: "Admin created", completed: showCustomerProfile.onboarding.adminCreated },
-                        { label: "Knowledge base uploaded", completed: showCustomerProfile.onboarding.knowledgeBaseUploaded },
-                        { label: "Training content added", completed: showCustomerProfile.onboarding.trainingContentAdded },
-                        { label: "Agents onboarded", completed: showCustomerProfile.onboarding.agentsOnboarded },
-                        { label: "First training completed", completed: showCustomerProfile.onboarding.firstTrainingCompleted },
-                      ].map((item, index) => (
-                        <div
-                          key={index}
-                          className={`p-4 rounded-lg border text-center ${
-                            item.completed ? "bg-green-50 border-green-200" : "bg-gray-50 border-gray-200"
-                          }`}
-                        >
-                          {item.completed ? (
-                            <CheckCircle className="h-8 w-8 text-green-500 mx-auto mb-2" />
-                          ) : (
-                            <XCircle className="h-8 w-8 text-gray-300 mx-auto mb-2" />
-                          )}
-                          <p className={`text-sm font-medium ${item.completed ? "text-green-700" : "text-gray-500"}`}>
-                            {item.label}
-                          </p>
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
               </div>
             </div>
           )}
