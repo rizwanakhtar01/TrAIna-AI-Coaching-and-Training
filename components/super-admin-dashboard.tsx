@@ -899,35 +899,29 @@ export function SuperAdminDashboard({ onLogout }: SuperAdminDashboardProps) {
                     </ul>
                   </div>
                 </label>
-                <label className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${newCustomer.enabledModules.aiCoachingTier === "none" ? "border-primary bg-primary/5" : "border-gray-200 hover:bg-gray-50"}`}>
-                  <input
-                    type="radio"
-                    name="aiCoachingTier"
-                    value="none"
-                    checked={newCustomer.enabledModules.aiCoachingTier === "none"}
-                    onChange={() => setNewCustomer({ ...newCustomer, enabledModules: { ...newCustomer.enabledModules, aiCoachingTier: "none" } })}
-                    className="mt-1"
-                  />
-                  <div className="flex-1">
-                    <p className="font-medium">None</p>
-                    <p className="text-xs text-muted-foreground mt-1">No AI Coaching features</p>
-                  </div>
-                </label>
               </div>
             </div>
             <div className="space-y-3">
-              <Label>Additional Modules</Label>
-              <div className="border rounded-lg p-3">
-                <label className="flex items-center gap-3 cursor-pointer">
+              <Label>AI Training</Label>
+              <div className={`border rounded-lg p-3 ${newCustomer.enabledModules.aiCoachingTier === "none" ? "opacity-50" : ""}`}>
+                <label className={`flex items-center gap-3 ${newCustomer.enabledModules.aiCoachingTier === "none" ? "cursor-not-allowed" : "cursor-pointer"}`}>
                   <input
                     type="checkbox"
                     checked={newCustomer.enabledModules.training}
-                    onChange={() => setNewCustomer({ ...newCustomer, enabledModules: { ...newCustomer.enabledModules, training: !newCustomer.enabledModules.training } })}
+                    onChange={() => {
+                      if (newCustomer.enabledModules.aiCoachingTier !== "none") {
+                        setNewCustomer({ ...newCustomer, enabledModules: { ...newCustomer.enabledModules, training: !newCustomer.enabledModules.training } });
+                      }
+                    }}
+                    disabled={newCustomer.enabledModules.aiCoachingTier === "none"}
                     className="h-4 w-4 rounded border-gray-300"
                   />
                   <div>
                     <p className="font-medium text-sm">AI based Agent Training</p>
                     <p className="text-xs text-muted-foreground">Interactive training modules and assessments</p>
+                    {newCustomer.enabledModules.aiCoachingTier === "none" && (
+                      <p className="text-xs text-amber-600 mt-1">Select an AI Coaching tier to enable this option</p>
+                    )}
                   </div>
                 </label>
               </div>
@@ -1144,35 +1138,29 @@ export function SuperAdminDashboard({ onLogout }: SuperAdminDashboardProps) {
                       </ul>
                     </div>
                   </label>
-                  <label className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${showEditCustomer.enabledModules.aiCoachingTier === "none" ? "border-primary bg-primary/5" : "border-gray-200 hover:bg-gray-50"}`}>
-                    <input
-                      type="radio"
-                      name="editAiCoachingTier"
-                      value="none"
-                      checked={showEditCustomer.enabledModules.aiCoachingTier === "none"}
-                      onChange={() => setShowEditCustomer({ ...showEditCustomer, enabledModules: { ...showEditCustomer.enabledModules, aiCoachingTier: "none" } })}
-                      className="mt-1"
-                    />
-                    <div className="flex-1">
-                      <p className="font-medium">None</p>
-                      <p className="text-xs text-muted-foreground mt-1">No AI Coaching features</p>
-                    </div>
-                  </label>
                 </div>
               </div>
               <div className="space-y-3">
-                <Label>Additional Modules</Label>
-                <div className="border rounded-lg p-3">
-                  <label className="flex items-center gap-3 cursor-pointer">
+                <Label>AI Training</Label>
+                <div className={`border rounded-lg p-3 ${showEditCustomer.enabledModules.aiCoachingTier === "none" ? "opacity-50" : ""}`}>
+                  <label className={`flex items-center gap-3 ${showEditCustomer.enabledModules.aiCoachingTier === "none" ? "cursor-not-allowed" : "cursor-pointer"}`}>
                     <input
                       type="checkbox"
                       checked={showEditCustomer.enabledModules.training}
-                      onChange={() => setShowEditCustomer({ ...showEditCustomer, enabledModules: { ...showEditCustomer.enabledModules, training: !showEditCustomer.enabledModules.training } })}
+                      onChange={() => {
+                        if (showEditCustomer.enabledModules.aiCoachingTier !== "none") {
+                          setShowEditCustomer({ ...showEditCustomer, enabledModules: { ...showEditCustomer.enabledModules, training: !showEditCustomer.enabledModules.training } });
+                        }
+                      }}
+                      disabled={showEditCustomer.enabledModules.aiCoachingTier === "none"}
                       className="h-4 w-4 rounded border-gray-300"
                     />
                     <div>
                       <p className="font-medium text-sm">AI based Agent Training</p>
                       <p className="text-xs text-muted-foreground">Interactive training modules and assessments</p>
+                      {showEditCustomer.enabledModules.aiCoachingTier === "none" && (
+                        <p className="text-xs text-amber-600 mt-1">Select an AI Coaching tier to enable this option</p>
+                      )}
                     </div>
                   </label>
                 </div>
