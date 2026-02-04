@@ -928,17 +928,6 @@ export function SuperAdminDashboard({ onLogout }: SuperAdminDashboardProps) {
                 </label>
               </div>
             </div>
-            {(newCustomer.enabledModules.aiCoachingTier !== "none" || newCustomer.enabledModules.training) && (
-              <div className="bg-muted/50 rounded-lg p-3 space-y-1">
-                <p className="text-sm font-medium">Selection Summary</p>
-                <p className="text-sm text-muted-foreground">
-                  AI Coaching: <span className="font-medium text-foreground capitalize">{newCustomer.enabledModules.aiCoachingTier === "none" ? "Not selected" : newCustomer.enabledModules.aiCoachingTier}</span>
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  Training: <span className="font-medium text-foreground">{newCustomer.enabledModules.training ? "Enabled" : "Not selected"}</span>
-                </p>
-              </div>
-            )}
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowCreateCustomer(false)}>
@@ -1169,17 +1158,6 @@ export function SuperAdminDashboard({ onLogout }: SuperAdminDashboardProps) {
                   </label>
                 </div>
               </div>
-              {(showEditCustomer.enabledModules.aiCoachingTier !== "none" || showEditCustomer.enabledModules.training) && (
-                <div className="bg-muted/50 rounded-lg p-3 space-y-1">
-                  <p className="text-sm font-medium">Selection Summary</p>
-                  <p className="text-sm text-muted-foreground">
-                    AI Coaching: <span className="font-medium text-foreground capitalize">{showEditCustomer.enabledModules.aiCoachingTier === "none" ? "Not selected" : showEditCustomer.enabledModules.aiCoachingTier}</span>
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    Training: <span className="font-medium text-foreground">{showEditCustomer.enabledModules.training ? "Enabled" : "Not selected"}</span>
-                  </p>
-                </div>
-              )}
             </div>
           )}
           <DialogFooter>
