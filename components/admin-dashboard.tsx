@@ -407,10 +407,11 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
     name: string;
     supervisorId: string;
     agentIds: string[];
+    documentIds: string[];
   }
   const [teams, setTeams] = useState<Team[]>([
-    { id: "team_001", name: "Billing Support Team", supervisorId: "usr_003", agentIds: ["usr_001", "usr_002"] },
-    { id: "team_002", name: "Technical Support Team", supervisorId: "usr_007", agentIds: ["usr_006", "usr_008"] },
+    { id: "team_001", name: "Billing Support Team", supervisorId: "usr_003", agentIds: ["usr_001", "usr_002"], documentIds: [] },
+    { id: "team_002", name: "Technical Support Team", supervisorId: "usr_007", agentIds: ["usr_006", "usr_008"], documentIds: [] },
   ]);
   const [teamListSearchQuery, setTeamListSearchQuery] = useState("");
   const [isCreateTeamOpen, setIsCreateTeamOpen] = useState(false);
@@ -419,6 +420,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
   const [newTeamSupervisorId, setNewTeamSupervisorId] = useState("");
   const [newTeamAgentIds, setNewTeamAgentIds] = useState<string[]>([]);
   const [createTeamAgentSearch, setCreateTeamAgentSearch] = useState("");
+  const [newTeamDocumentIds, setNewTeamDocumentIds] = useState<string[]>([]);
   const [teamToDelete, setTeamToDelete] = useState<Team | null>(null);
 
   // Sample routing analytics data (in a real app, this would come from API)
@@ -873,6 +875,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
     setNewTeamName("");
     setNewTeamSupervisorId("");
     setNewTeamAgentIds([]);
+    setNewTeamDocumentIds([]);
     setCreateTeamAgentSearch("");
     setIsCreateTeamOpen(true);
   };
@@ -882,6 +885,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
     setNewTeamName(team.name);
     setNewTeamSupervisorId(team.supervisorId);
     setNewTeamAgentIds([...team.agentIds]);
+    setNewTeamDocumentIds([...(team.documentIds || [])]);
     setCreateTeamAgentSearch("");
     setIsCreateTeamOpen(true);
   };
@@ -901,7 +905,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
       setTeams((prev) =>
         prev.map((t) =>
           t.id === editingTeam.id
-            ? { ...t, name: newTeamName.trim(), supervisorId: newTeamSupervisorId, agentIds: newTeamAgentIds }
+            ? { ...t, name: newTeamName.trim(), supervisorId: newTeamSupervisorId, agentIds: newTeamAgentIds, documentIds: newTeamDocumentIds }
             : t
         )
       );
@@ -911,6 +915,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
         name: newTeamName.trim(),
         supervisorId: newTeamSupervisorId,
         agentIds: newTeamAgentIds,
+        documentIds: newTeamDocumentIds,
       };
       setTeams((prev) => [...prev, newTeam]);
     }
@@ -920,6 +925,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
     setNewTeamName("");
     setNewTeamSupervisorId("");
     setNewTeamAgentIds([]);
+    setNewTeamDocumentIds([]);
   };
 
   const handleDeleteTeam = () => {
@@ -3572,6 +3578,54 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                         ))}
                       </SelectContent>
                     </Select>
+                  </div>
+
+                  {/* Business Documents Selection */}
+                  <div className="space-y-2">
+                    <Label>Business Documents</Label>
+                    <p className="text-xs text-muted-foreground">Select documents to assign to this team</p>
+                    {businessDocuments.filter(d => d.status === "ready").length > 0 ? (
+                      <div className="border rounded-lg max-h-[160px] overflow-y-auto">
+                        {businessDocuments.filter(d => d.status === "ready").map((doc) => (
+                          <div
+                            key={doc.id}
+                            className="flex items-center gap-3 p-3 hover:bg-muted border-b last:border-b-0 cursor-pointer transition-colors"
+                            onClick={() => {
+                              setNewTeamDocumentIds(prev =>
+                                prev.includes(doc.id)
+                                  ? prev.filter(id => id !== doc.id)
+                                  : [...prev, doc.id]
+                              );
+                            }}
+                          >
+                            <Checkbox
+                              checked={newTeamDocumentIds.includes(doc.id)}
+                              onCheckedChange={() => {
+                                setNewTeamDocumentIds(prev =>
+                                  prev.includes(doc.id)
+                                    ? prev.filter(id => id !== doc.id)
+                                    : [...prev, doc.id]
+                                );
+                              }}
+                            />
+                            <FileText className="h-4 w-4 text-muted-foreground" />
+                            <div className="flex-1">
+                              <p className="font-medium text-sm">{doc.name}</p>
+                              <p className="text-xs text-muted-foreground">{doc.size} &middot; {doc.uploadDate}</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="border rounded-lg p-4 text-center text-muted-foreground">
+                        <FileText className="h-6 w-6 mx-auto mb-1 opacity-50" />
+                        <p className="text-sm">No documents uploaded yet</p>
+                        <p className="text-xs">Upload documents in the LLM Agent section first</p>
+                      </div>
+                    )}
+                    {newTeamDocumentIds.length > 0 && (
+                      <p className="text-xs text-muted-foreground">{newTeamDocumentIds.length} document{newTeamDocumentIds.length !== 1 ? "s" : ""} selected</p>
+                    )}
                   </div>
 
                   {/* Add Agents Section */}
