@@ -3709,7 +3709,6 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                             <FolderOpen className="h-4 w-4 text-muted-foreground" />
                             <div className="flex-1">
                               <p className="font-medium text-sm">{kb.name}</p>
-                              <p className="text-xs text-muted-foreground">{kb.description}</p>
                             </div>
                           </div>
                         ))}
