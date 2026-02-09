@@ -1,0 +1,89 @@
+Enhance the existing **Business Documents** section under **Overall LLM Agent** to support **Topic-Based Knowledge Bases**.
+
+⚠️ Constraints:
+
+* UI-only implementation
+* No backend logic or persistence required
+* Do NOT break or remove the existing Business Documents capability
+* Use mock data where needed
+
+---
+
+## 🎯 **Objective**
+
+Allow Admins to organize business documents into **topic-specific knowledge bases** (e.g., Sales, Billing, Support) so these can later be assigned to specific teams or AI agents.
+
+---
+
+## 🧭 **UI Enhancements**
+
+### **1. Knowledge Base List View**
+
+Replace or extend the current Business Documents section with a **Knowledge Bases** view showing a list of KBs.
+
+Each Knowledge Base card/list item should display:
+
+* Knowledge Base Name (e.g., Sales, Refunds, Technical Support)
+* Short description
+* Number of documents uploaded
+* Actions: View / Edit / Delete
+
+Use mock KBs like:
+
+* Sales
+* Billing & Refunds
+* Account Management
+
+---
+
+### **2. Create Knowledge Base**
+
+Add a **“Create Knowledge Base”** button.
+
+On click, show a modal or page with:
+
+* Knowledge Base Name (required)
+* Description (optional)
+* Intended Use (helper text, e.g., “Used for sales-related queries”)
+
+On save:
+
+* Add the KB to the list view (mock only)
+
+---
+
+### **3. Knowledge Base Detail View**
+
+When clicking **View** on a KB:
+
+* Show KB name and description
+* Show an **Upload Documents** section scoped to this KB
+* Support uploading PDF, DOCX, and TXT files
+* Display a list of uploaded documents with:
+
+  * File name
+  * Upload date
+  * Delete action (UI only)
+
+This replaces the idea of one global document bucket with **KB-scoped uploads**.
+
+---
+
+### **4. UX & Copy Guidance**
+
+* Clearly communicate that:
+
+  > “Knowledge Bases help organize documents by topic and can be assigned to teams or AI agents.”
+* Maintain the same visual style as the existing Business Documents section.
+
+---
+
+## 📦 **Out of Scope (Do NOT Implement)**
+
+* Team assignment logic
+* AI agent binding
+* Document processing or embeddings
+* Backend storage
+
+This is strictly a UI + structural enhancement.
+

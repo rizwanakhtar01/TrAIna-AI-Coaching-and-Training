@@ -79,6 +79,8 @@ import {
   Search,
   UsersRound,
   User,
+  FolderOpen,
+  Eye,
 } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -181,6 +183,15 @@ interface BusinessDocument {
   vectorEmbedded: boolean;
 }
 
+interface KnowledgeBase {
+  id: string;
+  name: string;
+  description: string;
+  intendedUse: string;
+  documents: BusinessDocument[];
+  createdDate: string;
+}
+
 interface OrchestratorConfig {
   agentName: string;
   instructionSet: string;
@@ -268,11 +279,27 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
       knowledgeSources: [],
       isActive: false,
       lastUpdated: new Date().toISOString(),
-      documentsCount: 0,
+      documentsCount: 3,
     });
   const [isUploadingDoc, setIsUploadingDoc] = useState(false);
   const [documentToDelete, setDocumentToDelete] =
     useState<BusinessDocument | null>(null);
+
+  // Knowledge Base State
+  const [knowledgeBases, setKnowledgeBases] = useState<KnowledgeBase[]>([
+    { id: "kb_001", name: "Sales", description: "Sales-related documentation and guides", intendedUse: "Used for sales-related queries", documents: [], createdDate: "2025-01-15" },
+    { id: "kb_002", name: "Billing & Refunds", description: "Billing procedures and refund policies", intendedUse: "Used for billing and refund queries", documents: [{ id: "doc_b1", name: "Refund_Policy_2025.pdf", type: "pdf", size: "1.2 MB", uploadDate: "2025-01-20", status: "ready", vectorEmbedded: true }, { id: "doc_b2", name: "Billing_Procedures.docx", type: "docx", size: "890 KB", uploadDate: "2025-01-18", status: "ready", vectorEmbedded: true }], createdDate: "2025-01-10" },
+    { id: "kb_003", name: "Account Management", description: "Account setup, changes, and management procedures", intendedUse: "Used for account-related support queries", documents: [{ id: "doc_a1", name: "Account_Setup_Guide.pdf", type: "pdf", size: "2.1 MB", uploadDate: "2025-01-22", status: "ready", vectorEmbedded: true }], createdDate: "2025-01-12" },
+  ]);
+  const [isCreateKBOpen, setIsCreateKBOpen] = useState(false);
+  const [editingKB, setEditingKB] = useState<KnowledgeBase | null>(null);
+  const [newKBName, setNewKBName] = useState("");
+  const [newKBDescription, setNewKBDescription] = useState("");
+  const [newKBIntendedUse, setNewKBIntendedUse] = useState("");
+  const [viewingKB, setViewingKB] = useState<KnowledgeBase | null>(null);
+  const [kbToDelete, setKbToDelete] = useState<KnowledgeBase | null>(null);
+  const [isUploadingKBDoc, setIsUploadingKBDoc] = useState(false);
+  const [kbDocToDelete, setKbDocToDelete] = useState<{ kbId: string; doc: BusinessDocument } | null>(null);
 
   // User Management State
   const [isCreateUserOpen, setIsCreateUserOpen] = useState(false);
@@ -407,11 +434,11 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
     name: string;
     supervisorId: string;
     agentIds: string[];
-    documentIds: string[];
+    knowledgeBaseIds: string[];
   }
   const [teams, setTeams] = useState<Team[]>([
-    { id: "team_001", name: "Billing Support Team", supervisorId: "usr_003", agentIds: ["usr_001", "usr_002"], documentIds: [] },
-    { id: "team_002", name: "Technical Support Team", supervisorId: "usr_007", agentIds: ["usr_006", "usr_008"], documentIds: [] },
+    { id: "team_001", name: "Billing Support Team", supervisorId: "usr_003", agentIds: ["usr_001", "usr_002"], knowledgeBaseIds: [] },
+    { id: "team_002", name: "Technical Support Team", supervisorId: "usr_007", agentIds: ["usr_006", "usr_008"], knowledgeBaseIds: [] },
   ]);
   const [teamListSearchQuery, setTeamListSearchQuery] = useState("");
   const [isCreateTeamOpen, setIsCreateTeamOpen] = useState(false);
@@ -420,7 +447,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
   const [newTeamSupervisorId, setNewTeamSupervisorId] = useState("");
   const [newTeamAgentIds, setNewTeamAgentIds] = useState<string[]>([]);
   const [createTeamAgentSearch, setCreateTeamAgentSearch] = useState("");
-  const [newTeamDocumentIds, setNewTeamDocumentIds] = useState<string[]>([]);
+  const [newTeamKBIds, setNewTeamKBIds] = useState<string[]>([]);
   const [teamToDelete, setTeamToDelete] = useState<Team | null>(null);
 
   // Sample routing analytics data (in a real app, this would come from API)
@@ -540,6 +567,116 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
       knowledgeSources: prev.knowledgeSources.filter((id) => id !== docId),
       lastUpdated: new Date().toISOString(),
     }));
+  };
+
+  // Knowledge Base Handlers
+  const handleOpenCreateKB = () => {
+    setEditingKB(null);
+    setNewKBName("");
+    setNewKBDescription("");
+    setNewKBIntendedUse("");
+    setIsCreateKBOpen(true);
+  };
+
+  const handleOpenEditKB = (kb: KnowledgeBase) => {
+    setEditingKB(kb);
+    setNewKBName(kb.name);
+    setNewKBDescription(kb.description);
+    setNewKBIntendedUse(kb.intendedUse);
+    setIsCreateKBOpen(true);
+  };
+
+  const handleCreateKB = () => {
+    if (!newKBName.trim()) return;
+    const newKB: KnowledgeBase = {
+      id: `kb_${Date.now()}`,
+      name: newKBName.trim(),
+      description: newKBDescription.trim(),
+      intendedUse: newKBIntendedUse.trim(),
+      documents: [],
+      createdDate: new Date().toISOString().split("T")[0],
+    };
+    setKnowledgeBases((prev) => [...prev, newKB]);
+    setIsCreateKBOpen(false);
+  };
+
+  const handleEditKB = () => {
+    if (!editingKB || !newKBName.trim()) return;
+    setKnowledgeBases((prev) =>
+      prev.map((kb) =>
+        kb.id === editingKB.id
+          ? { ...kb, name: newKBName.trim(), description: newKBDescription.trim(), intendedUse: newKBIntendedUse.trim() }
+          : kb
+      )
+    );
+    if (viewingKB && viewingKB.id === editingKB.id) {
+      setViewingKB((prev) => prev ? { ...prev, name: newKBName.trim(), description: newKBDescription.trim(), intendedUse: newKBIntendedUse.trim() } : null);
+    }
+    setIsCreateKBOpen(false);
+    setEditingKB(null);
+  };
+
+  const handleDeleteKB = () => {
+    if (!kbToDelete) return;
+    setKnowledgeBases((prev) => prev.filter((kb) => kb.id !== kbToDelete.id));
+    if (viewingKB && viewingKB.id === kbToDelete.id) {
+      setViewingKB(null);
+    }
+    setKbToDelete(null);
+  };
+
+  const handleKBDocumentUpload = (kbId: string, files: File[]) => {
+    setIsUploadingKBDoc(true);
+    setTimeout(() => {
+      const newDocs: BusinessDocument[] = files.map((file) => ({
+        id: Math.random().toString(36).substr(2, 9),
+        name: file.name,
+        type: file.name.endsWith(".pdf") ? "pdf" : file.name.endsWith(".docx") ? "docx" : "txt",
+        size: (file.size / 1024).toFixed(1) + " KB",
+        uploadDate: new Date().toLocaleDateString(),
+        status: "processing" as const,
+        vectorEmbedded: false,
+      }));
+
+      setKnowledgeBases((prev) =>
+        prev.map((kb) => kb.id === kbId ? { ...kb, documents: [...kb.documents, ...newDocs] } : kb)
+      );
+      if (viewingKB && viewingKB.id === kbId) {
+        setViewingKB((prev) => prev ? { ...prev, documents: [...prev.documents, ...newDocs] } : null);
+      }
+
+      setTimeout(() => {
+        const updateDocs = (docs: BusinessDocument[]) =>
+          docs.map((doc) =>
+            newDocs.find((nd) => nd.id === doc.id)
+              ? { ...doc, status: "ready" as const, vectorEmbedded: true }
+              : doc
+          );
+        setKnowledgeBases((prev) => {
+          const updated = prev.map((kb) => kb.id === kbId ? { ...kb, documents: updateDocs(kb.documents) } : kb);
+          const totalDocs = updated.reduce((sum, kb) => sum + kb.documents.length, 0);
+          setOrchestratorConfig((oc) => ({ ...oc, documentsCount: totalDocs, lastUpdated: new Date().toISOString() }));
+          return updated;
+        });
+        if (viewingKB && viewingKB.id === kbId) {
+          setViewingKB((prev) => prev ? { ...prev, documents: updateDocs(prev.documents) } : null);
+        }
+      }, 2000);
+
+      setIsUploadingKBDoc(false);
+    }, 1000);
+  };
+
+  const handleDeleteKBDocument = (kbId: string, docId: string) => {
+    setKnowledgeBases((prev) => {
+      const updated = prev.map((kb) => kb.id === kbId ? { ...kb, documents: kb.documents.filter((d) => d.id !== docId) } : kb);
+      const totalDocs = updated.reduce((sum, kb) => sum + kb.documents.length, 0);
+      setOrchestratorConfig((oc) => ({ ...oc, documentsCount: totalDocs, lastUpdated: new Date().toISOString() }));
+      return updated;
+    });
+    if (viewingKB && viewingKB.id === kbId) {
+      setViewingKB((prev) => prev ? { ...prev, documents: prev.documents.filter((d) => d.id !== docId) } : null);
+    }
   };
 
   const saveOrchestratorConfig = () => {
@@ -875,7 +1012,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
     setNewTeamName("");
     setNewTeamSupervisorId("");
     setNewTeamAgentIds([]);
-    setNewTeamDocumentIds([]);
+    setNewTeamKBIds([]);
     setCreateTeamAgentSearch("");
     setIsCreateTeamOpen(true);
   };
@@ -885,7 +1022,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
     setNewTeamName(team.name);
     setNewTeamSupervisorId(team.supervisorId);
     setNewTeamAgentIds([...team.agentIds]);
-    setNewTeamDocumentIds([...(team.documentIds || [])]);
+    setNewTeamKBIds([...(team.knowledgeBaseIds || [])]);
     setCreateTeamAgentSearch("");
     setIsCreateTeamOpen(true);
   };
@@ -905,7 +1042,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
       setTeams((prev) =>
         prev.map((t) =>
           t.id === editingTeam.id
-            ? { ...t, name: newTeamName.trim(), supervisorId: newTeamSupervisorId, agentIds: newTeamAgentIds, documentIds: newTeamDocumentIds }
+            ? { ...t, name: newTeamName.trim(), supervisorId: newTeamSupervisorId, agentIds: newTeamAgentIds, knowledgeBaseIds: newTeamKBIds }
             : t
         )
       );
@@ -915,7 +1052,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
         name: newTeamName.trim(),
         supervisorId: newTeamSupervisorId,
         agentIds: newTeamAgentIds,
-        documentIds: newTeamDocumentIds,
+        knowledgeBaseIds: newTeamKBIds,
       };
       setTeams((prev) => [...prev, newTeam]);
     }
@@ -925,7 +1062,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
     setNewTeamName("");
     setNewTeamSupervisorId("");
     setNewTeamAgentIds([]);
-    setNewTeamDocumentIds([]);
+    setNewTeamKBIds([]);
   };
 
   const handleDeleteTeam = () => {
@@ -2428,139 +2565,264 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
               </CardContent>
             </Card>
 
-            {/* Document Management Section */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <FileText className="h-5 w-5" />
-                  Business Documents
-                </CardTitle>
-                <CardDescription>
-                  Upload and manage business-wide documents for the
-                  orchestrator's knowledge base
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6">
-                  <div className="text-center space-y-2">
-                    <Upload className="h-8 w-8 mx-auto text-muted-foreground" />
+            {/* Knowledge Bases Section */}
+            {!viewingKB ? (
+              <Card>
+                <CardHeader>
+                  <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm font-medium">
-                        Upload Business Documents
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        Supports PDF, DOCX, and TXT files
-                      </p>
+                      <CardTitle className="flex items-center gap-2">
+                        <FolderOpen className="h-5 w-5" />
+                        Knowledge Bases
+                      </CardTitle>
+                      <CardDescription>
+                        Knowledge Bases help organize documents by topic and can be assigned to teams or AI agents.
+                      </CardDescription>
                     </div>
-                    <Input
-                      type="file"
-                      multiple
-                      accept=".pdf,.docx,.txt"
-                      onChange={(e) => {
-                        const files = Array.from(e.target.files || []);
-                        if (files.length > 0) {
-                          handleBusinessDocumentUpload(files);
-                        }
-                      }}
-                      className="hidden"
-                      id="document-upload"
-                    />
-                    <Button
-                      variant="outline"
-                      onClick={() =>
-                        document.getElementById("document-upload")?.click()
-                      }
-                      disabled={isUploadingDoc}
-                    >
-                      {isUploadingDoc ? (
-                        <>
-                          <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-                          Processing...
-                        </>
-                      ) : (
-                        <>
-                          <Upload className="h-4 w-4 mr-2" />
-                          Choose Files
-                        </>
-                      )}
+                    <Button onClick={handleOpenCreateKB}>
+                      <Plus className="h-4 w-4 mr-2" />
+                      Create Knowledge Base
                     </Button>
                   </div>
-                </div>
-
-                {businessDocuments.length > 0 && (
-                  <div className="space-y-3">
-                    <h4 className="font-medium">
-                      Uploaded Documents ({businessDocuments.length})
-                    </h4>
-                    <div className="grid gap-3">
-                      {businessDocuments.map((doc) => (
-                        <div
-                          key={doc.id}
-                          className="flex items-center justify-between p-3 border rounded-lg"
-                        >
-                          <div className="flex items-center gap-3">
-                            <FileText className="h-5 w-5 text-muted-foreground" />
-                            <div>
-                              <p className="font-medium">{doc.name}</p>
-                              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                <span>{doc.size}</span>
-                                <span>•</span>
-                                <span>Uploaded {doc.uploadDate}</span>
-                                <span>•</span>
-                                <Badge
-                                  variant={
-                                    doc.status === "ready"
-                                      ? "default"
-                                      : doc.status === "processing"
-                                        ? "secondary"
-                                        : "destructive"
-                                  }
-                                  className="text-xs"
-                                >
-                                  {doc.status === "ready"
-                                    ? "Ready"
-                                    : doc.status === "processing"
-                                      ? "Processing"
-                                      : "Error"}
-                                </Badge>
-                              </div>
-                            </div>
+                </CardHeader>
+                <CardContent>
+                  {knowledgeBases.length > 0 ? (
+                    <div className="grid gap-4 md:grid-cols-3">
+                      {knowledgeBases.map((kb) => (
+                        <div key={kb.id} className="border rounded-lg p-4 space-y-3 hover:border-foreground/20 transition-colors">
+                          <div>
+                            <p className="font-bold">{kb.name}</p>
+                            <p className="text-sm text-muted-foreground">{kb.description}</p>
                           </div>
                           <div className="flex items-center gap-2">
-                            {doc.vectorEmbedded && (
-                              <Badge variant="outline" className="text-xs">
-                                <Database className="h-3 w-3 mr-1" />
-                                Embedded
-                              </Badge>
-                            )}
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => setDocumentToDelete(doc)}
-                            >
+                            <Badge variant="secondary" className="text-xs">
+                              {kb.documents.length} document{kb.documents.length !== 1 ? "s" : ""}
+                            </Badge>
+                          </div>
+                          <p className="text-xs text-muted-foreground">Created {kb.createdDate}</p>
+                          <div className="flex items-center gap-1">
+                            <Button variant="ghost" size="sm" onClick={() => setViewingKB(kb)}>
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                            <Button variant="ghost" size="sm" onClick={() => handleOpenEditKB(kb)}>
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button variant="ghost" size="sm" onClick={() => setKbToDelete(kb)}>
                               <Trash2 className="h-4 w-4" />
                             </Button>
                           </div>
                         </div>
                       ))}
                     </div>
+                  ) : (
+                    <div className="text-center py-8 text-muted-foreground">
+                      <FolderOpen className="h-10 w-10 mx-auto mb-2 opacity-50" />
+                      <p className="text-sm font-medium">No Knowledge Bases yet</p>
+                      <p className="text-xs">Create a knowledge base to organize your documents by topic.</p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            ) : (
+              <Card>
+                <CardHeader>
+                  <div>
+                    <Button variant="ghost" size="sm" className="mb-2" onClick={() => setViewingKB(null)}>
+                      <ChevronLeft className="h-4 w-4 mr-1" />
+                      Back to Knowledge Bases
+                    </Button>
+                    <CardTitle>{viewingKB.name}</CardTitle>
+                    <CardDescription>{viewingKB.description}</CardDescription>
+                    {viewingKB.intendedUse && (
+                      <p className="text-xs text-muted-foreground mt-1">{viewingKB.intendedUse}</p>
+                    )}
                   </div>
-                )}
-              </CardContent>
-            </Card>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6">
+                    <div className="text-center space-y-2">
+                      <Upload className="h-8 w-8 mx-auto text-muted-foreground" />
+                      <div>
+                        <p className="text-sm font-medium">Upload Documents</p>
+                        <p className="text-xs text-muted-foreground">Supports PDF, DOCX, and TXT files</p>
+                      </div>
+                      <Input
+                        type="file"
+                        multiple
+                        accept=".pdf,.docx,.txt"
+                        onChange={(e) => {
+                          const files = Array.from(e.target.files || []);
+                          if (files.length > 0) {
+                            handleKBDocumentUpload(viewingKB.id, files);
+                          }
+                        }}
+                        className="hidden"
+                        id={`kb-doc-upload-${viewingKB.id}`}
+                      />
+                      <Button
+                        variant="outline"
+                        onClick={() =>
+                          document.getElementById(`kb-doc-upload-${viewingKB.id}`)?.click()
+                        }
+                        disabled={isUploadingKBDoc}
+                      >
+                        {isUploadingKBDoc ? (
+                          <>
+                            <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                            Processing...
+                          </>
+                        ) : (
+                          <>
+                            <Upload className="h-4 w-4 mr-2" />
+                            Choose Files
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                  </div>
 
-            {/* Delete Document Confirmation Dialog */}
-            <AlertDialog
-              open={documentToDelete !== null}
-              onOpenChange={(open) => !open && setDocumentToDelete(null)}
-            >
+                  {viewingKB.documents.length > 0 ? (
+                    <div className="space-y-3">
+                      <h4 className="font-medium">Documents ({viewingKB.documents.length})</h4>
+                      <div className="grid gap-3">
+                        {viewingKB.documents.map((doc) => (
+                          <div
+                            key={doc.id}
+                            className="flex items-center justify-between p-3 border rounded-lg"
+                          >
+                            <div className="flex items-center gap-3">
+                              <FileText className="h-5 w-5 text-muted-foreground" />
+                              <div>
+                                <p className="font-medium">{doc.name}</p>
+                                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                  <span>{doc.size}</span>
+                                  <span>•</span>
+                                  <span>Uploaded {doc.uploadDate}</span>
+                                  <span>•</span>
+                                  <Badge
+                                    variant={
+                                      doc.status === "ready"
+                                        ? "default"
+                                        : doc.status === "processing"
+                                          ? "secondary"
+                                          : "destructive"
+                                    }
+                                    className="text-xs"
+                                  >
+                                    {doc.status === "ready"
+                                      ? "Ready"
+                                      : doc.status === "processing"
+                                        ? "Processing"
+                                        : "Error"}
+                                  </Badge>
+                                </div>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              {doc.vectorEmbedded && (
+                                <Badge variant="outline" className="text-xs">
+                                  <Database className="h-3 w-3 mr-1" />
+                                  Embedded
+                                </Badge>
+                              )}
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setKbDocToDelete({ kbId: viewingKB.id, doc })}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-center py-6 text-muted-foreground">
+                      <FileText className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                      <p className="text-sm">No documents in this knowledge base yet</p>
+                      <p className="text-xs">Upload documents above to get started.</p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Create/Edit Knowledge Base Dialog */}
+            <Dialog open={isCreateKBOpen} onOpenChange={setIsCreateKBOpen}>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>{editingKB ? "Edit Knowledge Base" : "Create Knowledge Base"}</DialogTitle>
+                  <DialogDescription>
+                    {editingKB ? "Update the knowledge base details." : "Create a new knowledge base to organize documents by topic."}
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4 py-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="kb-name">Name</Label>
+                    <Input
+                      id="kb-name"
+                      placeholder="e.g., Sales, Billing & Refunds"
+                      value={newKBName}
+                      onChange={(e) => setNewKBName(e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="kb-description">Description</Label>
+                    <Textarea
+                      id="kb-description"
+                      placeholder="Describe the purpose of this knowledge base"
+                      value={newKBDescription}
+                      onChange={(e) => setNewKBDescription(e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="kb-intended-use">Intended Use</Label>
+                    <Input
+                      id="kb-intended-use"
+                      placeholder="e.g., Used for sales-related queries"
+                      value={newKBIntendedUse}
+                      onChange={(e) => setNewKBIntendedUse(e.target.value)}
+                    />
+                  </div>
+                </div>
+                <DialogFooter>
+                  <Button variant="outline" onClick={() => setIsCreateKBOpen(false)}>Cancel</Button>
+                  <Button
+                    onClick={editingKB ? handleEditKB : handleCreateKB}
+                    disabled={!newKBName.trim()}
+                  >
+                    {editingKB ? "Save Changes" : "Create"}
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+
+            {/* Delete Knowledge Base Confirmation Dialog */}
+            <AlertDialog open={kbToDelete !== null} onOpenChange={(open) => !open && setKbToDelete(null)}>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Delete Knowledge Base</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Are you sure you want to delete &quot;{kbToDelete?.name}&quot;? This will remove the knowledge base and all its documents. This action cannot be undone.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction className="bg-red-600 hover:bg-red-700" onClick={handleDeleteKB}>
+                    Delete
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+
+            {/* Delete KB Document Confirmation Dialog */}
+            <AlertDialog open={kbDocToDelete !== null} onOpenChange={(open) => !open && setKbDocToDelete(null)}>
               <AlertDialogContent>
                 <AlertDialogHeader>
                   <AlertDialogTitle>Delete Document</AlertDialogTitle>
                   <AlertDialogDescription>
-                    Are you sure you want to delete this file? This action
-                    cannot be undone and will remove the document from the
-                    knowledge base.
+                    Are you sure you want to delete &quot;{kbDocToDelete?.doc.name}&quot;? This action cannot be undone and will remove the document from the knowledge base.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
@@ -2568,9 +2830,9 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                   <AlertDialogAction
                     className="bg-red-600 hover:bg-red-700"
                     onClick={() => {
-                      if (documentToDelete) {
-                        removeBusinessDocument(documentToDelete.id);
-                        setDocumentToDelete(null);
+                      if (kbDocToDelete) {
+                        handleDeleteKBDocument(kbDocToDelete.kbId, kbDocToDelete.doc.id);
+                        setKbDocToDelete(null);
                       }
                     }}
                   >
@@ -3580,51 +3842,51 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                     </Select>
                   </div>
 
-                  {/* Business Documents Selection */}
+                  {/* Knowledge Bases Selection */}
                   <div className="space-y-2">
-                    <Label>Business Documents</Label>
-                    <p className="text-xs text-muted-foreground">Select documents to assign to this team</p>
-                    {businessDocuments.filter(d => d.status === "ready").length > 0 ? (
+                    <Label>Knowledge Bases</Label>
+                    <p className="text-xs text-muted-foreground">Select knowledge bases to assign to this team</p>
+                    {knowledgeBases.length > 0 ? (
                       <div className="border rounded-lg max-h-[160px] overflow-y-auto">
-                        {businessDocuments.filter(d => d.status === "ready").map((doc) => (
+                        {knowledgeBases.map((kb) => (
                           <div
-                            key={doc.id}
+                            key={kb.id}
                             className="flex items-center gap-3 p-3 hover:bg-muted border-b last:border-b-0 cursor-pointer transition-colors"
                             onClick={() => {
-                              setNewTeamDocumentIds(prev =>
-                                prev.includes(doc.id)
-                                  ? prev.filter(id => id !== doc.id)
-                                  : [...prev, doc.id]
+                              setNewTeamKBIds(prev =>
+                                prev.includes(kb.id)
+                                  ? prev.filter(id => id !== kb.id)
+                                  : [...prev, kb.id]
                               );
                             }}
                           >
                             <Checkbox
-                              checked={newTeamDocumentIds.includes(doc.id)}
+                              checked={newTeamKBIds.includes(kb.id)}
                               onCheckedChange={() => {
-                                setNewTeamDocumentIds(prev =>
-                                  prev.includes(doc.id)
-                                    ? prev.filter(id => id !== doc.id)
-                                    : [...prev, doc.id]
+                                setNewTeamKBIds(prev =>
+                                  prev.includes(kb.id)
+                                    ? prev.filter(id => id !== kb.id)
+                                    : [...prev, kb.id]
                                 );
                               }}
                             />
-                            <FileText className="h-4 w-4 text-muted-foreground" />
+                            <FolderOpen className="h-4 w-4 text-muted-foreground" />
                             <div className="flex-1">
-                              <p className="font-medium text-sm">{doc.name}</p>
-                              <p className="text-xs text-muted-foreground">{doc.size} &middot; {doc.uploadDate}</p>
+                              <p className="font-medium text-sm">{kb.name}</p>
+                              <p className="text-xs text-muted-foreground">{kb.documents.length} document{kb.documents.length !== 1 ? "s" : ""} &middot; {kb.createdDate}</p>
                             </div>
                           </div>
                         ))}
                       </div>
                     ) : (
                       <div className="border rounded-lg p-4 text-center text-muted-foreground">
-                        <FileText className="h-6 w-6 mx-auto mb-1 opacity-50" />
-                        <p className="text-sm">No documents uploaded yet</p>
-                        <p className="text-xs">Upload documents in the LLM Agent section first</p>
+                        <FolderOpen className="h-6 w-6 mx-auto mb-1 opacity-50" />
+                        <p className="text-sm">No knowledge bases created yet</p>
+                        <p className="text-xs">Create knowledge bases in the LLM Agent section first</p>
                       </div>
                     )}
-                    {newTeamDocumentIds.length > 0 && (
-                      <p className="text-xs text-muted-foreground">{newTeamDocumentIds.length} document{newTeamDocumentIds.length !== 1 ? "s" : ""} selected</p>
+                    {newTeamKBIds.length > 0 && (
+                      <p className="text-xs text-muted-foreground">{newTeamKBIds.length} knowledge base{newTeamKBIds.length !== 1 ? "s" : ""} selected</p>
                     )}
                   </div>
 
