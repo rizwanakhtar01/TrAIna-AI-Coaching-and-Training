@@ -2601,7 +2601,10 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                         {knowledgeBases.map((kb) => (
                           <TableRow key={kb.id} className="hover:bg-[#F5FAFF]">
                             <TableCell className="font-medium">
-                              <div className="flex items-center gap-2">
+                              <div
+                                className="flex items-center gap-2 cursor-pointer hover:text-primary transition-colors"
+                                onClick={() => setViewingKB(kb)}
+                              >
                                 <FolderOpen className="h-4 w-4 text-primary" />
                                 {kb.name}
                               </div>
@@ -2621,10 +2624,6 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                                   </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
-                                  <DropdownMenuItem onClick={() => setViewingKB(kb)}>
-                                    <Eye className="h-4 w-4 mr-2" />
-                                    View
-                                  </DropdownMenuItem>
                                   <DropdownMenuItem onClick={() => handleOpenEditKB(kb)}>
                                     <Edit className="h-4 w-4 mr-2" />
                                     Edit
