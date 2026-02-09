@@ -2804,15 +2804,6 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                       onChange={(e) => setNewKBDescription(e.target.value)}
                     />
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="kb-intended-use">Intended Use</Label>
-                    <Input
-                      id="kb-intended-use"
-                      placeholder="e.g., Used for sales-related queries"
-                      value={newKBIntendedUse}
-                      onChange={(e) => setNewKBIntendedUse(e.target.value)}
-                    />
-                  </div>
                 </div>
                 <DialogFooter>
                   <Button variant="outline" onClick={() => setIsCreateKBOpen(false)}>Cancel</Button>
