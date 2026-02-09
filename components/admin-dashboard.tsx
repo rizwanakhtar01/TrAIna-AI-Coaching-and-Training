@@ -3638,7 +3638,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
 
             {/* Create/Edit Team Modal */}
             <Dialog open={isCreateTeamOpen} onOpenChange={setIsCreateTeamOpen}>
-              <DialogContent className="sm:max-w-[500px] max-h-[85vh] overflow-y-auto">
+              <DialogContent className="sm:max-w-[650px] max-h-[85vh] overflow-y-auto">
                 <DialogHeader>
                   <DialogTitle className="flex items-center gap-2">
                     <UsersRound className="h-5 w-5 text-primary" />
