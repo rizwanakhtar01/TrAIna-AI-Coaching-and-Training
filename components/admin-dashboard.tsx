@@ -2587,33 +2587,62 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                 </CardHeader>
                 <CardContent>
                   {knowledgeBases.length > 0 ? (
-                    <div className="grid gap-4 md:grid-cols-3">
-                      {knowledgeBases.map((kb) => (
-                        <div key={kb.id} className="border rounded-lg p-4 space-y-3 hover:border-foreground/20 transition-colors">
-                          <div>
-                            <p className="font-bold">{kb.name}</p>
-                            <p className="text-sm text-muted-foreground">{kb.description}</p>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <Badge variant="secondary" className="text-xs">
-                              {kb.documents.length} document{kb.documents.length !== 1 ? "s" : ""}
-                            </Badge>
-                          </div>
-                          <p className="text-xs text-muted-foreground">Created {kb.createdDate}</p>
-                          <div className="flex items-center gap-1">
-                            <Button variant="ghost" size="sm" onClick={() => setViewingKB(kb)}>
-                              <Eye className="h-4 w-4" />
-                            </Button>
-                            <Button variant="ghost" size="sm" onClick={() => handleOpenEditKB(kb)}>
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                            <Button variant="ghost" size="sm" onClick={() => setKbToDelete(kb)}>
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Name</TableHead>
+                          <TableHead>Description</TableHead>
+                          <TableHead>Documents</TableHead>
+                          <TableHead>Created</TableHead>
+                          <TableHead className="text-right">Actions</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {knowledgeBases.map((kb) => (
+                          <TableRow key={kb.id} className="hover:bg-[#F5FAFF]">
+                            <TableCell className="font-medium">
+                              <div className="flex items-center gap-2">
+                                <FolderOpen className="h-4 w-4 text-primary" />
+                                {kb.name}
+                              </div>
+                            </TableCell>
+                            <TableCell className="text-muted-foreground">{kb.description}</TableCell>
+                            <TableCell>
+                              <Badge variant="secondary">
+                                {kb.documents.length} {kb.documents.length === 1 ? "Document" : "Documents"}
+                              </Badge>
+                            </TableCell>
+                            <TableCell className="text-muted-foreground">{kb.createdDate}</TableCell>
+                            <TableCell className="text-right">
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button variant="ghost" size="icon" className="h-8 w-8">
+                                    <MoreHorizontal className="h-4 w-4" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                  <DropdownMenuItem onClick={() => setViewingKB(kb)}>
+                                    <Eye className="h-4 w-4 mr-2" />
+                                    View
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem onClick={() => handleOpenEditKB(kb)}>
+                                    <Edit className="h-4 w-4 mr-2" />
+                                    Edit
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    className="text-red-600 focus:text-red-600"
+                                    onClick={() => setKbToDelete(kb)}
+                                  >
+                                    <Trash2 className="h-4 w-4 mr-2" />
+                                    Delete
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
                   ) : (
                     <div className="text-center py-8 text-muted-foreground">
                       <FolderOpen className="h-10 w-10 mx-auto mb-2 opacity-50" />
