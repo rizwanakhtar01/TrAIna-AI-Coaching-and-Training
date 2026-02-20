@@ -1115,6 +1115,90 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
       channels: ["chat", "email"],
       dateRange: "Last 7 days",
     },
+    {
+      id: "CP004",
+      name: "Account Cancellation",
+      category: "Retention",
+      errorRate: 27,
+      frequency: 62,
+      trend: "up",
+      affectedAgents: ["AGT001", "AGT003", "AGT006"],
+      intents: ["cancel_account", "downgrade_plan", "retention_offer"],
+      channels: ["phone", "chat"],
+      dateRange: "Last 7 days",
+    },
+    {
+      id: "CP005",
+      name: "Shipping & Delivery",
+      category: "Logistics",
+      errorRate: 19,
+      frequency: 112,
+      trend: "stable",
+      affectedAgents: ["AGT002", "AGT004"],
+      intents: ["track_order", "delivery_issue", "lost_package"],
+      channels: ["chat", "email", "phone"],
+      dateRange: "Last 7 days",
+    },
+    {
+      id: "CP006",
+      name: "Product Returns",
+      category: "Financial",
+      errorRate: 22,
+      frequency: 89,
+      trend: "down",
+      affectedAgents: ["AGT001", "AGT005", "AGT006"],
+      intents: ["return_request", "exchange_item", "return_policy"],
+      channels: ["phone", "chat"],
+      dateRange: "Last 7 days",
+    },
+    {
+      id: "CP007",
+      name: "Password & Security",
+      category: "Technical",
+      errorRate: 14,
+      frequency: 134,
+      trend: "down",
+      affectedAgents: ["AGT002", "AGT003"],
+      intents: ["password_reset", "account_locked", "two_factor_auth"],
+      channels: ["chat", "email"],
+      dateRange: "Last 7 days",
+    },
+    {
+      id: "CP008",
+      name: "Subscription Changes",
+      category: "Financial",
+      errorRate: 25,
+      frequency: 71,
+      trend: "up",
+      affectedAgents: ["AGT004", "AGT006"],
+      intents: ["upgrade_plan", "change_billing", "promo_code"],
+      channels: ["phone", "chat", "email"],
+      dateRange: "Last 7 days",
+    },
+    {
+      id: "CP009",
+      name: "Compliance & Verification",
+      category: "Regulatory",
+      errorRate: 34,
+      frequency: 43,
+      trend: "stable",
+      affectedAgents: ["AGT001", "AGT002", "AGT005"],
+      intents: ["identity_verification", "compliance_check", "document_request"],
+      channels: ["phone", "email"],
+      dateRange: "Last 7 days",
+    },
+    {
+      id: "CP010",
+      name: "Escalation Handling",
+      category: "Process",
+      errorRate: 29,
+      frequency: 55,
+      trend: "up",
+      affectedAgents: ["AGT003", "AGT004", "AGT006"],
+      intents: ["supervisor_request", "complaint_escalation", "priority_case"],
+      channels: ["phone", "chat"],
+      dateRange: "Last 7 days",
+    },
   ];
 
   const coachingSessions: CoachingSession[] = [
@@ -1922,6 +2006,139 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
               handleTime: "+3.5 minutes",
               escalationRate: "22% higher than baseline",
               revenueImpact: "$15,600 in support overhead",
+            },
+          };
+        case "Account Cancellation":
+          return {
+            ...baseData,
+            peakTimes: ["9:00-10:00 AM", "1:00-2:00 PM", "5:00-6:00 PM"],
+            volumeSpikes: ["Post-billing cycle", "After price increases", "Contract renewal periods"],
+            rootCauses: [
+              { type: "Insufficient retention offer options", frequency: "32%" },
+              { type: "Agent unable to address root dissatisfaction", frequency: "28%" },
+              { type: "Competitor pricing comparison gaps", frequency: "18%" },
+              { type: "Lack of empathy in cancellation flow", frequency: "14%" },
+              { type: "Delayed escalation to retention team", frequency: "8%" },
+            ],
+            impact: {
+              customerSatisfaction: "-1.5 points",
+              handleTime: "+4.2 minutes",
+              escalationRate: "28% higher than baseline",
+              revenueImpact: "$24,800 in lost recurring revenue",
+            },
+          };
+        case "Shipping & Delivery":
+          return {
+            ...baseData,
+            peakTimes: ["11:00 AM-12:00 PM", "3:00-4:00 PM", "8:00-9:00 PM"],
+            volumeSpikes: ["Holiday seasons", "Flash sale periods", "Severe weather events"],
+            rootCauses: [
+              { type: "Tracking system delays and inaccuracies", frequency: "35%" },
+              { type: "Carrier handoff communication gaps", frequency: "25%" },
+              { type: "Address verification failures", frequency: "18%" },
+              { type: "Agents unable to initiate reshipment", frequency: "15%" },
+              { type: "Missing delivery confirmation protocols", frequency: "7%" },
+            ],
+            impact: {
+              customerSatisfaction: "-0.7 points",
+              handleTime: "+1.9 minutes",
+              escalationRate: "12% higher than baseline",
+              revenueImpact: "$11,300 in replacement shipments",
+            },
+          };
+        case "Product Returns":
+          return {
+            ...baseData,
+            peakTimes: ["10:00-11:00 AM", "4:00-5:00 PM", "7:00-8:00 PM"],
+            volumeSpikes: ["Post-holiday period", "End of return windows", "Product recall events"],
+            rootCauses: [
+              { type: "Return eligibility confusion", frequency: "30%" },
+              { type: "Restocking fee miscommunication", frequency: "25%" },
+              { type: "Return label generation failures", frequency: "20%" },
+              { type: "Refund vs exchange process unclear", frequency: "15%" },
+              { type: "Damaged item documentation gaps", frequency: "10%" },
+            ],
+            impact: {
+              customerSatisfaction: "-0.9 points",
+              handleTime: "+2.6 minutes",
+              escalationRate: "14% higher than baseline",
+              revenueImpact: "$16,200 in processing overhead",
+            },
+          };
+        case "Password & Security":
+          return {
+            ...baseData,
+            peakTimes: ["8:00-9:00 AM", "12:00-1:00 PM", "6:00-7:00 PM"],
+            volumeSpikes: ["After security breach notifications", "Monday mornings", "Post-system updates"],
+            rootCauses: [
+              { type: "Multi-step verification confusion", frequency: "38%" },
+              { type: "Recovery email/phone outdated", frequency: "27%" },
+              { type: "Agent security protocol adherence gaps", frequency: "18%" },
+              { type: "Two-factor setup complexity", frequency: "12%" },
+              { type: "Browser/device trust issues", frequency: "5%" },
+            ],
+            impact: {
+              customerSatisfaction: "-0.4 points",
+              handleTime: "+1.5 minutes",
+              escalationRate: "6% higher than baseline",
+              revenueImpact: "$4,100 in security team escalations",
+            },
+          };
+        case "Subscription Changes":
+          return {
+            ...baseData,
+            peakTimes: ["9:00-10:00 AM", "2:00-3:00 PM", "6:00-7:00 PM"],
+            volumeSpikes: ["Promotional periods", "Price change announcements", "Quarter-end"],
+            rootCauses: [
+              { type: "Plan comparison confusion", frequency: "33%" },
+              { type: "Proration calculation errors", frequency: "26%" },
+              { type: "Promo code stacking conflicts", frequency: "19%" },
+              { type: "Mid-cycle change limitations unclear", frequency: "14%" },
+              { type: "Feature access timing after upgrade", frequency: "8%" },
+            ],
+            impact: {
+              customerSatisfaction: "-0.6 points",
+              handleTime: "+2.1 minutes",
+              escalationRate: "11% higher than baseline",
+              revenueImpact: "$9,800 in billing adjustments",
+            },
+          };
+        case "Compliance & Verification":
+          return {
+            ...baseData,
+            peakTimes: ["10:00-11:00 AM", "1:00-2:00 PM", "4:00-5:00 PM"],
+            volumeSpikes: ["Regulatory audit periods", "New compliance requirements", "Annual verification cycles"],
+            rootCauses: [
+              { type: "Document requirements unclear to agents", frequency: "36%" },
+              { type: "Verification system timeout issues", frequency: "24%" },
+              { type: "Cross-border compliance variations", frequency: "18%" },
+              { type: "Sensitive data handling errors", frequency: "14%" },
+              { type: "Expired documentation follow-up gaps", frequency: "8%" },
+            ],
+            impact: {
+              customerSatisfaction: "-1.4 points",
+              handleTime: "+4.8 minutes",
+              escalationRate: "30% higher than baseline",
+              revenueImpact: "$18,500 in compliance remediation",
+            },
+          };
+        case "Escalation Handling":
+          return {
+            ...baseData,
+            peakTimes: ["11:00 AM-12:00 PM", "3:00-4:00 PM", "5:00-6:00 PM"],
+            volumeSpikes: ["Service outage periods", "After policy changes", "High complaint volume days"],
+            rootCauses: [
+              { type: "Unclear escalation criteria", frequency: "34%" },
+              { type: "Supervisor availability bottlenecks", frequency: "26%" },
+              { type: "Incomplete case documentation on handoff", frequency: "20%" },
+              { type: "Customer re-explanation frustration", frequency: "13%" },
+              { type: "Priority level misjudgment", frequency: "7%" },
+            ],
+            impact: {
+              customerSatisfaction: "-1.3 points",
+              handleTime: "+3.8 minutes",
+              escalationRate: "25% higher than baseline",
+              revenueImpact: "$14,200 in supervisor overhead",
             },
           };
         default:
