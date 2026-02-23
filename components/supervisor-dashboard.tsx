@@ -174,6 +174,7 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
   const [showAlerts, setShowAlerts] = useState(false);
   const [selectedPattern, setSelectedPattern] = useState<string | null>(null);
   const [showPatternDetails, setShowPatternDetails] = useState(false);
+  const [agentPerfFilter, setAgentPerfFilter] = useState<"all" | "struggling" | "high">("all");
   const [patternTimeFilter, setPatternTimeFilter] = useState("yesterday");
   const [patternCustomDate, setPatternCustomDate] = useState<Date | undefined>(undefined);
   const [patternCalendarOpen, setPatternCalendarOpen] = useState(false);
@@ -2253,68 +2254,6 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
             </CardContent>
           </Card>
 
-          {/* Error Rate Trend */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <TrendingUp className="h-5 w-5 text-chart-1" />
-                Error Rate Trend (Last 30 days)
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="h-64">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={patternDetails.errorRateTrend}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="day" />
-                    <YAxis />
-                    <Tooltip />
-                    <Line
-                      type="monotone"
-                      dataKey="rate"
-                      stroke="#ef4444"
-                      strokeWidth={2}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <h4 className="font-medium mb-2">
-                    Peak Error Days and Times
-                  </h4>
-                  <ul className="space-y-1">
-                    {patternDetails.peakTimes.map((time, index) => (
-                      <li
-                        key={index}
-                        className="text-sm text-muted-foreground flex items-center gap-2"
-                      >
-                        <Clock className="h-3 w-3" />
-                        {time}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-                <div>
-                  <h4 className="font-medium mb-2">
-                    Correlation with Volume Spikes
-                  </h4>
-                  <ul className="space-y-1">
-                    {patternDetails.volumeSpikes.map((spike, index) => (
-                      <li
-                        key={index}
-                        className="text-sm text-muted-foreground flex items-center gap-2"
-                      >
-                        <Activity className="h-3 w-3" />
-                        {spike}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
           {/* Root Cause Analysis */}
           <Card>
             <CardHeader>
@@ -2340,169 +2279,78 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
                   ))}
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-4 pt-4 border-t">
-                <div>
-                  <h4 className="font-medium mb-2">System/Process Issues</h4>
-                  <div className="text-sm text-muted-foreground">
-                    <p>• Workflow complexity and system limitations</p>
-                    <p>• Integration delays and timeout issues</p>
-                    <p>• Authorization and access restrictions</p>
-                  </div>
-                </div>
-                <div>
-                  <h4 className="font-medium mb-2">Agent Skill Issues</h4>
-                  <div className="text-sm text-muted-foreground">
-                    <p>• Knowledge gaps in policy interpretation</p>
-                    <p>• Communication and explanation skills</p>
-                    <p>• Decision-making confidence levels</p>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Impact Assessment */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <AlertTriangle className="h-5 w-5 text-chart-3" />
-                Impact Assessment
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 gap-6">
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between p-3 bg-red-50 rounded-lg border border-red-200">
-                    <span className="text-sm font-medium">
-                      Customer Satisfaction Impact
-                    </span>
-                    <span className="text-red-600 font-bold">
-                      {patternDetails.impact.customerSatisfaction}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between p-3 bg-orange-50 rounded-lg border border-orange-200">
-                    <span className="text-sm font-medium">
-                      Average Handle Time Increase
-                    </span>
-                    <span className="text-orange-600 font-bold">
-                      {patternDetails.impact.handleTime}
-                    </span>
-                  </div>
-                </div>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between p-3 bg-yellow-50 rounded-lg border border-yellow-200">
-                    <span className="text-sm font-medium">Escalation Rate</span>
-                    <span className="text-yellow-600 font-bold">
-                      {patternDetails.impact.escalationRate}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between p-3 bg-purple-50 rounded-lg border border-purple-200">
-                    <span className="text-sm font-medium">Revenue Impact</span>
-                    <span className="text-purple-600 font-bold">
-                      {patternDetails.impact.revenueImpact}
-                    </span>
-                  </div>
-                </div>
-              </div>
             </CardContent>
           </Card>
 
           {/* Agent Performance Distribution */}
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Users className="h-5 w-5 text-chart-4" />
-                Agent Performance Distribution
-              </CardTitle>
+              <div className="flex items-center justify-between">
+                <CardTitle className="flex items-center gap-2">
+                  <Users className="h-5 w-5 text-chart-4" />
+                  Agent Performance Distribution
+                </CardTitle>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant={agentPerfFilter === "all" ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setAgentPerfFilter("all")}
+                  >
+                    All
+                  </Button>
+                  <Button
+                    variant={agentPerfFilter === "struggling" ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setAgentPerfFilter("struggling")}
+                    className={agentPerfFilter === "struggling" ? "bg-red-600 hover:bg-red-700" : ""}
+                  >
+                    Struggling
+                  </Button>
+                  <Button
+                    variant={agentPerfFilter === "high" ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setAgentPerfFilter("high")}
+                    className={agentPerfFilter === "high" ? "bg-green-600 hover:bg-green-700" : ""}
+                  >
+                    High Performers
+                  </Button>
+                </div>
+              </div>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-3 gap-6">
-                <div>
-                  <h4 className="font-medium mb-3 text-chart-4">
-                    High Performers
-                  </h4>
-                  <p className="text-sm text-muted-foreground mb-3">
-                    Agents handling this issue well
-                  </p>
-                  <div className="space-y-2">
-                    {affectedAgentsData
-                      .filter(
-                        (agent) =>
-                          agent.status === "excellent" ||
-                          agent.status === "good",
-                      )
-                      .map((agent) => (
-                        <div
-                          key={agent.id}
-                          className="flex items-center gap-2 p-2 bg-green-50 rounded border border-green-200"
-                        >
-                          <div className="h-6 w-6 rounded-full bg-green-100 flex items-center justify-center">
-                            <span className="text-xs font-medium text-green-800">
-                              {agent.avatar}
-                            </span>
-                          </div>
-                          <span className="text-sm">{agent.name}</span>
-                          <CheckCircle className="h-3 w-3 text-green-600 ml-auto" />
+              <div className="space-y-2">
+                {affectedAgentsData
+                  .filter((agent) => {
+                    if (agentPerfFilter === "struggling") return agent.status === "at-risk" || agent.status === "needs-attention";
+                    if (agentPerfFilter === "high") return agent.status === "excellent" || agent.status === "good";
+                    return true;
+                  })
+                  .map((agent) => {
+                    const isHighPerformer = agent.status === "excellent" || agent.status === "good";
+                    return (
+                      <div
+                        key={agent.id}
+                        className={`flex items-center gap-3 p-3 rounded-lg border ${isHighPerformer ? "bg-green-50 border-green-200" : "bg-red-50 border-red-200"}`}
+                      >
+                        <div className={`h-8 w-8 rounded-full flex items-center justify-center ${isHighPerformer ? "bg-green-100" : "bg-red-100"}`}>
+                          <span className={`text-xs font-medium ${isHighPerformer ? "text-green-800" : "text-red-800"}`}>
+                            {agent.avatar}
+                          </span>
                         </div>
-                      ))}
-                  </div>
-                </div>
-
-                <div>
-                  <h4 className="font-medium mb-3 text-destructive">
-                    Struggling Agents
-                  </h4>
-                  <p className="text-sm text-muted-foreground mb-3">
-                    Needing immediate support
-                  </p>
-                  <div className="space-y-2">
-                    {affectedAgentsData
-                      .filter(
-                        (agent) =>
-                          agent.status === "at-risk" ||
-                          agent.status === "needs-attention",
-                      )
-                      .map((agent) => (
-                        <div
-                          key={agent.id}
-                          className="flex items-center gap-2 p-2 bg-red-50 rounded border border-red-200"
-                        >
-                          <div className="h-6 w-6 rounded-full bg-red-100 flex items-center justify-center">
-                            <span className="text-xs font-medium text-red-800">
-                              {agent.avatar}
-                            </span>
-                          </div>
-                          <span className="text-sm">{agent.name}</span>
-                          <XCircle className="h-3 w-3 text-red-600 ml-auto" />
+                        <div className="flex-1">
+                          <span className="text-sm font-medium">{agent.name}</span>
                         </div>
-                      ))}
-                  </div>
-                </div>
-
-                <div>
-                  <h4 className="font-medium mb-3 text-chart-5">
-                    Training Status
-                  </h4>
-                  <p className="text-sm text-muted-foreground mb-3">
-                    Completion by agent
-                  </p>
-                  <div className="space-y-3">
-                    {affectedAgentsData.map((agent) => {
-                      const completionRate = Math.floor(
-                        (agent.sessionsCompleted / agent.sessionsTarget) * 100,
-                      );
-                      return (
-                        <div key={agent.id} className="space-y-1">
-                          <div className="flex justify-between text-sm">
-                            <span>{agent.name}</span>
-                            <span>{completionRate}%</span>
-                          </div>
-                          <Progress value={completionRate} className="h-2" />
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
+                        <Badge variant="outline" className={isHighPerformer ? "border-green-300 text-green-700" : "border-red-300 text-red-700"}>
+                          {isHighPerformer ? "High Performer" : "Struggling"}
+                        </Badge>
+                        {isHighPerformer ? (
+                          <CheckCircle className="h-4 w-4 text-green-600" />
+                        ) : (
+                          <XCircle className="h-4 w-4 text-red-600" />
+                        )}
+                      </div>
+                    );
+                  })}
               </div>
             </CardContent>
           </Card>
