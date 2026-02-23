@@ -130,6 +130,7 @@ interface ChallengingPattern {
   errorRate: number;
   frequency: number;
   trend: "up" | "down" | "stable";
+  changePercent: number;
   affectedAgents: string[];
   intents: string[];
   channels: string[];
@@ -1089,6 +1090,7 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
       errorRate: 23,
       frequency: 145,
       trend: "up",
+      changePercent: 12,
       affectedAgents: ["AGT001", "AGT002", "AGT004"],
       intents: ["process_refund", "refund_status", "cancel_order"],
       channels: ["phone", "chat", "email"],
@@ -1101,6 +1103,7 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
       errorRate: 18,
       frequency: 98,
       trend: "down",
+      changePercent: -8,
       affectedAgents: ["AGT005", "AGT006"],
       intents: ["billing_question", "payment_issue", "invoice_dispute"],
       channels: ["phone", "chat"],
@@ -1113,6 +1116,7 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
       errorRate: 31,
       frequency: 76,
       trend: "stable",
+      changePercent: 1,
       affectedAgents: ["AGT003", "AGT005"],
       intents: ["tech_support", "troubleshooting", "setup_help"],
       channels: ["chat", "email"],
@@ -1125,6 +1129,7 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
       errorRate: 27,
       frequency: 62,
       trend: "up",
+      changePercent: 15,
       affectedAgents: ["AGT001", "AGT003", "AGT006"],
       intents: ["cancel_account", "downgrade_plan", "retention_offer"],
       channels: ["phone", "chat"],
@@ -1137,6 +1142,7 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
       errorRate: 19,
       frequency: 112,
       trend: "stable",
+      changePercent: -2,
       affectedAgents: ["AGT002", "AGT004"],
       intents: ["track_order", "delivery_issue", "lost_package"],
       channels: ["chat", "email", "phone"],
@@ -1149,6 +1155,7 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
       errorRate: 22,
       frequency: 89,
       trend: "down",
+      changePercent: -11,
       affectedAgents: ["AGT001", "AGT005", "AGT006"],
       intents: ["return_request", "exchange_item", "return_policy"],
       channels: ["phone", "chat"],
@@ -1161,6 +1168,7 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
       errorRate: 14,
       frequency: 134,
       trend: "down",
+      changePercent: -6,
       affectedAgents: ["AGT002", "AGT003"],
       intents: ["password_reset", "account_locked", "two_factor_auth"],
       channels: ["chat", "email"],
@@ -1173,6 +1181,7 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
       errorRate: 25,
       frequency: 71,
       trend: "up",
+      changePercent: 9,
       affectedAgents: ["AGT004", "AGT006"],
       intents: ["upgrade_plan", "change_billing", "promo_code"],
       channels: ["phone", "chat", "email"],
@@ -1185,6 +1194,7 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
       errorRate: 34,
       frequency: 43,
       trend: "stable",
+      changePercent: 3,
       affectedAgents: ["AGT001", "AGT002", "AGT005"],
       intents: ["identity_verification", "compliance_check", "document_request"],
       channels: ["phone", "email"],
@@ -1197,6 +1207,7 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
       errorRate: 29,
       frequency: 55,
       trend: "up",
+      changePercent: 18,
       affectedAgents: ["AGT003", "AGT004", "AGT006"],
       intents: ["supervisor_request", "complaint_escalation", "priority_case"],
       channels: ["phone", "chat"],
@@ -3282,6 +3293,14 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
                           <h3 className="text-lg font-semibold text-foreground">
                             {pattern.name}
                           </h3>
+                          <span className={`inline-flex items-center text-xs font-medium ${pattern.changePercent > 0 ? "text-red-600" : pattern.changePercent < 0 ? "text-green-600" : "text-muted-foreground"}`}>
+                            {pattern.changePercent > 0 ? (
+                              <TrendingUp className="h-3 w-3 mr-1" />
+                            ) : pattern.changePercent < 0 ? (
+                              <TrendingDown className="h-3 w-3 mr-1" />
+                            ) : null}
+                            {pattern.changePercent > 0 ? "+" : ""}{pattern.changePercent}% vs prev day
+                          </span>
                         </div>
                         <div className="flex gap-6 text-sm">
                           <div>
