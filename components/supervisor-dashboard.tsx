@@ -165,7 +165,7 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [selectedAgent, setSelectedAgent] = useState<string | null>(null);
   const [timeFilter, setTimeFilter] = useState("daily");
-  const [agentFilter, setAgentFilter] = useState("at-risk");
+  const [agentFilter, setAgentFilter] = useState("all");
   const [intentFilter, setIntentFilter] = useState("all");
   const [channelFilter, setChannelFilter] = useState("all");
   const [editingNotes, setEditingNotes] = useState<string | null>(null);
@@ -1388,17 +1388,8 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
   const getFilteredPatterns = () => {
     return challengingPatterns.filter((pattern) => {
       const agentIds = pattern.affectedAgents;
-      if (agentFilter === "at-risk") {
-        const atRiskAgentIds = agents
-          .filter((a) => a.status === "at-risk")
-          .map((a) => a.id);
-        if (!agentIds.some((id) => atRiskAgentIds.includes(id))) return false;
-      }
-      if (agentFilter === "top") {
-        const topAgentIds = agents
-          .filter((a) => a.status === "excellent")
-          .map((a) => a.id);
-        if (!agentIds.some((id) => topAgentIds.includes(id))) return false;
+      if (agentFilter !== "all") {
+        if (!agentIds.includes(agentFilter)) return false;
       }
 
       if (intentFilter !== "all") {
@@ -1416,16 +1407,9 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
 
   const getFilteredAgents = () => {
     return agents.filter((agent) => {
-      if (agentFilter === "affected" && selectedPattern) {
-        const pattern = challengingPatterns.find(
-          (p) => p.id === selectedPattern,
-        );
-        return pattern ? pattern.affectedAgents.includes(agent.id) : true;
+      if (agentFilter !== "all") {
+        return agent.id === agentFilter;
       }
-
-      if (agentFilter === "at-risk") return agent.status === "at-risk";
-      if (agentFilter === "top") return agent.status === "excellent";
-
       return true;
     });
   };
@@ -3209,16 +3193,14 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
               </div>
               <div className="flex items-center gap-2">
                 <Select value={agentFilter} onValueChange={setAgentFilter}>
-                  <SelectTrigger className="w-32">
-                    <SelectValue />
+                  <SelectTrigger className="w-44">
+                    <SelectValue placeholder="All Agents" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Agents</SelectItem>
-                    <SelectItem value="at-risk">At Risk</SelectItem>
-                    <SelectItem value="top">Top Performers</SelectItem>
-                    <SelectItem value="affected">
-                      Affected by Pattern
-                    </SelectItem>
+                    {agents.map((agent) => (
+                      <SelectItem key={agent.id} value={agent.id}>{agent.name}</SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
                 <Select value={intentFilter} onValueChange={setIntentFilter}>
@@ -3272,23 +3254,6 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
                           <h3 className="text-lg font-semibold text-foreground">
                             {pattern.name}
                           </h3>
-                          <Badge
-                            variant={
-                              pattern.trend === "up"
-                                ? "destructive"
-                                : pattern.trend === "down"
-                                  ? "default"
-                                  : "secondary"
-                            }
-                          >
-                            {pattern.trend === "up" && (
-                              <TrendingUp className="h-3 w-3 mr-1" />
-                            )}
-                            {pattern.trend === "down" && (
-                              <TrendingDown className="h-3 w-3 mr-1" />
-                            )}
-                            {pattern.trend === "up" ? "Trending Up" : pattern.trend === "down" ? "Trending Down" : "Stable"}
-                          </Badge>
                         </div>
                         <div className="flex gap-6 text-sm">
                           <div>
@@ -3354,14 +3319,14 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
               </div>
               <div className="flex items-center gap-2">
                 <Select value={agentFilter} onValueChange={setAgentFilter}>
-                  <SelectTrigger className="w-40">
-                    <SelectValue placeholder="Filter agents" />
+                  <SelectTrigger className="w-44">
+                    <SelectValue placeholder="All Agents" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Agents</SelectItem>
-                    <SelectItem value="at-risk">At Risk Only</SelectItem>
-                    <SelectItem value="top">Top Performers</SelectItem>
-                    <SelectItem value="excellent">Excellent Status</SelectItem>
+                    {agents.map((agent) => (
+                      <SelectItem key={agent.id} value={agent.id}>{agent.name}</SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
