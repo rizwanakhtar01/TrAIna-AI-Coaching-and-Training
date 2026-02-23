@@ -173,6 +173,9 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
   const [showAlerts, setShowAlerts] = useState(false);
   const [selectedPattern, setSelectedPattern] = useState<string | null>(null);
   const [showPatternDetails, setShowPatternDetails] = useState(false);
+  const [patternTimeFilter, setPatternTimeFilter] = useState("yesterday");
+  const [patternCustomDate, setPatternCustomDate] = useState<Date | undefined>(undefined);
+  const [patternCalendarOpen, setPatternCalendarOpen] = useState(false);
 
   // State for daily summary agent details
   const [showDailyAgentDetails, setShowDailyAgentDetails] = useState(false);
@@ -3203,16 +3206,42 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
                     ))}
                   </SelectContent>
                 </Select>
-                <Select value={timeFilter} onValueChange={setTimeFilter}>
-                  <SelectTrigger className="w-36">
+                <Select value={patternTimeFilter} onValueChange={(val) => {
+                  setPatternTimeFilter(val);
+                  if (val !== "custom") setPatternCustomDate(undefined);
+                  if (val === "custom") setPatternCalendarOpen(true);
+                }}>
+                  <SelectTrigger className="w-40">
                     <SelectValue placeholder="Time Range" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="daily">Last 7 Days</SelectItem>
-                    <SelectItem value="weekly">Last 4 Weeks</SelectItem>
-                    <SelectItem value="monthly">Last 3 Months</SelectItem>
+                    <SelectItem value="yesterday">Yesterday</SelectItem>
+                    <SelectItem value="last3days">Last 3 Days</SelectItem>
+                    <SelectItem value="last7days">Last 7 Days</SelectItem>
+                    <SelectItem value="custom">Custom Date</SelectItem>
                   </SelectContent>
                 </Select>
+                {patternTimeFilter === "custom" && (
+                  <Popover open={patternCalendarOpen} onOpenChange={setPatternCalendarOpen}>
+                    <PopoverTrigger asChild>
+                      <Button variant="outline" size="sm" className="w-40 justify-start text-left font-normal">
+                        <CalendarIcon className="mr-2 h-4 w-4 shrink-0 opacity-50" />
+                        {patternCustomDate ? format(patternCustomDate, "MMM dd, yyyy") : "Pick a date"}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <CalendarPicker
+                        mode="single"
+                        selected={patternCustomDate}
+                        onSelect={(date) => {
+                          setPatternCustomDate(date ?? undefined);
+                          setPatternCalendarOpen(false);
+                        }}
+                        disabled={(date) => date > new Date()}
+                      />
+                    </PopoverContent>
+                  </Popover>
+                )}
                 <Select value={channelFilter} onValueChange={setChannelFilter}>
                   <SelectTrigger className="w-32">
                     <SelectValue placeholder="All Channels" />
