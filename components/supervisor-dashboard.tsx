@@ -3265,14 +3265,13 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
                   key={pattern.id}
                   className="hover:shadow-md transition-shadow"
                 >
-                  <CardContent className="p-6">
-                    <div className="flex items-center justify-between mb-4">
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between">
                       <div className="flex-1">
                         <div className="flex items-center gap-3 mb-2">
                           <h3 className="text-lg font-semibold text-foreground">
                             {pattern.name}
                           </h3>
-                          <Badge variant="outline">{pattern.category}</Badge>
                           <Badge
                             variant={
                               pattern.trend === "up"
@@ -3288,86 +3287,35 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
                             {pattern.trend === "down" && (
                               <TrendingDown className="h-3 w-3 mr-1" />
                             )}
-                            {pattern.errorRate}% error rate
+                            {pattern.trend === "up" ? "Trending Up" : pattern.trend === "down" ? "Trending Down" : "Stable"}
                           </Badge>
                         </div>
-                        <div className="grid grid-cols-3 gap-4 text-sm">
+                        <div className="flex gap-6 text-sm">
                           <div>
-                            <span className="text-muted-foreground">
-                              Frequency:{" "}
-                            </span>
-                            <span className="font-medium">
-                              {pattern.frequency} occurrences
-                            </span>
+                            <span className="text-muted-foreground">Frequency: </span>
+                            <span className="font-medium">{pattern.frequency} occurrences</span>
                           </div>
                           <div>
-                            <span className="text-muted-foreground">
-                              Affected Agents:{" "}
-                            </span>
-                            <span className="font-medium">
-                              {pattern.affectedAgents.length}
-                            </span>
+                            <span className="text-muted-foreground">Affected Agents: </span>
+                            <span className="font-medium">{pattern.affectedAgents.length}</span>
                           </div>
                           <div>
-                            <span className="text-muted-foreground">
-                              Date Range:{" "}
-                            </span>
-                            <span className="font-medium">
-                              {pattern.dateRange}
-                            </span>
+                            <span className="text-muted-foreground">Channels: </span>
+                            <span className="font-medium">{pattern.channels.join(", ")}</span>
                           </div>
                         </div>
                       </div>
-                      <div className="flex gap-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => {
-                            setSelectedPattern(pattern.id);
-                            setShowPatternDetails(true);
-                          }}
-                        >
-                          <Eye className="h-4 w-4 mr-2" />
-                          View Details
-                        </Button>
-                      </div>
-                    </div>
-
-                    <div className="pt-4 border-t">
-                      <div className="grid grid-cols-2 gap-4 text-xs">
-                        <div>
-                          <span className="text-muted-foreground">
-                            Top Intents:{" "}
-                          </span>
-                          <div className="flex gap-1 mt-1">
-                            {pattern.intents.slice(0, 3).map((intent, i) => (
-                              <Badge
-                                key={i}
-                                variant="secondary"
-                                className="text-xs"
-                              >
-                                {intent}
-                              </Badge>
-                            ))}
-                          </div>
-                        </div>
-                        <div>
-                          <span className="text-muted-foreground">
-                            Channels:{" "}
-                          </span>
-                          <div className="flex gap-1 mt-1">
-                            {pattern.channels.map((channel, i) => (
-                              <Badge
-                                key={i}
-                                variant="outline"
-                                className="text-xs"
-                              >
-                                {channel}
-                              </Badge>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setSelectedPattern(pattern.id);
+                          setShowPatternDetails(true);
+                        }}
+                      >
+                        <Eye className="h-4 w-4 mr-2" />
+                        View Details
+                      </Button>
                     </div>
                   </CardContent>
                 </Card>
