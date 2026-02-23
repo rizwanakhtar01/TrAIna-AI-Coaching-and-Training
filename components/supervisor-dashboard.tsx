@@ -3299,7 +3299,7 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
                             ) : pattern.changePercent < 0 ? (
                               <TrendingDown className="h-3 w-3 mr-1" />
                             ) : null}
-                            {pattern.changePercent > 0 ? "+" : ""}{pattern.changePercent}% vs prev day
+                            {pattern.changePercent > 0 ? "+" : ""}{pattern.changePercent}% vs {patternTimeFilter === "yesterday" ? "prior day" : "prior date range"}
                           </span>
                         </div>
                         <div className="flex gap-6 text-sm">
