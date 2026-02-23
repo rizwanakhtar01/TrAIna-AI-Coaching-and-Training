@@ -3203,6 +3203,16 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
                     ))}
                   </SelectContent>
                 </Select>
+                <Select value={timeFilter} onValueChange={setTimeFilter}>
+                  <SelectTrigger className="w-36">
+                    <SelectValue placeholder="Time Range" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="daily">Last 7 Days</SelectItem>
+                    <SelectItem value="weekly">Last 4 Weeks</SelectItem>
+                    <SelectItem value="monthly">Last 3 Months</SelectItem>
+                  </SelectContent>
+                </Select>
                 <Select value={channelFilter} onValueChange={setChannelFilter}>
                   <SelectTrigger className="w-32">
                     <SelectValue placeholder="All Channels" />
