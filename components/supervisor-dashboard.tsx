@@ -3203,17 +3203,6 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
                     ))}
                   </SelectContent>
                 </Select>
-                <Select value={intentFilter} onValueChange={setIntentFilter}>
-                  <SelectTrigger className="w-32">
-                    <SelectValue placeholder="All Intents" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Intents</SelectItem>
-                    <SelectItem value="refund">Refunds</SelectItem>
-                    <SelectItem value="billing">Billing</SelectItem>
-                    <SelectItem value="technical">Technical</SelectItem>
-                  </SelectContent>
-                </Select>
                 <Select value={channelFilter} onValueChange={setChannelFilter}>
                   <SelectTrigger className="w-32">
                     <SelectValue placeholder="All Channels" />
