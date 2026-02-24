@@ -322,30 +322,6 @@ function ContactReviewCard({ review }: ContactReviewCardProps) {
               <Badge variant="outline" className="capitalize">
                 {review.channel}
               </Badge>
-              {review.channel === "phone" && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={togglePlayback}
-                  className="h-7 px-2 text-xs bg-transparent"
-                >
-                  {isPlaying ? (
-                    <>
-                      <Pause className="h-3 w-3 mr-1" />
-                      Pause
-                    </>
-                  ) : (
-                    <>
-                      <Play className="h-3 w-3 mr-1" />
-                      Recording
-                    </>
-                  )}
-                </Button>
-              )}
-            </div>
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Clock className="h-3 w-3" />
-              {review.duration}
             </div>
             <Badge variant="secondary" className="text-xs">
               <MapPin className="h-3 w-3 mr-1" />
@@ -358,27 +334,6 @@ function ContactReviewCard({ review }: ContactReviewCardProps) {
             </span>
           </div>
         </div>
-        {review.channel === "phone" && isPlaying && (
-          <div className="bg-muted/30 p-3 rounded-md border">
-            <div className="flex items-center gap-3">
-              <Volume2 className="h-4 w-4 text-primary" />
-              <div className="flex-1">
-                <div className="flex justify-between text-xs text-muted-foreground mb-1">
-                  <span>Call Recording</span>
-                  <span>
-                    {formatTime(currentTime)} / {formatTime(duration)}
-                  </span>
-                </div>
-                <div className="w-full bg-muted rounded-full h-2">
-                  <div
-                    className="bg-primary h-2 rounded-full transition-all duration-1000"
-                    style={{ width: `${(currentTime / duration) * 100}%` }}
-                  ></div>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
         <CardTitle className="text-base">{review.customerIssue}</CardTitle>
         <div className="bg-muted/30 p-3 rounded-md border-l-4 border-primary/30">
           <p className="text-sm text-foreground font-medium mb-1">
