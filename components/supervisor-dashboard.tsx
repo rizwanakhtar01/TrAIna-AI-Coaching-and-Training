@@ -3279,21 +3279,6 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
                             />
                           </div>
 
-                          {/* Average Score Trend */}
-                          <div className="text-center">
-                            <div className="flex items-center gap-1">
-                              <span className="text-2xl font-bold text-foreground">
-                                {agent.averageScore}
-                              </span>
-                              {getTrendIcon(
-                                agent.averageScore,
-                                agent.previousScore,
-                              )}
-                            </div>
-                            <p className="text-xs text-muted-foreground">
-                              Avg Score
-                            </p>
-                          </div>
 
                           {/* Engagement Level */}
                           {/* <div className="text-center">
