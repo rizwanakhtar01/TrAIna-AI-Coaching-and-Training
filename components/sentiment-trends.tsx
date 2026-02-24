@@ -416,40 +416,6 @@ export function SentimentTrendsScreen() {
         </CardContent>
       </Card>
 
-      {/* Key Insights */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Calendar className="h-5 w-5 text-primary" />
-            Key Insights & Recommendations
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {sentimentInsights.map((insight, index) => {
-              const IconComponent = insight.icon;
-              return (
-                <div
-                  key={index}
-                  className="flex gap-4 p-4 bg-card border rounded-lg"
-                >
-                  <div className={`flex-shrink-0 ${insight.color}`}>
-                    <IconComponent className="h-5 w-5" />
-                  </div>
-                  <div className="space-y-1">
-                    <h4 className="font-medium text-foreground">
-                      {insight.title}
-                    </h4>
-                    <p className="text-sm text-muted-foreground">
-                      {insight.description}
-                    </p>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </CardContent>
-      </Card>
 
       {/* Detailed Breakdown */}
       {/* <Card>
