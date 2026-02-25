@@ -264,16 +264,6 @@ export function AiCoachingDashboard({ onLogout }: AiCoachingDashboardProps) {
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span>Empathy Score</span>
-                      <span className="font-medium">85%</span>
-                    </div>
-                    <Progress value={85} className="h-2" />
-                    <p className="text-xs text-muted-foreground">
-                      +15% improvement this week
-                    </p>
-                  </div>
 
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm">

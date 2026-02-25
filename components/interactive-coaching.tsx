@@ -650,14 +650,10 @@ export function InteractiveCoachingScreen() {
             <CardDescription>Track your skill improvements over time</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="grid gap-4 md:grid-cols-3">
+            <div className="grid gap-4 md:grid-cols-2">
               <div className="text-center p-4 rounded-lg bg-accent/5">
                 <div className="text-2xl font-bold text-accent">7</div>
                 <p className="text-sm text-muted-foreground">Sessions Completed</p>
-              </div>
-              <div className="text-center p-4 rounded-lg bg-primary/5">
-                <div className="text-2xl font-bold text-primary">85%</div>
-                <p className="text-sm text-muted-foreground">Average Score</p>
               </div>
               <div className="text-center p-4 rounded-lg bg-chart-4/5">
                 <div className="text-2xl font-bold text-chart-4">3</div>

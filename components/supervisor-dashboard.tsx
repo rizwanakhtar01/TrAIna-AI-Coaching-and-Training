@@ -971,11 +971,6 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
               </span>
             </div>
             <div className="flex items-center gap-2">
-              <div
-                className={`text-lg font-bold ${getScoreColor(review.overallScore)}`}
-              >
-                {review.overallScore}
-              </div>
               <Button
                 variant="ghost"
                 size="sm"
@@ -1369,8 +1364,6 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
       Email: agent.email,
       "Sessions Completed": agent.sessionsCompleted,
       "Sessions Target": agent.sessionsTarget,
-      "Average Score": agent.averageScore,
-      "Previous Score": agent.previousScore,
       "Engagement Time (min)": agent.engagementTime,
       Status: agent.status,
       "Last Session": agent.lastSession,
@@ -1639,52 +1632,8 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
                 </div>
               </div>
             </div>
-            <div className="text-right">
-              <div className="text-3xl font-bold text-foreground">
-                {agent.averageScore}
-              </div>
-              <div className="flex items-center gap-1">
-                {getTrendIcon(agent.averageScore, agent.previousScore)}
-                <span className="text-sm text-muted-foreground">
-                  Current Score
-                </span>
-              </div>
-            </div>
           </div>
 
-          {/* Performance Timeline */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Performance Over Time</CardTitle>
-              <CardDescription>
-                Weekly trend chart showing score improvement
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={getPerformanceTimelineData()}>
-                  <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
-                  <XAxis dataKey="period" className="text-xs" />
-                  <YAxis domain={[7, 10]} className="text-xs" />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "hsl(var(--card))",
-                      border: "1px solid hsl(var(--border))",
-                      borderRadius: "8px",
-                    }}
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="score"
-                    stroke="#3b82f6"
-                    strokeWidth={3}
-                    dot={{ fill: "#3b82f6", strokeWidth: 2, r: 6 }}
-                    name="Score"
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
 
           {/* Detailed Agent Analysis */}
           <div className="grid gap-6 md:grid-cols-2">
@@ -1788,7 +1737,6 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
                   <div key={session.id} className="border rounded-lg p-4">
                     <div className="flex justify-between items-start mb-2">
                       <h4 className="font-medium">{session.scenario}</h4>
-                      <Badge variant="outline">{session.score}/10</Badge>
                     </div>
                     <p className="text-sm text-muted-foreground mb-2">
                       {session.feedback}
@@ -1823,17 +1771,6 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-3">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm">Average Score</span>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm text-muted-foreground">
-                        {agent.previousScore}
-                      </span>
-                      <ArrowRight className="h-3 w-3" />
-                      <span className="font-medium">{agent.averageScore}</span>
-                      {getTrendIcon(agent.averageScore, agent.previousScore)}
-                    </div>
-                  </div>
                   <div className="flex justify-between items-center">
                     <span className="text-sm">Sessions Completed</span>
                     <div className="flex items-center gap-2">

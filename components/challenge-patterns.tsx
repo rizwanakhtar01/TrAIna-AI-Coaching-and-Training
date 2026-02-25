@@ -195,10 +195,6 @@ function ChallengePatternCard({ pattern, onViewDetails }: ChallengePatternCardPr
 
       <CardContent className="space-y-4">
         <div className="flex items-center justify-between">
-          <div className="space-y-1">
-            <div className="text-2xl font-bold text-foreground">{pattern.currentScore}%</div>
-            <div className="text-xs text-muted-foreground">Current Score</div>
-          </div>
           <div className={`flex items-center gap-1 text-sm ${getTrendColor()}`}>
             {getTrendIcon()}
             <span className="font-medium">
@@ -207,14 +203,6 @@ function ChallengePatternCard({ pattern, onViewDetails }: ChallengePatternCardPr
             </span>
             <span className="text-muted-foreground">vs last period</span>
           </div>
-        </div>
-
-        <div className="space-y-2">
-          <div className="flex justify-between text-sm">
-            <span>Progress</span>
-            <span>{pattern.currentScore}%</span>
-          </div>
-          <Progress value={pattern.currentScore} className="h-2" />
         </div>
 
         <div className="flex items-center justify-between text-sm text-muted-foreground">
@@ -254,25 +242,9 @@ function ChallengeDetailView({ pattern, onBack }: ChallengeDetailViewProps) {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              <div className="text-center">
-                <div className="text-3xl font-bold text-foreground">{pattern.currentScore}%</div>
-                <p className="text-sm text-muted-foreground">Current Score</p>
-                <div className="flex items-center justify-center gap-1 mt-2 text-chart-4">
-                  <TrendingUp className="h-4 w-4" />
-                  <span className="font-medium">+{pattern.trendPercentage}% improvement</span>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                {pattern.weeklyProgress.map((week, index) => (
-                  <div key={index} className="flex justify-between items-center">
-                    <span className="text-sm text-muted-foreground">{week.week}</span>
-                    <div className="flex items-center gap-2">
-                      <Progress value={week.score} className="h-2 w-20" />
-                      <span className="text-sm font-medium w-10">{week.score}%</span>
-                    </div>
-                  </div>
-                ))}
+              <div className="flex items-center justify-center gap-1 text-chart-4">
+                <TrendingUp className="h-4 w-4" />
+                <span className="font-medium">+{pattern.trendPercentage}% improvement</span>
               </div>
             </div>
           </CardContent>
@@ -387,7 +359,7 @@ export function ChallengePatternsScreen() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-4 md:grid-cols-3">
+          <div className="grid gap-4 md:grid-cols-2">
             <div className="text-center space-y-2">
               <div className="text-2xl font-bold text-chart-4">2</div>
               <div className="text-sm text-muted-foreground">Patterns Improving</div>
@@ -395,10 +367,6 @@ export function ChallengePatternsScreen() {
             <div className="text-center space-y-2">
               <div className="text-2xl font-bold text-muted-foreground">1</div>
               <div className="text-sm text-muted-foreground">Patterns Stable</div>
-            </div>
-            <div className="text-center space-y-2">
-              <div className="text-2xl font-bold text-foreground">78%</div>
-              <div className="text-sm text-muted-foreground">Average Score</div>
             </div>
           </div>
 
