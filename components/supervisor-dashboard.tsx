@@ -2987,9 +2987,6 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
-                        <Badge variant="destructive">
-                          {challenge.errorRate}% error rate
-                        </Badge>
                         {challenge.trend === "up" && (
                           <TrendingUp className="h-4 w-4 text-red-600" />
                         )}
