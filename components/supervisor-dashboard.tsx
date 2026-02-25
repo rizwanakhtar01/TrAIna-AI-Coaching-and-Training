@@ -224,7 +224,7 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
   // Agent detail view filters
   const [agentDetailSearchTerm, setAgentDetailSearchTerm] = useState("");
   const [agentDetailFilterChannel, setAgentDetailFilterChannel] = useState("all");
-  const [agentDetailFilterTime, setAgentDetailFilterTime] = useState("yesterday");
+  const [agentDetailFilterTime, setAgentDetailFilterTime] = useState<"today" | "yesterday" | "last3days" | "last7days" | "custom">("yesterday");
   const [agentDetailCustomDate, setAgentDetailCustomDate] = useState<Date | undefined>(undefined);
   const [agentDetailCalendarOpen, setAgentDetailCalendarOpen] = useState(false);
 
@@ -2367,7 +2367,7 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
                 </div>
 
                 <Select value={agentDetailFilterTime} onValueChange={(val) => {
-                  setAgentDetailFilterTime(val);
+                  setAgentDetailFilterTime(val as "today" | "yesterday" | "last3days" | "last7days" | "custom");
                   if (val !== "custom") setAgentDetailCustomDate(undefined);
                   if (val === "custom") setAgentDetailCalendarOpen(true);
                 }}>

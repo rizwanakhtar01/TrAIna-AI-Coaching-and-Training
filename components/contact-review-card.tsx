@@ -443,7 +443,7 @@ interface ContactReviewsListProps {
   // Controlled mode props - when provided, filters are controlled externally
   controlledSearchTerm?: string;
   controlledFilterChannel?: string;
-  controlledFilterTime?: "today" | "yesterday" | "custom";
+  controlledFilterTime?: "today" | "yesterday" | "last3days" | "last7days" | "custom";
   controlledCustomDate?: Date;
   hideFilters?: boolean;
 }
@@ -461,7 +461,7 @@ export function ContactReviewsList({
   
   const [searchTerm, setSearchTerm] = useState("");
   const [filterChannel, setFilterChannel] = useState("all");
-  const [filterTime, setFilterTime] = useState<"today" | "yesterday" | "custom">("today");
+  const [filterTime, setFilterTime] = useState<"today" | "yesterday" | "last3days" | "last7days" | "custom">("today");
   const [customDate, setCustomDate] = useState<Date | undefined>(undefined);
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [pendingCustomDate, setPendingCustomDate] = useState<Date | undefined>(undefined);
