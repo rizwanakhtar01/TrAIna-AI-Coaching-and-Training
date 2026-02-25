@@ -2945,14 +2945,6 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
                           <h3 className="text-lg font-semibold text-foreground">
                             {pattern.name}
                           </h3>
-                          <span className={`inline-flex items-center text-xs font-medium ${pattern.changePercent > 0 ? "text-red-600" : pattern.changePercent < 0 ? "text-green-600" : "text-muted-foreground"}`}>
-                            {pattern.changePercent > 0 ? (
-                              <TrendingUp className="h-3 w-3 mr-1" />
-                            ) : pattern.changePercent < 0 ? (
-                              <TrendingDown className="h-3 w-3 mr-1" />
-                            ) : null}
-                            {pattern.changePercent > 0 ? "+" : ""}{pattern.changePercent}% vs {patternTimeFilter === "yesterday" ? "prior day" : "prior date range"}
-                          </span>
                         </div>
                         <div className="flex gap-6 text-sm">
                           <div>
