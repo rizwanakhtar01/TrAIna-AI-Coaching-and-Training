@@ -2784,62 +2784,6 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
             </Badge>
           </div>
           <div className="flex items-center gap-4">
-            {/* Alerts Notification */}
-            <div className="relative">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setShowAlerts(!showAlerts)}
-                className="relative"
-              >
-                <Bell className="h-4 w-4" />
-                {unreadAlertsCount > 0 && (
-                  <span className="absolute -top-1 -right-1 h-4 w-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
-                    {unreadAlertsCount}
-                  </span>
-                )}
-              </Button>
-              {showAlerts && (
-                <div className="absolute right-0 top-10 w-80 bg-card border rounded-lg shadow-lg z-50">
-                  <div className="p-4 border-b">
-                    <h3 className="font-medium">Notifications</h3>
-                  </div>
-                  <div className="max-h-64 overflow-y-auto">
-                    {alerts.map((alert) => (
-                      <div
-                        key={alert.id}
-                        className={`p-3 border-b ${!alert.isRead ? "bg-blue-50" : ""}`}
-                      >
-                        <div className="flex items-start gap-2">
-                          <div className="mt-1">
-                            {alert.type === "warning" && (
-                              <AlertTriangle className="h-4 w-4 text-yellow-600" />
-                            )}
-                            {alert.type === "error" && (
-                              <XCircle className="h-4 w-4 text-red-600" />
-                            )}
-                            {alert.type === "info" && (
-                              <CheckCircle className="h-4 w-4 text-blue-600" />
-                            )}
-                          </div>
-                          <div className="flex-1">
-                            <h4 className="text-sm font-medium">
-                              {alert.title}
-                            </h4>
-                            <p className="text-xs text-muted-foreground">
-                              {alert.message}
-                            </p>
-                            <span className="text-xs text-muted-foreground">
-                              {alert.timestamp}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <span>Team Lead - Customer Support</span>
               <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center">
