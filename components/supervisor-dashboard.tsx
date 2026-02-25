@@ -224,10 +224,9 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
   // Agent detail view filters
   const [agentDetailSearchTerm, setAgentDetailSearchTerm] = useState("");
   const [agentDetailFilterChannel, setAgentDetailFilterChannel] = useState("all");
-  const [agentDetailFilterTime, setAgentDetailFilterTime] = useState<"today" | "yesterday" | "custom">("today");
+  const [agentDetailFilterTime, setAgentDetailFilterTime] = useState("yesterday");
   const [agentDetailCustomDate, setAgentDetailCustomDate] = useState<Date | undefined>(undefined);
   const [agentDetailCalendarOpen, setAgentDetailCalendarOpen] = useState(false);
-  const [agentDetailPendingDate, setAgentDetailPendingDate] = useState<Date | undefined>(undefined);
 
   // Comprehensive mock data for supervisor dashboard
   const agents: Agent[] = [
@@ -2395,105 +2394,42 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
                   />
                 </div>
 
-                <Popover 
-                  open={agentDetailCalendarOpen} 
-                  onOpenChange={(open) => {
-                    setAgentDetailCalendarOpen(open);
-                    if (!open) {
-                      setAgentDetailPendingDate(undefined);
-                    }
-                  }}
-                >
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className="w-[150px] justify-between"
-                    >
-                      <span className="truncate">
-                        {agentDetailFilterTime === "custom" && agentDetailCustomDate
-                          ? `Custom: ${format(agentDetailCustomDate, "d MMM")}`
-                          : agentDetailFilterTime === "today"
-                            ? "Today"
-                            : agentDetailFilterTime === "yesterday"
-                              ? "Yesterday"
-                              : "Today"}
-                      </span>
-                      <CalendarIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <div className="p-2 border-b flex gap-1">
-                      <Button
-                        variant={agentDetailFilterTime === "today" ? "default" : "ghost"}
-                        size="sm"
-                        onClick={() => {
-                          setAgentDetailFilterTime("today");
-                          setAgentDetailCustomDate(undefined);
-                          setAgentDetailPendingDate(undefined);
+                <Select value={agentDetailFilterTime} onValueChange={(val) => {
+                  setAgentDetailFilterTime(val);
+                  if (val !== "custom") setAgentDetailCustomDate(undefined);
+                  if (val === "custom") setAgentDetailCalendarOpen(true);
+                }}>
+                  <SelectTrigger className="w-40">
+                    <SelectValue placeholder="Time Range" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="yesterday">Yesterday</SelectItem>
+                    <SelectItem value="last3days">Last 3 Days</SelectItem>
+                    <SelectItem value="last7days">Last 7 Days</SelectItem>
+                    <SelectItem value="custom">Custom Date</SelectItem>
+                  </SelectContent>
+                </Select>
+                {agentDetailFilterTime === "custom" && (
+                  <Popover open={agentDetailCalendarOpen} onOpenChange={setAgentDetailCalendarOpen}>
+                    <PopoverTrigger asChild>
+                      <Button variant="outline" size="sm" className="w-40 justify-start text-left font-normal">
+                        <CalendarIcon className="mr-2 h-4 w-4 shrink-0 opacity-50" />
+                        {agentDetailCustomDate ? format(agentDetailCustomDate, "MMM dd, yyyy") : "Pick a date"}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <CalendarPicker
+                        mode="single"
+                        selected={agentDetailCustomDate}
+                        onSelect={(date) => {
+                          setAgentDetailCustomDate(date ?? undefined);
                           setAgentDetailCalendarOpen(false);
                         }}
-                      >
-                        Today
-                      </Button>
-                      <Button
-                        variant={agentDetailFilterTime === "yesterday" ? "default" : "ghost"}
-                        size="sm"
-                        onClick={() => {
-                          setAgentDetailFilterTime("yesterday");
-                          setAgentDetailCustomDate(undefined);
-                          setAgentDetailPendingDate(undefined);
-                          setAgentDetailCalendarOpen(false);
-                        }}
-                      >
-                        Yesterday
-                      </Button>
-                      <Button
-                        variant={agentDetailFilterTime === "custom" || agentDetailPendingDate ? "default" : "ghost"}
-                        size="sm"
-                        onClick={() => {
-                          setAgentDetailPendingDate(agentDetailCustomDate || new Date());
-                        }}
-                      >
-                        Custom
-                      </Button>
-                    </div>
-                    <CalendarPicker
-                      mode="single"
-                      selected={agentDetailPendingDate || agentDetailCustomDate}
-                      onSelect={(date) => {
-                        setAgentDetailPendingDate(date);
-                      }}
-                      disabled={(date: Date) => date > new Date()}
-                      initialFocus
-                    />
-                    <div className="p-2 border-t flex justify-end gap-2">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => {
-                          setAgentDetailPendingDate(undefined);
-                          setAgentDetailCalendarOpen(false);
-                        }}
-                      >
-                        Cancel
-                      </Button>
-                      <Button
-                        size="sm"
-                        disabled={!agentDetailPendingDate}
-                        onClick={() => {
-                          if (agentDetailPendingDate) {
-                            setAgentDetailFilterTime("custom");
-                            setAgentDetailCustomDate(agentDetailPendingDate);
-                            setAgentDetailPendingDate(undefined);
-                            setAgentDetailCalendarOpen(false);
-                          }
-                        }}
-                      >
-                        Apply
-                      </Button>
-                    </div>
-                  </PopoverContent>
-                </Popover>
+                        disabled={(date) => date > new Date()}
+                      />
+                    </PopoverContent>
+                  </Popover>
+                )}
 
                 <Select value={agentDetailFilterChannel} onValueChange={setAgentDetailFilterChannel}>
                   <SelectTrigger className="w-32">
