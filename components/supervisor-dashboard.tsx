@@ -2878,7 +2878,7 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
               <CardHeader>
                 <CardTitle>Team Performance Trend</CardTitle>
                 <CardDescription>
-                  Average team score and session completion over time
+                  Sessions completed over time
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -2899,11 +2899,11 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
                     />
                     <Line
                       type="monotone"
-                      dataKey="score"
+                      dataKey="sessions"
                       stroke="#3b82f6"
                       strokeWidth={3}
                       dot={{ fill: "#3b82f6", strokeWidth: 2, r: 6 }}
-                      name="Avg Score"
+                      name="Sessions Completed"
                     />
                   </LineChart>
                 </ResponsiveContainer>
