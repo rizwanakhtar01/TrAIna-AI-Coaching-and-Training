@@ -2221,72 +2221,52 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
           {/* Agent Performance Distribution */}
           <Card>
             <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle className="flex items-center gap-2">
-                  <Users className="h-5 w-5 text-chart-4" />
-                  Agent Performance Distribution
-                </CardTitle>
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant={agentPerfFilter === "all" ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setAgentPerfFilter("all")}
-                  >
-                    All
-                  </Button>
-                  <Button
-                    variant={agentPerfFilter === "struggling" ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setAgentPerfFilter("struggling")}
-                    className={agentPerfFilter === "struggling" ? "bg-red-600 hover:bg-red-700" : ""}
-                  >
-                    Struggling
-                  </Button>
-                  <Button
-                    variant={agentPerfFilter === "high" ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setAgentPerfFilter("high")}
-                    className={agentPerfFilter === "high" ? "bg-green-600 hover:bg-green-700" : ""}
-                  >
-                    High Performers
-                  </Button>
-                </div>
-              </div>
+              <CardTitle className="flex items-center gap-2">
+                <Users className="h-5 w-5 text-chart-4" />
+                Impacted Agents
+              </CardTitle>
+              <CardDescription>
+                Contacts where this pattern was identified, per agent
+              </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-2">
-                {affectedAgentsData
-                  .filter((agent) => {
-                    if (agentPerfFilter === "struggling") return agent.status === "at-risk" || agent.status === "needs-attention";
-                    if (agentPerfFilter === "high") return agent.status === "excellent" || agent.status === "good";
-                    return true;
-                  })
-                  .map((agent) => {
-                    const isHighPerformer = agent.status === "excellent" || agent.status === "good";
-                    return (
-                      <div
-                        key={agent.id}
-                        className={`flex items-center gap-3 p-3 rounded-lg border ${isHighPerformer ? "bg-green-50 border-green-200" : "bg-red-50 border-red-200"}`}
-                      >
-                        <div className={`h-8 w-8 rounded-full flex items-center justify-center ${isHighPerformer ? "bg-green-100" : "bg-red-100"}`}>
-                          <span className={`text-xs font-medium ${isHighPerformer ? "text-green-800" : "text-red-800"}`}>
-                            {agent.avatar}
-                          </span>
+              <div className="space-y-1">
+                <div className="grid grid-cols-3 text-xs text-muted-foreground font-medium px-3 pb-2 border-b">
+                  <span>Agent</span>
+                  <span className="text-center">Contacts with Pattern</span>
+                  <span className="text-right">% of Total Contacts</span>
+                </div>
+                {affectedAgentsData.map((agent, index) => {
+                  const contactsWithPattern = [14, 9, 21, 7, 17, 11][index % 6];
+                  const totalContacts = [38, 42, 55, 30, 48, 36][index % 6];
+                  const percentage = Math.round((contactsWithPattern / totalContacts) * 100);
+                  return (
+                    <div
+                      key={agent.id}
+                      className="grid grid-cols-3 items-center p-3 rounded-lg hover:bg-muted/50 transition-colors"
+                    >
+                      <div className="flex items-center gap-2">
+                        <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                          <span className="text-xs font-medium text-primary">{agent.avatar}</span>
                         </div>
-                        <div className="flex-1">
-                          <span className="text-sm font-medium">{agent.name}</span>
-                        </div>
-                        <Badge variant="outline" className={isHighPerformer ? "border-green-300 text-green-700" : "border-red-300 text-red-700"}>
-                          {isHighPerformer ? "High Performer" : "Struggling"}
-                        </Badge>
-                        {isHighPerformer ? (
-                          <CheckCircle className="h-4 w-4 text-green-600" />
-                        ) : (
-                          <XCircle className="h-4 w-4 text-red-600" />
-                        )}
+                        <span className="text-sm font-medium">{agent.name}</span>
                       </div>
-                    );
-                  })}
+                      <div className="text-center">
+                        <span className="text-sm font-semibold text-foreground">{contactsWithPattern}</span>
+                        <span className="text-xs text-muted-foreground ml-1">/ {totalContacts}</span>
+                      </div>
+                      <div className="flex items-center justify-end gap-2">
+                        <div className="w-20 bg-muted rounded-full h-1.5">
+                          <div
+                            className="bg-destructive h-1.5 rounded-full"
+                            style={{ width: `${percentage}%` }}
+                          />
+                        </div>
+                        <span className="text-sm font-semibold text-destructive w-9 text-right">{percentage}%</span>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </CardContent>
           </Card>
