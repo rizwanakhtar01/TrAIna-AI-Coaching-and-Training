@@ -1089,7 +1089,7 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
       changePercent: 12,
       affectedAgents: ["AGT001", "AGT002", "AGT004"],
       intents: ["process_refund", "refund_status", "cancel_order"],
-      channels: ["phone", "chat", "email"],
+      channels: ["phone", "chat"],
       dateRange: "Last 7 days",
     },
     {
@@ -1115,7 +1115,7 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
       changePercent: 1,
       affectedAgents: ["AGT003", "AGT005"],
       intents: ["tech_support", "troubleshooting", "setup_help"],
-      channels: ["chat", "email"],
+      channels: ["chat"],
       dateRange: "Last 7 days",
     },
     {
@@ -1141,7 +1141,7 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
       changePercent: -2,
       affectedAgents: ["AGT002", "AGT004"],
       intents: ["track_order", "delivery_issue", "lost_package"],
-      channels: ["chat", "email", "phone"],
+      channels: ["chat", "phone"],
       dateRange: "Last 7 days",
     },
     {
@@ -1167,7 +1167,7 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
       changePercent: -6,
       affectedAgents: ["AGT002", "AGT003"],
       intents: ["password_reset", "account_locked", "two_factor_auth"],
-      channels: ["chat", "email"],
+      channels: ["chat"],
       dateRange: "Last 7 days",
     },
     {
@@ -1180,7 +1180,7 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
       changePercent: 9,
       affectedAgents: ["AGT004", "AGT006"],
       intents: ["upgrade_plan", "change_billing", "promo_code"],
-      channels: ["phone", "chat", "email"],
+      channels: ["phone", "chat"],
       dateRange: "Last 7 days",
     },
     {
@@ -1193,7 +1193,7 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
       changePercent: 3,
       affectedAgents: ["AGT001", "AGT002", "AGT005"],
       intents: ["identity_verification", "compliance_check", "document_request"],
-      channels: ["phone", "email"],
+      channels: ["phone"],
       dateRange: "Last 7 days",
     },
     {
@@ -2978,7 +2978,6 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
                     <SelectItem value="all">All Channels</SelectItem>
                     <SelectItem value="phone">Phone</SelectItem>
                     <SelectItem value="chat">Chat</SelectItem>
-                    <SelectItem value="email">Email</SelectItem>
                   </SelectContent>
                 </Select>
                 {(intentFilter !== "all" ||
