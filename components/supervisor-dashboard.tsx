@@ -2859,17 +2859,6 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
                 </p>
               </div>
               <div className="flex items-center gap-2">
-                <Select value={agentFilter} onValueChange={setAgentFilter}>
-                  <SelectTrigger className="w-44">
-                    <SelectValue placeholder="All Agents" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Agents</SelectItem>
-                    {agents.map((agent) => (
-                      <SelectItem key={agent.id} value={agent.id}>{agent.name}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
                 <Select value={patternTimeFilter} onValueChange={(val) => {
                   setPatternTimeFilter(val);
                   if (val !== "custom") setPatternCustomDate(undefined);
@@ -2950,10 +2939,6 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
                           <div>
                             <span className="text-muted-foreground">Frequency: </span>
                             <span className="font-medium">{pattern.frequency} occurrences</span>
-                          </div>
-                          <div>
-                            <span className="text-muted-foreground">Affected Agents: </span>
-                            <span className="font-medium">{pattern.affectedAgents.length}</span>
                           </div>
                           <div>
                             <span className="text-muted-foreground">Channels: </span>
