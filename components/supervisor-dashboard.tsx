@@ -2986,15 +2986,6 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
                           </p>
                         </div>
                       </div>
-                      <div className="flex items-center gap-2">
-                        {challenge.trend === "up" && (
-                          <TrendingUp className="h-4 w-4 text-red-600" />
-                        )}
-                        {challenge.trend === "down" && (
-                          <TrendingDown className="h-4 w-4 text-green-600" />
-                        )}
-                        
-                      </div>
                     </div>
                   ))}
                 </div>
