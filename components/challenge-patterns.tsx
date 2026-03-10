@@ -232,25 +232,7 @@ function ChallengeDetailView({ pattern, onBack }: ChallengeDetailViewProps) {
         </div>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <BarChart3 className="h-5 w-5 text-primary" />
-              Progress Trend
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="flex items-center justify-center gap-1 text-chart-4">
-                <TrendingUp className="h-4 w-4" />
-                <span className="font-medium">+{pattern.trendPercentage}% improvement</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
+      <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Lightbulb className="h-5 w-5 text-accent" />
@@ -270,58 +252,57 @@ function ChallengeDetailView({ pattern, onBack }: ChallengeDetailViewProps) {
             </div>
           </CardContent>
         </Card>
-      </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <AlertTriangle className="h-5 w-5 text-chart-5" />
-            Recent Examples
-          </CardTitle>
-          <CardDescription>Specific situations where this pattern was identified</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {pattern.examples.map((example) => (
-              <div key={example.id} className="border rounded-lg p-4 space-y-3">
-                <div className="flex items-center justify-between">
-                  <Badge variant="outline" className="text-xs">
-                    <Calendar className="h-3 w-3 mr-1" />
-                    {example.date}
-                  </Badge>
-                  <span className="text-sm font-medium text-foreground">{example.situation}</span>
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-chart-5" />
+              Recent Examples
+            </CardTitle>
+            <CardDescription>Specific situations where this pattern was identified</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {pattern.examples.map((example) => (
+                <div key={example.id} className="border rounded-lg p-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <Badge variant="outline" className="text-xs">
+                      <Calendar className="h-3 w-3 mr-1" />
+                      {example.date}
+                    </Badge>
+                    <span className="text-sm font-medium text-foreground">{example.situation}</span>
+                  </div>
+
+                  <div className="grid gap-3 md:grid-cols-3">
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2 text-sm font-medium text-chart-5">
+                        <AlertTriangle className="h-3 w-3" />
+                        What happened
+                      </div>
+                      <p className="text-sm text-muted-foreground">{example.whatHappened}</p>
+                    </div>
+
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2 text-sm font-medium text-chart-4">
+                        <CheckCircle className="h-3 w-3" />
+                        Better approach
+                      </div>
+                      <p className="text-sm text-muted-foreground">{example.betterApproach}</p>
+                    </div>
+
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2 text-sm font-medium text-accent">
+                        <Target className="h-3 w-3" />
+                        Impact
+                      </div>
+                      <p className="text-sm text-muted-foreground">{example.impact}</p>
+                    </div>
+                  </div>
                 </div>
-
-                <div className="grid gap-3 md:grid-cols-3">
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2 text-sm font-medium text-chart-5">
-                      <AlertTriangle className="h-3 w-3" />
-                      What happened
-                    </div>
-                    <p className="text-sm text-muted-foreground">{example.whatHappened}</p>
-                  </div>
-
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2 text-sm font-medium text-chart-4">
-                      <CheckCircle className="h-3 w-3" />
-                      Better approach
-                    </div>
-                    <p className="text-sm text-muted-foreground">{example.betterApproach}</p>
-                  </div>
-
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2 text-sm font-medium text-accent">
-                      <Target className="h-3 w-3" />
-                      Impact
-                    </div>
-                    <p className="text-sm text-muted-foreground">{example.impact}</p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
     </div>
   )
 }
