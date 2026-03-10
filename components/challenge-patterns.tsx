@@ -256,17 +256,14 @@ function ChallengeDetailView({ pattern, onBack }: ChallengeDetailViewProps) {
             <div className="space-y-4">
               {pattern.examples.map((example) => (
                 <div key={example.id} className="border rounded-lg p-4 space-y-3">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <Badge variant="outline" className="text-xs">
-                        <Calendar className="h-3 w-3 mr-1" />
-                        {example.date}
-                      </Badge>
-                      <Badge variant="secondary" className="text-xs font-mono">
-                        {example.contactId}
-                      </Badge>
-                    </div>
-                    <span className="text-sm font-medium text-foreground">{example.situation}</span>
+                  <div className="flex items-center gap-2">
+                    <Badge variant="outline" className="text-xs">
+                      <Calendar className="h-3 w-3 mr-1" />
+                      {example.date}
+                    </Badge>
+                    <Badge variant="secondary" className="text-xs font-mono">
+                      {example.contactId}
+                    </Badge>
                   </div>
 
                   <div className="grid gap-3 md:grid-cols-3">
