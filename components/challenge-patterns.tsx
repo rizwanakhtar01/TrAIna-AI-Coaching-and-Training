@@ -28,6 +28,7 @@ interface ChallengePattern {
   priority: "high" | "medium" | "low"
   examples: {
     id: string
+    contactId: string
     date: string
     situation: string
     whatHappened: string
@@ -54,6 +55,7 @@ const challengePatterns: ChallengePattern[] = [
     examples: [
       {
         id: "1",
+        contactId: "CTX-048291",
         date: "2 days ago",
         situation: "Customer angry about delayed refund",
         whatHappened: "Jumped straight into troubleshooting without acknowledging frustration",
@@ -62,6 +64,7 @@ const challengePatterns: ChallengePattern[] = [
       },
       {
         id: "2",
+        contactId: "CTX-051837",
         date: "1 week ago",
         situation: "Third callback for same technical issue",
         whatHappened: "Focused on the technical problem immediately",
@@ -95,6 +98,7 @@ const challengePatterns: ChallengePattern[] = [
     examples: [
       {
         id: "1",
+        contactId: "CTX-039504",
         date: "3 days ago",
         situation: "Customer asking about order status",
         whatHappened: "Took 45 seconds to respond while researching",
@@ -127,6 +131,7 @@ const challengePatterns: ChallengePattern[] = [
     examples: [
       {
         id: "1",
+        contactId: "CTX-062748",
         date: "1 day ago",
         situation: "Subscription cancellation request",
         whatHappened: "Processed cancellation and ended chat without confirmation",
@@ -252,10 +257,15 @@ function ChallengeDetailView({ pattern, onBack }: ChallengeDetailViewProps) {
               {pattern.examples.map((example) => (
                 <div key={example.id} className="border rounded-lg p-4 space-y-3">
                   <div className="flex items-center justify-between">
-                    <Badge variant="outline" className="text-xs">
-                      <Calendar className="h-3 w-3 mr-1" />
-                      {example.date}
-                    </Badge>
+                    <div className="flex items-center gap-2">
+                      <Badge variant="outline" className="text-xs">
+                        <Calendar className="h-3 w-3 mr-1" />
+                        {example.date}
+                      </Badge>
+                      <Badge variant="secondary" className="text-xs font-mono">
+                        {example.contactId}
+                      </Badge>
+                    </div>
                     <span className="text-sm font-medium text-foreground">{example.situation}</span>
                   </div>
 
