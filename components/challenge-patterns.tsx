@@ -184,9 +184,6 @@ function ChallengePatternCard({ pattern, onViewDetails }: ChallengePatternCardPr
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <CardTitle className="text-lg">{pattern.title}</CardTitle>
-            <Badge variant="outline" className={getPriorityColor()}>
-              {pattern.priority} priority
-            </Badge>
           </div>
           <ChevronRight className="h-4 w-4 text-muted-foreground" />
         </div>
@@ -194,17 +191,6 @@ function ChallengePatternCard({ pattern, onViewDetails }: ChallengePatternCardPr
       </CardHeader>
 
       <CardContent className="space-y-4">
-        <div className="flex items-center justify-between">
-          <div className={`flex items-center gap-1 text-sm ${getTrendColor()}`}>
-            {getTrendIcon()}
-            <span className="font-medium">
-              {pattern.trend === "improving" ? "+" : pattern.trend === "declining" ? "-" : ""}
-              {pattern.trendPercentage}%
-            </span>
-            <span className="text-muted-foreground">vs last period</span>
-          </div>
-        </div>
-
         <div className="flex items-center justify-between text-sm text-muted-foreground">
           <span>{pattern.examples.length} examples to review</span>
           <span>{pattern.tips.length} coaching tips</span>
