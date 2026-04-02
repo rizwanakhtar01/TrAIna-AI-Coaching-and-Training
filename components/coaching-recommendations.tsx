@@ -752,126 +752,16 @@ export function CoachingProgressTracker() {
 
   const overduePlansList = agentPlansData.filter((p) => p.status === "overdue")
 
-  // ── Agent drill-down ──
+  // ── Agent drill-down — reuses AgentPlanDetail in read-only supervisor mode ──
   if (drilldownAgentId) {
     const plan = agentPlansData.find((p) => p.agentId === drilldownAgentId)
     if (!plan) return null
-    const { done, total, pct } = getPlanProgress(plan)
-
     return (
-      <div className="space-y-6">
-        <Button variant="ghost" size="sm" onClick={() => setDrilldownAgentId(null)}>
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to agent list
-        </Button>
-
-        {/* Agent header */}
-        <div className="flex items-center gap-4">
-          <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-            <span className="font-medium text-primary">{plan.agentAvatar}</span>
-          </div>
-          <div>
-            <h3 className="text-xl font-bold">{plan.agentName}</h3>
-            <p className="text-sm text-muted-foreground">
-              1 active plan · {pct}% overall progress
-            </p>
-          </div>
-        </div>
-
-        {/* Overdue alert */}
-        {plan.status === "overdue" && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-center justify-between">
-            <div className="flex items-center gap-2 text-red-700">
-              <AlertTriangle className="h-4 w-4" />
-              <span className="text-sm font-medium">This plan is overdue. Due date has passed.</span>
-            </div>
-            <Button size="sm" variant="outline" className="border-red-300 text-red-700 hover:bg-red-100">
-              <Send className="h-3 w-3 mr-1" />
-              Send reminder
-            </Button>
-          </div>
-        )}
-
-        {/* Plan card */}
-        <Card>
-          <CardHeader>
-            <div className="flex items-start justify-between">
-              <div>
-                <CardTitle>{plan.patternName}</CardTitle>
-                <CardDescription>{plan.areaToImprove}</CardDescription>
-              </div>
-              <StatusBadge status={plan.status} />
-            </div>
-            <div className="flex gap-4 text-sm text-muted-foreground">
-              <span>Assigned {plan.assignedDate}</span>
-              <span>Due: {plan.dueDate}</span>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-1.5">
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Progress</span>
-                <span className="font-medium">
-                  {done}/{total} sections
-                </span>
-              </div>
-              <Progress value={pct} className="h-2" />
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {plan.sections.map((section) => (
-                <div
-                  key={section.id}
-                  className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border ${
-                    section.completed
-                      ? "bg-green-50 border-green-200 text-green-700"
-                      : "bg-muted border-transparent text-muted-foreground"
-                  }`}
-                >
-                  {section.completed ? (
-                    <CheckCircle className="h-3 w-3" />
-                  ) : (
-                    <div className="h-3 w-3 rounded-full border border-current" />
-                  )}
-                  {section.title}
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Activity timeline */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-base">
-              <Activity className="h-4 w-4" />
-              Activity timeline
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {plan.timeline.map((event, i) => (
-                <div key={i} className="flex items-start gap-3">
-                  <div
-                    className={`h-2.5 w-2.5 rounded-full mt-1.5 flex-shrink-0 ${
-                      event.type === "assigned"
-                        ? "bg-blue-500"
-                        : event.type === "opened"
-                        ? "bg-amber-500"
-                        : event.type === "section"
-                        ? "bg-green-500"
-                        : "bg-muted"
-                    }`}
-                  />
-                  <div>
-                    <p className="text-sm">{event.event}</p>
-                    <p className="text-xs text-muted-foreground">{event.date}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      <AgentPlanDetail
+        planId={plan.id}
+        onBack={() => setDrilldownAgentId(null)}
+        readOnly
+      />
     )
   }
 
@@ -1178,13 +1068,15 @@ export function AgentCoachingPlans({ onViewPlan }: AgentCoachingPlansProps) {
 interface AgentPlanDetailProps {
   planId: string
   onBack: () => void
+  readOnly?: boolean
 }
 
-export function AgentPlanDetail({ planId, onBack }: AgentPlanDetailProps) {
+export function AgentPlanDetail({ planId, onBack, readOnly = false }: AgentPlanDetailProps) {
   const initial = agentPlansData.find((p) => p.id === planId)
   const [plan, setPlan] = useState<AgentPlan | null>(initial ?? null)
   const [openSections, setOpenSections] = useState<Set<string>>(new Set(["s1"]))
   const [feedbackSubmitted, setFeedbackSubmitted] = useState(false)
+  const [reminderSent, setReminderSent] = useState(false)
 
   if (!plan) return null
 
@@ -1270,8 +1162,47 @@ export function AgentPlanDetail({ planId, onBack }: AgentPlanDetailProps) {
     <div className="space-y-6">
       <Button variant="ghost" size="sm" onClick={onBack}>
         <ArrowLeft className="h-4 w-4 mr-2" />
-        Back to My Coaching Plans
+        {readOnly ? "Back to agent list" : "Back to My Coaching Plans"}
       </Button>
+
+      {/* Supervisor read-only: agent identity row */}
+      {readOnly && (
+        <div className="flex items-center gap-4">
+          <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+            <span className="font-medium text-primary">{plan.agentAvatar}</span>
+          </div>
+          <div>
+            <h3 className="text-xl font-bold">{plan.agentName}</h3>
+            <p className="text-sm text-muted-foreground">
+              Viewing plan as supervisor · {pct}% overall progress
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* Overdue alert (supervisor: shows Send reminder) */}
+      {plan.status === "overdue" && (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-center justify-between">
+          <div className="flex items-center gap-2 text-red-700">
+            <AlertTriangle className="h-4 w-4" />
+            <span className="text-sm font-medium">
+              {readOnly ? "This plan is overdue. Due date has passed." : "Your plan is overdue — please complete the remaining sections as soon as possible."}
+            </span>
+          </div>
+          {readOnly && (
+            <Button
+              size="sm"
+              variant="outline"
+              className="border-red-300 text-red-700 hover:bg-red-100"
+              onClick={() => setReminderSent(true)}
+              disabled={reminderSent}
+            >
+              <Send className="h-3 w-3 mr-1" />
+              {reminderSent ? "Reminder sent ✓" : "Send reminder"}
+            </Button>
+          )}
+        </div>
+      )}
 
       {/* Header card */}
       <Card
@@ -1309,11 +1240,21 @@ export function AgentPlanDetail({ planId, onBack }: AgentPlanDetailProps) {
         </CardContent>
       </Card>
 
-      {/* Supervisor note */}
-      {plan.supervisorNote && (
+      {/* Supervisor note (shown to agent) */}
+      {!readOnly && plan.supervisorNote && (
         <Card className="bg-amber-50 border-amber-200">
           <CardContent className="p-4">
             <p className="text-xs font-semibold text-amber-700 mb-1">Note from your supervisor</p>
+            <p className="text-sm text-amber-900 italic">{plan.supervisorNote}</p>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Supervisor read-only: supervisor note preview */}
+      {readOnly && plan.supervisorNote && (
+        <Card className="bg-amber-50 border-amber-200">
+          <CardContent className="p-4">
+            <p className="text-xs font-semibold text-amber-700 mb-1">Your note to this agent</p>
             <p className="text-sm text-amber-900 italic">{plan.supervisorNote}</p>
           </CardContent>
         </Card>
@@ -1323,7 +1264,13 @@ export function AgentPlanDetail({ planId, onBack }: AgentPlanDetailProps) {
       <div className="space-y-3">
         {plan.sections.map((section, idx) => (
           <Card key={section.id} className={section.completed ? "border-green-200" : ""}>
-            <button className="w-full text-left" onClick={() => toggleSection(section.id)}>
+            <div
+              className="w-full text-left cursor-pointer select-none"
+              role="button"
+              tabIndex={0}
+              onClick={() => toggleSection(section.id)}
+              onKeyDown={(e) => e.key === "Enter" && toggleSection(section.id)}
+            >
               <CardHeader
                 className={`pb-3 rounded-t-lg ${section.completed ? "bg-green-50" : ""}`}
               >
@@ -1341,7 +1288,11 @@ export function AgentPlanDetail({ planId, onBack }: AgentPlanDetailProps) {
                     {section.title}
                   </CardTitle>
                   <div className="flex items-center gap-2">
-                    {!section.completed ? (
+                    {section.completed ? (
+                      <Badge className="bg-green-100 text-green-800 text-xs">✓ Completed</Badge>
+                    ) : readOnly ? (
+                      <Badge variant="outline" className="text-xs text-muted-foreground">Pending</Badge>
+                    ) : (
                       <Button
                         size="sm"
                         variant="outline"
@@ -1353,8 +1304,6 @@ export function AgentPlanDetail({ planId, onBack }: AgentPlanDetailProps) {
                       >
                         Mark complete
                       </Button>
-                    ) : (
-                      <Badge className="bg-green-100 text-green-800 text-xs">✓ Completed</Badge>
                     )}
                     {openSections.has(section.id) ? (
                       <ChevronUp className="h-4 w-4 text-muted-foreground" />
@@ -1364,7 +1313,7 @@ export function AgentPlanDetail({ planId, onBack }: AgentPlanDetailProps) {
                   </div>
                 </div>
               </CardHeader>
-            </button>
+            </div>
             {openSections.has(section.id) && (
               <CardContent className="pt-0">{renderSectionContent(section)}</CardContent>
             )}
@@ -1372,8 +1321,43 @@ export function AgentPlanDetail({ planId, onBack }: AgentPlanDetailProps) {
         ))}
       </div>
 
-      {/* Celebration card */}
-      {allDone && (
+      {/* Activity timeline (supervisor view) */}
+      {readOnly && plan.timeline.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Activity className="h-4 w-4" />
+              Activity timeline
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {plan.timeline.map((event, i) => (
+                <div key={i} className="flex items-start gap-3">
+                  <div
+                    className={`h-2.5 w-2.5 rounded-full mt-1.5 flex-shrink-0 ${
+                      event.type === "assigned"
+                        ? "bg-blue-500"
+                        : event.type === "opened"
+                        ? "bg-amber-500"
+                        : event.type === "section"
+                        ? "bg-green-500"
+                        : "bg-muted"
+                    }`}
+                  />
+                  <div>
+                    <p className="text-sm">{event.event}</p>
+                    <p className="text-xs text-muted-foreground">{event.date}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Celebration card (agent view only) */}
+      {!readOnly && allDone && (
         <Card className="bg-green-50 border-green-300">
           <CardContent className="p-8 text-center space-y-4">
             <div className="text-4xl">🎉</div>
@@ -1389,6 +1373,19 @@ export function AgentPlanDetail({ planId, onBack }: AgentPlanDetailProps) {
             >
               {feedbackSubmitted ? "Feedback submitted ✓" : "Submit feedback"}
             </Button>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* All done banner (supervisor view) */}
+      {readOnly && allDone && (
+        <Card className="bg-green-50 border-green-300">
+          <CardContent className="p-6 flex items-center gap-4">
+            <CheckCircle className="h-8 w-8 text-green-600 flex-shrink-0" />
+            <div>
+              <h3 className="font-bold text-green-800">All sections completed by {plan.agentName}</h3>
+              <p className="text-sm text-green-700">This coaching plan is finished.</p>
+            </div>
           </CardContent>
         </Card>
       )}
