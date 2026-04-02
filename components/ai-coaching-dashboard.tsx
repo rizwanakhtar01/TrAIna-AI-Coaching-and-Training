@@ -395,21 +395,6 @@ export function AiCoachingDashboard({ onLogout, onSwitchToSupervisor }: AiCoachi
         </Tabs>
       </div>
 
-      {/* Persona switcher */}
-      {onSwitchToSupervisor && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50">
-          <div className="flex items-center gap-3 bg-card border border-border shadow-lg rounded-full px-5 py-2.5">
-            <Badge className="bg-teal-100 text-teal-800 border-teal-200">Agent view</Badge>
-            <span className="text-sm text-muted-foreground">Switch to:</span>
-            <button
-              onClick={onSwitchToSupervisor}
-              className="text-sm font-medium text-primary hover:underline"
-            >
-              Supervisor view
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
