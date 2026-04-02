@@ -6,6 +6,11 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Calendar as CalendarPicker } from "@/components/ui/calendar";
 import { ContactReviewsList } from "@/components/contact-review-card";
 import {
+  AiRecommendationCard,
+  CoachingCardReview,
+  CoachingProgressTracker,
+} from "@/components/coaching-recommendations";
+import {
   Card,
   CardContent,
   CardDescription,
@@ -160,9 +165,10 @@ interface Alert {
 
 interface SupervisorDashboardProps {
   onLogout: () => void;
+  onSwitchToAgent?: () => void;
 }
 
-export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
+export function SupervisorDashboard({ onLogout, onSwitchToAgent }: SupervisorDashboardProps) {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [selectedAgent, setSelectedAgent] = useState<string | null>(null);
   const [timeFilter, setTimeFilter] = useState("daily");
@@ -174,6 +180,7 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
   const [showAlerts, setShowAlerts] = useState(false);
   const [selectedPattern, setSelectedPattern] = useState<string | null>(null);
   const [showPatternDetails, setShowPatternDetails] = useState(false);
+  const [showCoachingCardReview, setShowCoachingCardReview] = useState(false);
   const [agentPerfFilter, setAgentPerfFilter] = useState<"all" | "struggling" | "high">("all");
   const [patternTimeFilter, setPatternTimeFilter] = useState("yesterday");
   const [patternCustomDate, setPatternCustomDate] = useState<Date | undefined>(undefined);
@@ -1862,6 +1869,29 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
   }
 
   // If viewing pattern details, show that page
+  if (showCoachingCardReview && selectedPattern) {
+    const pattern = challengingPatterns.find((p) => p.id === selectedPattern);
+    if (!pattern) return null;
+    return (
+      <CoachingCardReview
+        patternName={pattern.name}
+        occurrences={pattern.frequency}
+        affectedAgentsCount={pattern.affectedAgents.length}
+        timeframe={pattern.dateRange}
+        impactedAgents={agents
+          .filter((a) => pattern.affectedAgents.includes(a.id))
+          .map((a) => ({ id: a.id, name: a.name, avatar: a.avatar }))}
+        onBack={() => setShowCoachingCardReview(false)}
+        onGoToProgress={() => {
+          setShowCoachingCardReview(false);
+          setShowPatternDetails(false);
+          setActiveTab("progress");
+        }}
+        onLogout={onLogout}
+      />
+    );
+  }
+
   if (showPatternDetails && selectedPattern) {
     const pattern = challengingPatterns.find((p) => p.id === selectedPattern);
     if (!pattern) return null;
@@ -2262,6 +2292,12 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
               </div>
             </CardContent>
           </Card>
+
+          {/* AI Coaching Recommendation */}
+          <AiRecommendationCard
+            patternName={pattern.name}
+            onReviewCard={() => setShowCoachingCardReview(true)}
+          />
         </div>
       </div>
     );
@@ -2938,151 +2974,11 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
 
           {/* Coaching Progress Tracker */}
           <TabsContent value="progress" className="space-y-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-2xl font-bold text-foreground">
-                  Coaching Progress Tracker
-                </h2>
-                <p className="text-muted-foreground">
-                  Individual coaching progress
-                </p>
-                {agentFilter === "affected" && selectedPattern && (
-                  <div className="flex items-center gap-2 mt-2">
-                    <Badge variant="outline">
-                      Showing agents affected by pattern
-                    </Badge>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => {
-                        setAgentFilter("all");
-                        setSelectedPattern(null);
-                      }}
-                    >
-                      <ArrowLeft className="h-3 w-3 mr-1" />
-                      Back to All Agents
-                    </Button>
-                  </div>
-                )}
-              </div>
-              <div className="flex items-center gap-2">
-                <Select value={agentFilter} onValueChange={setAgentFilter}>
-                  <SelectTrigger className="w-44">
-                    <SelectValue placeholder="All Agents" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Agents</SelectItem>
-                    {agents.map((agent) => (
-                      <SelectItem key={agent.id} value={agent.id}>{agent.name}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+            <div>
+              <h2 className="text-2xl font-bold text-foreground">Coaching Progress Tracker</h2>
+              <p className="text-muted-foreground">AI-assigned plans and completion tracking across the team</p>
             </div>
-
-            <div className="grid gap-4">
-              {getFilteredAgents().map((agent) => {
-                const statusBadge = getStatusBadge(agent.status);
-                const engagement = getEngagementLevel(agent.engagementTime);
-
-                return (
-                  <Card
-                    key={agent.id}
-                    className={`hover:shadow-md transition-shadow cursor-pointer ${
-                      agent.status === "at-risk"
-                        ? "border-red-200 bg-red-50/50"
-                        : ""
-                    }`}
-                    onClick={() => setSelectedAgent(agent.id)}
-                  >
-                    <CardContent className="p-6">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-4">
-                          <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-                            <span className="font-medium text-primary">
-                              {agent.avatar}
-                            </span>
-                          </div>
-                          <div>
-                            <h3 className="font-semibold text-foreground">
-                              {agent.name}
-                            </h3>
-                            <p className="text-sm text-muted-foreground">
-                              {agent.email} • Last session: {agent.lastSession}
-                            </p>
-                          </div>
-                        </div>
-
-                        <div className="flex items-center gap-6">
-                          {/* Sessions Completed */}
-                          <div className="text-center">
-                            <div className="text-2xl font-bold text-foreground">
-                              {agent.sessionsCompleted}/{agent.sessionsTarget}
-                            </div>
-                            <p className="text-xs text-muted-foreground">
-                              Sessions
-                            </p>
-                            <Progress
-                              value={
-                                (agent.sessionsCompleted /
-                                  agent.sessionsTarget) *
-                                100
-                              }
-                              className="w-16 mt-1"
-                            />
-                          </div>
-
-
-                          {/* Engagement Level */}
-                          {/* <div className="text-center">
-                            <div
-                              className={`text-lg font-bold ${engagement.color}`}
-                            >
-                              {engagement.level}
-                            </div>
-                            <p className="text-xs text-muted-foreground">
-                              {agent.engagementTime}min
-                            </p>
-                          </div> */}
-
-                          {/* Traffic Light Status */}
-                          {/* <div className="text-center">
-                            <Badge {...statusBadge}>
-                              {statusBadge.icon} {statusBadge.text}
-                            </Badge>
-                          </div> */}
-
-                          <Button variant="outline" size="sm">
-                            <ArrowRight className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </div>
-
-                      <div className="mt-4 pt-4 border-t">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <p className="text-sm font-medium text-foreground mb-1">
-                              Improvement Areas:
-                            </p>
-                            <div className="flex gap-2">
-                              {agent.improvementAreas.map((area, i) => (
-                                <Badge
-                                  key={i}
-                                  variant="outline"
-                                  className="text-xs"
-                                >
-                                  {area}
-                                </Badge>
-                              ))}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                );
-              })}
-            </div>
+            <CoachingProgressTracker />
           </TabsContent>
 
           {/* Daily Team Coaching Summary */}
@@ -3184,6 +3080,22 @@ export function SupervisorDashboard({ onLogout }: SupervisorDashboardProps) {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* Persona switcher */}
+      {onSwitchToAgent && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50">
+          <div className="flex items-center gap-3 bg-card border border-border shadow-lg rounded-full px-5 py-2.5">
+            <Badge className="bg-blue-100 text-blue-800 border-blue-200">Supervisor view</Badge>
+            <span className="text-sm text-muted-foreground">Switch to:</span>
+            <button
+              onClick={onSwitchToAgent}
+              className="text-sm font-medium text-primary hover:underline"
+            >
+              Agent view
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

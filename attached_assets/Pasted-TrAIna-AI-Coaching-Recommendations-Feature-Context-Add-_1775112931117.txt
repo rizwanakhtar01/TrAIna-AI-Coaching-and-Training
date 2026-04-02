@@ -1,0 +1,112 @@
+TrAIna — AI Coaching Recommendations Feature
+Context
+Add the AI Coaching Recommendations feature to the existing TrAIna prototype. This feature extends the Challenging Patterns Explorer with AI-generated coaching cards that supervisors review, approve, and assign to agents. Agents receive and complete coaching plans tracked in real time.
+The existing app already has: Challenging Patterns Explorer (list view), Pattern Detail page with impacted agents table, and a Coaching Progress tab. This prompt covers the new screens and modifications needed.
+
+Screens to Build (5 total)
+
+
+Screen 1 — Pattern Detail Page (modify existing)
+Keep existing: stat cards (occurrences, agents, channels, timeframe) and impacted agents table.
+Add new section below impacted agents:
+
+Green-bordered card titled "AI coaching recommendation"
+Shows one coaching card per pattern with:
+
+Pattern name (bold) + "Area to improve" subtitle
+Status badge: "Ready for review" (green) or "Generating..." (amber)
+Section count: "5 sections: Coaching objective, Talk tracks, Policy & KB, Practice scenario, Best practices"
+"Review card →" button (primary blue) navigates to Screen 3
+
+
+
+Screen 2 — Coaching Card Review (new)
+Two-column layout: content left (65%), action sidebar right (35%).
+Left column — Card content:
+
+Header card: pattern name, area to improve, stats (occurrences, agents, timeframe) on light blue bg
+Coaching objective: green bg card with the AI-generated objective text
+Expandable accordion sections (default first open):
+
+Talk track examples — 2 quoted script blocks labeled "Standard scenario" and "Edge case handling" on gray bg, italic text
+Policy & knowledge base — list of clickable document links on light blue bg. For Phase 1 these are placeholder links the supervisor can edit. Include helper text: "Attach relevant policy documents"
+Practice scenario — purple bg card with the AI simulation prompt. Footer note: "Interactive practice available in Phase 2"
+Best practices from top performers — bulleted list of 4-5 behavioral tips
+
+
+
+Right column — Action sidebar (sticky):
+
+"Approve card" button (green, full width, prominent)
+"Edit sections" button (outline gray)
+"Reject card" button (outline red)
+Divider
+"Assign to agents" section: checkboxes for impacted agents (pre-checked for agents above threshold, unchecked with note for those below)
+"Due date" input (default: 7 days from today)
+"Note for agent" textarea (optional, placeholder: "Add a personal note...")
+Metadata footer: generation date, contact count basis, AI confidence score
+
+Approve state: Replace content with success confirmation (green checkmark, "Coaching card approved", "Card saved to agent profiles"), two buttons: "Back to pattern" and "Go to Coaching Progress →"
+Screen 3 — Coaching Progress Tracker (new, supervisor)
+Top: 5 stat cards in a row — Total plans, Active, Completed, Overdue, Sections done (fraction)
+Overdue alert banner: Red bg, shows count + agent/pattern names, "Send reminders" button. Only visible when overdue > 0.
+View toggle: "By agent" / "By plan" pill switcher
+By agent view (default):
+
+Card per agent: avatar, name, status badges (Overdue/All complete), plan count, pattern list
+Aggregate progress bar + fraction
+Mini pill tags per plan showing pattern name + progress fraction, color-coded by status
+Click card → agent drill-down
+
+By plan view:
+
+Table: Agent (avatar + name), Pattern, Area to improve, Status badge, Progress bar + fraction, Due date, Action button ("Nudge" for overdue)
+Sortable, overdue rows first
+
+Agent drill-down (sub-screen):
+
+Back button → returns to agent list
+Agent header: avatar (48px), name, plan count, aggregate progress
+Per-plan cards with: pattern name, status badge, area to improve, assigned/due dates, progress bar, section-level progress chips (Objective ✓, Talk tracks ✓, Policy ○, etc.)
+Overdue plans show red alert with "Send reminder" button
+Activity timeline at bottom: chronological list of events (opened plan, completed section, plan assigned) with colored dots and timestamps
+
+Screen 4 — Agent Dashboard (new, agent persona)
+Top: 4 stat cards — Active plans, Sections completed (fraction), Due this week, Overdue
+Active plans list:
+
+Card per plan: pattern name, status badge, "Area to improve" subtitle, assigned/due dates, days remaining, progress bar + fraction
+Click → opens plan detail (Screen 6)
+
+Completed section: Muted cards with strikethrough pattern name, "Completed" badge, completion date
+Screen 5 — Agent Plan Detail (new, agent persona)
+Header card: Pattern name, area to improve, assigned by, due date, days remaining, full-width progress bar + fraction. Left border color = status (blue default, red overdue).
+Supervisor note: Amber bg card with italic note text. Only shown if supervisor attached a note.
+Section cards (one per coaching section):
+
+Header row: icon + title left, "Mark complete" / "✓ Completed" toggle button right
+Completed sections: green left border, green bg header, green button
+Content area below header with section-specific content:
+
+Objective: plain text paragraph
+Talk tracks: labeled quoted script blocks on gray bg
+Policy & KB: clickable document link cards on light blue bg
+Practice scenario: purple bg card with scenario text + Phase 2 note
+Best practices: bulleted list
+
+
+
+Completion state: When all sections done, show celebration card (green bg, party emoji, "All sections completed!", "Your supervisor has been notified", "Submit feedback" button)
+
+Navigation
+Supervisor flow
+Patterns Explorer → Pattern Detail → Card Review → (approve) → Coaching Progress → Agent Drill-down
+Agent flow
+Agent Dashboard → Plan Detail → (complete sections) → Celebration state
+Switching personas
+Add a floating bottom bar or toggle to switch between Supervisor and Agent views for demo purposes. Supervisor screens use blue accent badge, Agent screens use teal accent badge.
+Tab navigation
+
+Supervisor tabs: Dashboard, Agent Performance Review, Challenging Patterns, Coaching Progress
+Agent tabs: My Dashboard, My Coaching Plans, Practice Sessions
+Active tab highlighted with blue bottom border and bold text

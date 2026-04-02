@@ -43,9 +43,19 @@ export default function Home() {
   if (viewMode === "dashboard" && userRole) {
     switch (userRole) {
       case "agent":
-        return <AiCoachingDashboard onLogout={handleLogout} />
+        return (
+          <AiCoachingDashboard
+            onLogout={handleLogout}
+            onSwitchToSupervisor={() => setUserRole("supervisor")}
+          />
+        )
       case "supervisor":
-        return <SupervisorDashboard onLogout={handleLogout} />
+        return (
+          <SupervisorDashboard
+            onLogout={handleLogout}
+            onSwitchToAgent={() => setUserRole("agent")}
+          />
+        )
       case "admin":
         return <AdminDashboard onLogout={handleLogout} />
       case "superadmin":

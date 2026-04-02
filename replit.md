@@ -17,6 +17,8 @@ The application features a modern dashboard interface with multiple specialized 
 - **User Management System**: Admin dashboard feature for managing platform users with CRUD operations, role assignment (Agent/Supervisor/Admin), Amazon Connect User ID mapping, activation/deactivation, and auto-generated passwords
 - **Team Management System**: Supervisor-agent assignment interface with supervisor cards showing team size, dual-panel modal for managing team members (Available/Assigned agents), search functionality, and click-to-add/remove interactions
 - **Super Admin Dashboard**: Platform-wide tenant management for OmniTrAina with sidebar navigation, customer management (list, create, view, suspend), platform overview metrics (total customers, agents onboarded, training modules, KB uploaded %, active training %), onboarding readiness checklist tracking (5 steps), and Access & Roles informational section
+- **AI Coaching Recommendations**: Full end-to-end coaching flow — supervisor pattern detail shows AI recommendation card → opens 2-column Coaching Card Review (coaching objective, talk tracks, policy docs, practice scenario, best practices, agent assignment, approve/reject) → enhanced Coaching Progress Tracker with 5 stat cards, overdue banner, by-agent/by-plan views, agent drill-down with activity timeline → Agent "My Coaching Plans" tab with plan detail view showing section-by-section progress with mark-complete and celebration state
+- **Persona Switcher**: Floating bottom bar in supervisor and agent dashboards for switching between views in demos (blue badge for supervisor, teal badge for agent)
 
 ## User Preferences
 

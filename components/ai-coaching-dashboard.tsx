@@ -32,18 +32,22 @@ import { ContactReviewsList } from "./contact-review-card";
 import { ChallengePatternsScreen } from "./challenge-patterns";
 import { SentimentTrendsScreen } from "./sentiment-trends";
 import { InteractiveCoachingScreen } from "./interactive-coaching";
+import { AgentCoachingPlans, AgentPlanDetail } from "./coaching-recommendations";
 
 interface AiCoachingDashboardProps {
   onLogout: () => void;
+  onSwitchToSupervisor?: () => void;
 }
 
-export function AiCoachingDashboard({ onLogout }: AiCoachingDashboardProps) {
+export function AiCoachingDashboard({ onLogout, onSwitchToSupervisor }: AiCoachingDashboardProps) {
   const [activeTab, setActiveTab] = useState("dashboard");
+  const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null);
 
   const navigateToReviews = () => setActiveTab("reviews");
   const navigateToPatterns = () => setActiveTab("patterns");
   const navigateToSentiment = () => setActiveTab("sentiment");
   const navigateToCoaching = () => setActiveTab("coaching");
+  const navigateToPlans = () => setActiveTab("plans");
 
   return (
     <div className="space-y-6">
@@ -93,13 +97,13 @@ export function AiCoachingDashboard({ onLogout }: AiCoachingDashboardProps) {
           onValueChange={setActiveTab}
           className="space-y-6"
         >
-          <TabsList className="grid w-full grid-cols-5 lg:w-[750px] bg-zinc-100">
-            <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
-
+          <TabsList className="grid w-full grid-cols-6 lg:w-[900px] bg-zinc-100">
+            <TabsTrigger value="dashboard">My Dashboard</TabsTrigger>
+            <TabsTrigger value="plans">My Coaching Plans</TabsTrigger>
             <TabsTrigger value="reviews">Contact Reviews</TabsTrigger>
             <TabsTrigger value="patterns">Challenge Patterns</TabsTrigger>
             <TabsTrigger value="sentiment">Sentiment Trends</TabsTrigger>
-            <TabsTrigger value="coaching">Interactive Coaching</TabsTrigger>
+            <TabsTrigger value="coaching">Practice Sessions</TabsTrigger>
           </TabsList>
 
           <TabsContent value="dashboard" className="space-y-6">
@@ -353,7 +357,23 @@ export function AiCoachingDashboard({ onLogout }: AiCoachingDashboardProps) {
 
           </TabsContent>
 
-          {/* Interactive Coaching */}
+          {/* My Coaching Plans */}
+          <TabsContent value="plans" className="space-y-6">
+            <div>
+              <h2 className="text-2xl font-bold text-foreground">My Coaching Plans</h2>
+              <p className="text-muted-foreground">AI-generated plans assigned to you by your supervisor</p>
+            </div>
+            {selectedPlanId ? (
+              <AgentPlanDetail
+                planId={selectedPlanId}
+                onBack={() => setSelectedPlanId(null)}
+              />
+            ) : (
+              <AgentCoachingPlans onViewPlan={(id) => setSelectedPlanId(id)} />
+            )}
+          </TabsContent>
+
+          {/* Practice Sessions (formerly Interactive Coaching) */}
           <TabsContent value="coaching" className="space-y-6">
             <InteractiveCoachingScreen />
           </TabsContent>
@@ -374,6 +394,22 @@ export function AiCoachingDashboard({ onLogout }: AiCoachingDashboardProps) {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* Persona switcher */}
+      {onSwitchToSupervisor && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50">
+          <div className="flex items-center gap-3 bg-card border border-border shadow-lg rounded-full px-5 py-2.5">
+            <Badge className="bg-teal-100 text-teal-800 border-teal-200">Agent view</Badge>
+            <span className="text-sm text-muted-foreground">Switch to:</span>
+            <button
+              onClick={onSwitchToSupervisor}
+              className="text-sm font-medium text-primary hover:underline"
+            >
+              Supervisor view
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
