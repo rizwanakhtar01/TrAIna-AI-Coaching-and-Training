@@ -2823,8 +2823,7 @@ export function SupervisorDashboard({ onLogout, onSwitchToAgent }: SupervisorDas
                         <div>
                           <h4 className="font-medium">{challenge.name}</h4>
                           <p className="text-sm text-muted-foreground">
-                            {challenge.category} • {challenge.frequency}{" "}
-                            occurrences
+                            {challenge.frequency} occurrences
                           </p>
                         </div>
                       </div>
