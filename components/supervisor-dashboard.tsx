@@ -171,7 +171,7 @@ interface SupervisorDashboardProps {
 export function SupervisorDashboard({ onLogout, onSwitchToAgent }: SupervisorDashboardProps) {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [selectedAgent, setSelectedAgent] = useState<string | null>(null);
-  const [timeFilter, setTimeFilter] = useState("daily");
+  const [timeFilter, setTimeFilter] = useState("yesterday");
   const [agentFilter, setAgentFilter] = useState("all");
   const [intentFilter, setIntentFilter] = useState("all");
   const [channelFilter, setChannelFilter] = useState("all");
@@ -1429,7 +1429,7 @@ export function SupervisorDashboard({ onLogout, onSwitchToAgent }: SupervisorDas
   };
 
   const getPerformanceTimelineData = () => {
-    if (timeFilter === "daily") {
+    if (timeFilter === "yesterday") {
       return [
         { period: "Mon", score: 8.2, sessions: 12 },
         { period: "Tue", score: 8.4, sessions: 14 },
@@ -1439,7 +1439,7 @@ export function SupervisorDashboard({ onLogout, onSwitchToAgent }: SupervisorDas
         { period: "Sat", score: 8.4, sessions: 11 },
         { period: "Sun", score: 8.3, sessions: 10 },
       ];
-    } else if (timeFilter === "monthly") {
+    } else if (timeFilter === "month") {
       return [
         { period: "Aug", score: 7.5, sessions: 180 },
         { period: "Sep", score: 7.8, sessions: 195 },
@@ -1485,7 +1485,7 @@ export function SupervisorDashboard({ onLogout, onSwitchToAgent }: SupervisorDas
       avgPrevScore > 0 ? ((avgScore - avgPrevScore) / avgPrevScore) * 100 : 0;
 
     const previousWeekImprovement =
-      timeFilter === "daily" ? 8 : timeFilter === "monthly" ? 15 : 12;
+      timeFilter === "yesterday" ? 8 : timeFilter === "month" ? 15 : 12;
 
     const totalSessions = filteredAgents.reduce(
       (sum, a) => sum + a.sessionsCompleted,
@@ -2692,6 +2692,23 @@ export function SupervisorDashboard({ onLogout, onSwitchToAgent }: SupervisorDas
               <TabsTrigger value="patterns" className="px-4">Challenging Patterns</TabsTrigger>
               <TabsTrigger value="progress" className="px-4">Coaching Progress</TabsTrigger>
             </TabsList>
+
+            {/* Timeframe selector */}
+            <div className="flex items-center gap-1 bg-muted p-1 rounded-lg">
+              {(["yesterday", "week", "month"] as const).map((value) => (
+                <button
+                  key={value}
+                  onClick={() => setTimeFilter(value)}
+                  className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
+                    timeFilter === value
+                      ? "bg-background shadow text-foreground"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {value === "yesterday" ? "Yesterday" : value === "week" ? "This Week" : "This Month"}
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* Team Overview Dashboard */}
@@ -2701,12 +2718,12 @@ export function SupervisorDashboard({ onLogout, onSwitchToAgent }: SupervisorDas
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">
-                    Agents Coached This{" "}
-                    {timeFilter === "daily"
-                      ? "Day"
-                      : timeFilter === "monthly"
-                        ? "Month"
-                        : "Week"}
+                    Agents Coached{" "}
+                    {timeFilter === "yesterday"
+                      ? "Yesterday"
+                      : timeFilter === "month"
+                        ? "This Month"
+                        : "This Week"}
                   </CardTitle>
                   <Users className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
@@ -2738,10 +2755,10 @@ export function SupervisorDashboard({ onLogout, onSwitchToAgent }: SupervisorDas
                     {getFilteredTeamMetrics().teamImprovementPercent}%
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    vs last{" "}
-                    {timeFilter === "daily"
+                    vs previous{" "}
+                    {timeFilter === "yesterday"
                       ? "day"
-                      : timeFilter === "monthly"
+                      : timeFilter === "month"
                         ? "month"
                         : "week"}{" "}
                     (+{getFilteredTeamMetrics().previousWeekImprovement}%)
