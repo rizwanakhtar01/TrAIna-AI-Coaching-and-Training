@@ -2694,7 +2694,7 @@ export function SupervisorDashboard({ onLogout, onSwitchToAgent }: SupervisorDas
             </TabsList>
 
             {/* Timeframe selector */}
-            <div className="flex items-center gap-1 bg-muted p-1 rounded-lg">
+            <div className="flex items-center gap-1 bg-zinc-100 p-1 rounded-lg">
               {(["yesterday", "week", "month"] as const).map((value) => (
                 <button
                   key={value}
