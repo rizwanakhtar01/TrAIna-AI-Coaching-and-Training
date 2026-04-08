@@ -81,6 +81,11 @@ import {
   User,
   FolderOpen,
   Eye,
+  Wand2,
+  Loader2,
+  X,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -240,6 +245,14 @@ interface TeamAssignment {
   agentIds: string[];
 }
 
+interface AnalysisArea {
+  id: string;
+  title: string;
+  definition: string;
+  goodExample: string;
+  badExample: string;
+}
+
 export function AdminDashboard({ onLogout }: AdminDashboardProps) {
   const [activeTab, setActiveTab] = useState("overview");
   const [isCreateWizardOpen, setIsCreateWizardOpen] = useState(false);
@@ -284,6 +297,30 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
   const [isUploadingDoc, setIsUploadingDoc] = useState(false);
   const [documentToDelete, setDocumentToDelete] =
     useState<BusinessDocument | null>(null);
+
+  // Analysis Areas state
+  const [analysisAreas, setAnalysisAreas] = useState<AnalysisArea[]>([
+    {
+      id: "aa_1",
+      title: "Empathy & Tone",
+      definition: "Measures whether the agent demonstrates genuine understanding of the customer's emotions and maintains a warm, professional tone throughout the interaction.",
+      goodExample: "\"I completely understand how frustrating this must be for you. Let me personally make sure we get this resolved today.\"",
+      badExample: "\"That's just our policy. There's nothing I can do about it.\"",
+    },
+    {
+      id: "aa_2",
+      title: "First Contact Resolution",
+      definition: "Evaluates whether the agent resolves the customer's issue fully within a single interaction, without requiring a callback or follow-up contact.",
+      goodExample: "Agent identifies root cause, applies fix, confirms resolution, and asks if there's anything else before closing.",
+      badExample: "Agent transfers the customer multiple times and the issue remains unresolved at the end of the call.",
+    },
+  ]);
+  const [isAreaDialogOpen, setIsAreaDialogOpen] = useState(false);
+  const [editingArea, setEditingArea] = useState<AnalysisArea | null>(null);
+  const [areaForm, setAreaForm] = useState({ title: "", definition: "", goodExample: "", badExample: "" });
+  const [generatingField, setGeneratingField] = useState<string | null>(null);
+  const [expandedAreaId, setExpandedAreaId] = useState<string | null>(null);
+  const [areaToDelete, setAreaToDelete] = useState<AnalysisArea | null>(null);
 
   // Knowledge Base State
   const [knowledgeBases, setKnowledgeBases] = useState<KnowledgeBase[]>([
@@ -694,6 +731,68 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
       isActive: !prev.isActive,
       lastUpdated: new Date().toISOString(),
     }));
+  };
+
+  // Analysis Areas handlers
+  const openAddArea = () => {
+    setEditingArea(null);
+    setAreaForm({ title: "", definition: "", goodExample: "", badExample: "" });
+    setIsAreaDialogOpen(true);
+  };
+
+  const openEditArea = (area: AnalysisArea) => {
+    setEditingArea(area);
+    setAreaForm({ title: area.title, definition: area.definition, goodExample: area.goodExample, badExample: area.badExample });
+    setIsAreaDialogOpen(true);
+  };
+
+  const saveArea = () => {
+    if (!areaForm.title.trim()) return;
+    if (editingArea) {
+      setAnalysisAreas((prev) => prev.map((a) => a.id === editingArea.id ? { ...a, ...areaForm } : a));
+    } else {
+      setAnalysisAreas((prev) => [...prev, { id: `aa_${Date.now()}`, ...areaForm }]);
+    }
+    setIsAreaDialogOpen(false);
+  };
+
+  const confirmDeleteArea = () => {
+    if (!areaToDelete) return;
+    setAnalysisAreas((prev) => prev.filter((a) => a.id !== areaToDelete.id));
+    setAreaToDelete(null);
+  };
+
+  const generateWithAI = async (field: "definition" | "goodExample" | "badExample") => {
+    if (!areaForm.title.trim()) return;
+    setGeneratingField(field);
+    await new Promise((r) => setTimeout(r, 1400));
+    const title = areaForm.title.toLowerCase();
+    const suggestions: Record<string, Record<string, string>> = {
+      definition: {
+        empathy: "Measures whether the agent acknowledges and validates the customer's feelings, adapts their communication style to the customer's emotional state, and ensures the customer feels genuinely heard throughout the interaction.",
+        resolution: "Evaluates whether the agent fully resolves the customer's issue within the interaction, confirms the resolution with the customer, and ensures no follow-up contact is needed.",
+        compliance: "Assesses whether the agent follows all mandatory compliance requirements, correctly discloses required information, and avoids statements that could create legal or regulatory risk.",
+        default: `Evaluates the degree to which the agent demonstrates ${areaForm.title} during customer interactions, based on observable behaviors, language choices, and outcomes achieved.`,
+      },
+      goodExample: {
+        empathy: `"I can hear how stressful this has been — let me take ownership of this right now and walk you through exactly what I'm doing to fix it."`,
+        resolution: "Agent confirms the fix is applied, explains what was done, sets clear expectations for next steps, and asks if there's anything else before ending the call.",
+        compliance: `"Before we proceed, I do need to let you know that this call may be recorded for quality and training purposes. Is that okay with you?"`,
+        default: `Agent clearly demonstrates ${areaForm.title} by [specific observable action], resulting in a positive customer experience and measurable outcome.`,
+      },
+      badExample: {
+        empathy: `"I understand." (said flatly with no follow-up). Agent moves immediately to troubleshooting without acknowledging the customer's frustration.`,
+        resolution: "Agent closes the contact without confirming the issue is resolved. Customer calls back within 24 hours with the same problem.",
+        compliance: "Agent skips required disclosure, makes a promise that contradicts policy, or shares account details without completing proper verification.",
+        default: `Agent fails to demonstrate ${areaForm.title}, resulting in customer dissatisfaction, escalation, or a missed opportunity to meet quality standards.`,
+      },
+    };
+    const key = title.includes("empathy") || title.includes("tone") ? "empathy"
+      : title.includes("resol") || title.includes("fcr") || title.includes("first contact") ? "resolution"
+      : title.includes("compli") || title.includes("legal") || title.includes("regulat") ? "compliance"
+      : "default";
+    setAreaForm((prev) => ({ ...prev, [field]: suggestions[field][key] }));
+    setGeneratingField(null);
   };
 
   // User Management Helper Functions
@@ -2564,6 +2663,231 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                 </div>
               </CardContent>
             </Card>
+
+            {/* Analysis Areas Section */}
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="flex items-center gap-2">
+                      <Target className="h-5 w-5" />
+                      Analysis Areas
+                    </CardTitle>
+                    <CardDescription>
+                      Define the dimensions TrAIna uses when evaluating agent contacts. Each area shapes how interactions are scored and coached.
+                    </CardDescription>
+                  </div>
+                  <Button onClick={openAddArea}>
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Analysis Area
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                {analysisAreas.length === 0 ? (
+                  <div className="text-center py-10 text-muted-foreground border-2 border-dashed rounded-lg">
+                    <Target className="h-10 w-10 mx-auto mb-2 opacity-40" />
+                    <p className="text-sm font-medium">No analysis areas defined yet</p>
+                    <p className="text-xs mt-1">Add an area to tell TrAIna what to look for when reviewing contacts.</p>
+                    <Button variant="outline" size="sm" className="mt-4" onClick={openAddArea}>
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add your first area
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {analysisAreas.map((area) => {
+                      const isExpanded = expandedAreaId === area.id;
+                      return (
+                        <div key={area.id} className="border rounded-lg overflow-hidden">
+                          {/* Row header */}
+                          <div
+                            className="flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-muted/40 transition-colors"
+                            onClick={() => setExpandedAreaId(isExpanded ? null : area.id)}
+                          >
+                            <div className="flex items-center gap-3">
+                              {isExpanded
+                                ? <ChevronUp className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                                : <ChevronDown className="h-4 w-4 text-muted-foreground flex-shrink-0" />}
+                              <span className="font-medium">{area.title}</span>
+                            </div>
+                            <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+                              <Button variant="ghost" size="sm" className="h-8 px-2 text-muted-foreground hover:text-foreground" onClick={() => openEditArea(area)}>
+                                <Edit className="h-3.5 w-3.5" />
+                              </Button>
+                              <Button variant="ghost" size="sm" className="h-8 px-2 text-muted-foreground hover:text-red-600" onClick={() => setAreaToDelete(area)}>
+                                <Trash2 className="h-3.5 w-3.5" />
+                              </Button>
+                            </div>
+                          </div>
+
+                          {/* Expanded detail */}
+                          {isExpanded && (
+                            <div className="px-4 pb-4 pt-1 border-t bg-muted/20 space-y-4">
+                              <div>
+                                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">Definition</p>
+                                <p className="text-sm">{area.definition || <span className="italic text-muted-foreground">Not provided</span>}</p>
+                              </div>
+                              <div className="grid grid-cols-2 gap-4">
+                                <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                                  <p className="text-xs font-semibold text-green-700 uppercase tracking-wide mb-1">Good Example</p>
+                                  <p className="text-sm text-green-900">{area.goodExample || <span className="italic text-muted-foreground">Not provided</span>}</p>
+                                </div>
+                                <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+                                  <p className="text-xs font-semibold text-red-700 uppercase tracking-wide mb-1">Bad Example</p>
+                                  <p className="text-sm text-red-900">{area.badExample || <span className="italic text-muted-foreground">Not provided</span>}</p>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Add / Edit Analysis Area Dialog */}
+            <Dialog open={isAreaDialogOpen} onOpenChange={setIsAreaDialogOpen}>
+              <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle>{editingArea ? "Edit Analysis Area" : "Add Analysis Area"}</DialogTitle>
+                  <DialogDescription>
+                    {editingArea ? "Update this analysis dimension." : "Define a new dimension TrAIna will use when evaluating agent contacts."}
+                  </DialogDescription>
+                </DialogHeader>
+
+                <div className="space-y-5 py-2">
+                  {/* Title */}
+                  <div className="space-y-2">
+                    <Label htmlFor="area-title">Title <span className="text-red-500">*</span></Label>
+                    <Input
+                      id="area-title"
+                      placeholder="e.g. Empathy & Tone, First Contact Resolution, Compliance Adherence"
+                      value={areaForm.title}
+                      onChange={(e) => setAreaForm((f) => ({ ...f, title: e.target.value }))}
+                    />
+                  </div>
+
+                  {/* Definition */}
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="area-definition">Definition</Label>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="h-7 text-xs gap-1.5"
+                        disabled={!areaForm.title.trim() || generatingField === "definition"}
+                        onClick={() => generateWithAI("definition")}
+                      >
+                        {generatingField === "definition"
+                          ? <Loader2 className="h-3 w-3 animate-spin" />
+                          : <Wand2 className="h-3 w-3" />}
+                        {generatingField === "definition" ? "Generating…" : "Generate with AI"}
+                      </Button>
+                    </div>
+                    <Textarea
+                      id="area-definition"
+                      rows={3}
+                      placeholder="Describe what this area measures and how agents are evaluated against it…"
+                      value={areaForm.definition}
+                      onChange={(e) => setAreaForm((f) => ({ ...f, definition: e.target.value }))}
+                    />
+                  </div>
+
+                  {/* Good Example */}
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="area-good" className="text-green-700">Good Example</Label>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="h-7 text-xs gap-1.5"
+                        disabled={!areaForm.title.trim() || generatingField === "goodExample"}
+                        onClick={() => generateWithAI("goodExample")}
+                      >
+                        {generatingField === "goodExample"
+                          ? <Loader2 className="h-3 w-3 animate-spin" />
+                          : <Wand2 className="h-3 w-3" />}
+                        {generatingField === "goodExample" ? "Generating…" : "Generate with AI"}
+                      </Button>
+                    </div>
+                    <Textarea
+                      id="area-good"
+                      rows={2}
+                      placeholder="Show what excellent performance looks like for this area…"
+                      className="border-green-200 focus-visible:ring-green-400"
+                      value={areaForm.goodExample}
+                      onChange={(e) => setAreaForm((f) => ({ ...f, goodExample: e.target.value }))}
+                    />
+                  </div>
+
+                  {/* Bad Example */}
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="area-bad" className="text-red-600">Bad Example</Label>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="h-7 text-xs gap-1.5"
+                        disabled={!areaForm.title.trim() || generatingField === "badExample"}
+                        onClick={() => generateWithAI("badExample")}
+                      >
+                        {generatingField === "badExample"
+                          ? <Loader2 className="h-3 w-3 animate-spin" />
+                          : <Wand2 className="h-3 w-3" />}
+                        {generatingField === "badExample" ? "Generating…" : "Generate with AI"}
+                      </Button>
+                    </div>
+                    <Textarea
+                      id="area-bad"
+                      rows={2}
+                      placeholder="Show what poor performance looks like for this area…"
+                      className="border-red-200 focus-visible:ring-red-400"
+                      value={areaForm.badExample}
+                      onChange={(e) => setAreaForm((f) => ({ ...f, badExample: e.target.value }))}
+                    />
+                  </div>
+
+                  {!areaForm.title.trim() && (
+                    <p className="text-xs text-muted-foreground flex items-center gap-1">
+                      <Wand2 className="h-3 w-3" />
+                      Enter a title first to enable AI generation for the other fields.
+                    </p>
+                  )}
+                </div>
+
+                <DialogFooter>
+                  <Button variant="outline" onClick={() => setIsAreaDialogOpen(false)}>Cancel</Button>
+                  <Button onClick={saveArea} disabled={!areaForm.title.trim()}>
+                    <Save className="h-4 w-4 mr-2" />
+                    {editingArea ? "Save Changes" : "Add Area"}
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+
+            {/* Delete Confirmation */}
+            <AlertDialog open={!!areaToDelete} onOpenChange={(open) => !open && setAreaToDelete(null)}>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Remove Analysis Area</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Are you sure you want to remove <strong>{areaToDelete?.title}</strong>? This area will no longer be used when TrAIna scores agent contacts.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction className="bg-red-600 hover:bg-red-700" onClick={confirmDeleteArea}>
+                    Remove
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
 
             {/* Knowledge Bases Section */}
             {!viewingKB ? (
