@@ -746,8 +746,10 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
     setIsAreaDialogOpen(true);
   };
 
+  const allAreaFieldsFilled = !!(areaForm.title.trim() && areaForm.definition.trim() && areaForm.goodExample.trim() && areaForm.badExample.trim());
+
   const saveArea = () => {
-    if (!areaForm.title.trim()) return;
+    if (!allAreaFieldsFilled) return;
     if (editingArea) {
       setAnalysisAreas((prev) => prev.map((a) => a.id === editingArea.id ? { ...a, ...areaForm } : a));
     } else {
@@ -2750,7 +2752,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
 
             {/* Add / Edit Analysis Area Dialog */}
             <Dialog open={isAreaDialogOpen} onOpenChange={setIsAreaDialogOpen}>
-              <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+              <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                   <DialogTitle>{editingArea ? "Edit Analysis Area" : "Add Analysis Area"}</DialogTitle>
                   <DialogDescription>
@@ -2761,7 +2763,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                 <div className="space-y-5 py-2">
                   {/* Title */}
                   <div className="space-y-2">
-                    <Label htmlFor="area-title">Title <span className="text-red-500">*</span></Label>
+                    <Label htmlFor="area-title">Title <span className="text-red-500">*</span> <span className="text-xs font-normal text-muted-foreground">(all fields required)</span></Label>
                     <Input
                       id="area-title"
                       placeholder="e.g. Empathy & Tone, First Contact Resolution, Compliance Adherence"
@@ -2773,7 +2775,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                   {/* Definition */}
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <Label htmlFor="area-definition">Definition</Label>
+                      <Label htmlFor="area-definition">Definition <span className="text-red-500">*</span></Label>
                       <Button
                         type="button"
                         variant="outline"
@@ -2800,7 +2802,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                   {/* Good Example */}
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <Label htmlFor="area-good" className="text-green-700">Good Example</Label>
+                      <Label htmlFor="area-good" className="text-green-700">Good Example <span className="text-red-500">*</span></Label>
                       <Button
                         type="button"
                         variant="outline"
@@ -2828,7 +2830,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                   {/* Bad Example */}
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <Label htmlFor="area-bad" className="text-red-600">Bad Example</Label>
+                      <Label htmlFor="area-bad" className="text-red-600">Bad Example <span className="text-red-500">*</span></Label>
                       <Button
                         type="button"
                         variant="outline"
@@ -2856,14 +2858,14 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                   {!areaForm.title.trim() && (
                     <p className="text-xs text-muted-foreground flex items-center gap-1">
                       <Wand2 className="h-3 w-3" />
-                      Enter a title first to enable AI generation for the other fields.
+                      Enter a title first to enable AI generation for Definition, Good Example, and Bad Example.
                     </p>
                   )}
                 </div>
 
                 <DialogFooter>
                   <Button variant="outline" onClick={() => setIsAreaDialogOpen(false)}>Cancel</Button>
-                  <Button onClick={saveArea} disabled={!areaForm.title.trim()}>
+                  <Button onClick={saveArea} disabled={!allAreaFieldsFilled}>
                     <Save className="h-4 w-4 mr-2" />
                     {editingArea ? "Save Changes" : "Add Area"}
                   </Button>
