@@ -303,30 +303,91 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
     {
       id: "aa_1",
       title: "Empathy & Tone",
-      definition: "Measures whether the agent demonstrates genuine understanding of the customer's emotions and maintains a warm, professional tone throughout the interaction.",
-      goodExample: "\"I completely understand how frustrating this must be for you. Let me personally make sure we get this resolved today.\"",
-      badExample: "\"That's just our policy. There's nothing I can do about it.\"",
+      definition:
+        "Measures whether the agent demonstrates genuine understanding of the customer's emotions and maintains a warm, professional tone throughout the interaction.",
+      goodExample:
+        '"I completely understand how frustrating this must be for you. Let me personally make sure we get this resolved today."',
+      badExample:
+        "\"That's just our policy. There's nothing I can do about it.\"",
     },
     {
       id: "aa_2",
       title: "First Contact Resolution",
-      definition: "Evaluates whether the agent resolves the customer's issue fully within a single interaction, without requiring a callback or follow-up contact.",
-      goodExample: "Agent identifies root cause, applies fix, confirms resolution, and asks if there's anything else before closing.",
-      badExample: "Agent transfers the customer multiple times and the issue remains unresolved at the end of the call.",
+      definition:
+        "Evaluates whether the agent resolves the customer's issue fully within a single interaction, without requiring a callback or follow-up contact.",
+      goodExample:
+        "Agent identifies root cause, applies fix, confirms resolution, and asks if there's anything else before closing.",
+      badExample:
+        "Agent transfers the customer multiple times and the issue remains unresolved at the end of the call.",
     },
   ]);
   const [isAreaDialogOpen, setIsAreaDialogOpen] = useState(false);
   const [editingArea, setEditingArea] = useState<AnalysisArea | null>(null);
-  const [areaForm, setAreaForm] = useState({ title: "", definition: "", goodExample: "", badExample: "" });
+  const [areaForm, setAreaForm] = useState({
+    title: "",
+    definition: "",
+    goodExample: "",
+    badExample: "",
+  });
   const [generatingField, setGeneratingField] = useState<string | null>(null);
   const [expandedAreaId, setExpandedAreaId] = useState<string | null>(null);
   const [areaToDelete, setAreaToDelete] = useState<AnalysisArea | null>(null);
 
   // Knowledge Base State
   const [knowledgeBases, setKnowledgeBases] = useState<KnowledgeBase[]>([
-    { id: "kb_001", name: "Sales", description: "Sales-related documentation and guides", intendedUse: "Used for sales-related queries", documents: [], createdDate: "2025-01-15" },
-    { id: "kb_002", name: "Billing & Refunds", description: "Billing procedures and refund policies", intendedUse: "Used for billing and refund queries", documents: [{ id: "doc_b1", name: "Refund_Policy_2025.pdf", type: "pdf", size: "1.2 MB", uploadDate: "2025-01-20", status: "ready", vectorEmbedded: true }, { id: "doc_b2", name: "Billing_Procedures.docx", type: "docx", size: "890 KB", uploadDate: "2025-01-18", status: "ready", vectorEmbedded: true }], createdDate: "2025-01-10" },
-    { id: "kb_003", name: "Account Management", description: "Account setup, changes, and management procedures", intendedUse: "Used for account-related support queries", documents: [{ id: "doc_a1", name: "Account_Setup_Guide.pdf", type: "pdf", size: "2.1 MB", uploadDate: "2025-01-22", status: "ready", vectorEmbedded: true }], createdDate: "2025-01-12" },
+    {
+      id: "kb_001",
+      name: "Sales",
+      description: "Sales-related documentation and guides",
+      intendedUse: "Used for sales-related queries",
+      documents: [],
+      createdDate: "2025-01-15",
+    },
+    {
+      id: "kb_002",
+      name: "Billing & Refunds",
+      description: "Billing procedures and refund policies",
+      intendedUse: "Used for billing and refund queries",
+      documents: [
+        {
+          id: "doc_b1",
+          name: "Refund_Policy_2025.pdf",
+          type: "pdf",
+          size: "1.2 MB",
+          uploadDate: "2025-01-20",
+          status: "ready",
+          vectorEmbedded: true,
+        },
+        {
+          id: "doc_b2",
+          name: "Billing_Procedures.docx",
+          type: "docx",
+          size: "890 KB",
+          uploadDate: "2025-01-18",
+          status: "ready",
+          vectorEmbedded: true,
+        },
+      ],
+      createdDate: "2025-01-10",
+    },
+    {
+      id: "kb_003",
+      name: "Account Management",
+      description: "Account setup, changes, and management procedures",
+      intendedUse: "Used for account-related support queries",
+      documents: [
+        {
+          id: "doc_a1",
+          name: "Account_Setup_Guide.pdf",
+          type: "pdf",
+          size: "2.1 MB",
+          uploadDate: "2025-01-22",
+          status: "ready",
+          vectorEmbedded: true,
+        },
+      ],
+      createdDate: "2025-01-12",
+    },
   ]);
   const [isCreateKBOpen, setIsCreateKBOpen] = useState(false);
   const [editingKB, setEditingKB] = useState<KnowledgeBase | null>(null);
@@ -336,7 +397,10 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
   const [viewingKB, setViewingKB] = useState<KnowledgeBase | null>(null);
   const [kbToDelete, setKbToDelete] = useState<KnowledgeBase | null>(null);
   const [isUploadingKBDoc, setIsUploadingKBDoc] = useState(false);
-  const [kbDocToDelete, setKbDocToDelete] = useState<{ kbId: string; doc: BusinessDocument } | null>(null);
+  const [kbDocToDelete, setKbDocToDelete] = useState<{
+    kbId: string;
+    doc: BusinessDocument;
+  } | null>(null);
 
   // User Management State
   const [isCreateUserOpen, setIsCreateUserOpen] = useState(false);
@@ -474,8 +538,20 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
     knowledgeBaseIds: string[];
   }
   const [teams, setTeams] = useState<Team[]>([
-    { id: "team_001", name: "Billing Support Team", supervisorId: "usr_003", agentIds: ["usr_001", "usr_002"], knowledgeBaseIds: [] },
-    { id: "team_002", name: "Technical Support Team", supervisorId: "usr_007", agentIds: ["usr_006", "usr_008"], knowledgeBaseIds: [] },
+    {
+      id: "team_001",
+      name: "Billing Support Team",
+      supervisorId: "usr_003",
+      agentIds: ["usr_001", "usr_002"],
+      knowledgeBaseIds: [],
+    },
+    {
+      id: "team_002",
+      name: "Technical Support Team",
+      supervisorId: "usr_007",
+      agentIds: ["usr_006", "usr_008"],
+      knowledgeBaseIds: [],
+    },
   ]);
   const [teamListSearchQuery, setTeamListSearchQuery] = useState("");
   const [isCreateTeamOpen, setIsCreateTeamOpen] = useState(false);
@@ -642,12 +718,26 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
     setKnowledgeBases((prev) =>
       prev.map((kb) =>
         kb.id === editingKB.id
-          ? { ...kb, name: newKBName.trim(), description: newKBDescription.trim(), intendedUse: newKBIntendedUse.trim() }
-          : kb
-      )
+          ? {
+              ...kb,
+              name: newKBName.trim(),
+              description: newKBDescription.trim(),
+              intendedUse: newKBIntendedUse.trim(),
+            }
+          : kb,
+      ),
     );
     if (viewingKB && viewingKB.id === editingKB.id) {
-      setViewingKB((prev) => prev ? { ...prev, name: newKBName.trim(), description: newKBDescription.trim(), intendedUse: newKBIntendedUse.trim() } : null);
+      setViewingKB((prev) =>
+        prev
+          ? {
+              ...prev,
+              name: newKBName.trim(),
+              description: newKBDescription.trim(),
+              intendedUse: newKBIntendedUse.trim(),
+            }
+          : null,
+      );
     }
     setIsCreateKBOpen(false);
     setEditingKB(null);
@@ -668,7 +758,11 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
       const newDocs: BusinessDocument[] = files.map((file) => ({
         id: Math.random().toString(36).substr(2, 9),
         name: file.name,
-        type: file.name.endsWith(".pdf") ? "pdf" : file.name.endsWith(".docx") ? "docx" : "txt",
+        type: file.name.endsWith(".pdf")
+          ? "pdf"
+          : file.name.endsWith(".docx")
+            ? "docx"
+            : "txt",
         size: (file.size / 1024).toFixed(1) + " KB",
         uploadDate: new Date().toLocaleDateString(),
         status: "processing" as const,
@@ -676,10 +770,16 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
       }));
 
       setKnowledgeBases((prev) =>
-        prev.map((kb) => kb.id === kbId ? { ...kb, documents: [...kb.documents, ...newDocs] } : kb)
+        prev.map((kb) =>
+          kb.id === kbId
+            ? { ...kb, documents: [...kb.documents, ...newDocs] }
+            : kb,
+        ),
       );
       if (viewingKB && viewingKB.id === kbId) {
-        setViewingKB((prev) => prev ? { ...prev, documents: [...prev.documents, ...newDocs] } : null);
+        setViewingKB((prev) =>
+          prev ? { ...prev, documents: [...prev.documents, ...newDocs] } : null,
+        );
       }
 
       setTimeout(() => {
@@ -687,16 +787,29 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
           docs.map((doc) =>
             newDocs.find((nd) => nd.id === doc.id)
               ? { ...doc, status: "ready" as const, vectorEmbedded: true }
-              : doc
+              : doc,
           );
         setKnowledgeBases((prev) => {
-          const updated = prev.map((kb) => kb.id === kbId ? { ...kb, documents: updateDocs(kb.documents) } : kb);
-          const totalDocs = updated.reduce((sum, kb) => sum + kb.documents.length, 0);
-          setOrchestratorConfig((oc) => ({ ...oc, documentsCount: totalDocs, lastUpdated: new Date().toISOString() }));
+          const updated = prev.map((kb) =>
+            kb.id === kbId
+              ? { ...kb, documents: updateDocs(kb.documents) }
+              : kb,
+          );
+          const totalDocs = updated.reduce(
+            (sum, kb) => sum + kb.documents.length,
+            0,
+          );
+          setOrchestratorConfig((oc) => ({
+            ...oc,
+            documentsCount: totalDocs,
+            lastUpdated: new Date().toISOString(),
+          }));
           return updated;
         });
         if (viewingKB && viewingKB.id === kbId) {
-          setViewingKB((prev) => prev ? { ...prev, documents: updateDocs(prev.documents) } : null);
+          setViewingKB((prev) =>
+            prev ? { ...prev, documents: updateDocs(prev.documents) } : null,
+          );
         }
       }, 2000);
 
@@ -706,13 +819,28 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
 
   const handleDeleteKBDocument = (kbId: string, docId: string) => {
     setKnowledgeBases((prev) => {
-      const updated = prev.map((kb) => kb.id === kbId ? { ...kb, documents: kb.documents.filter((d) => d.id !== docId) } : kb);
-      const totalDocs = updated.reduce((sum, kb) => sum + kb.documents.length, 0);
-      setOrchestratorConfig((oc) => ({ ...oc, documentsCount: totalDocs, lastUpdated: new Date().toISOString() }));
+      const updated = prev.map((kb) =>
+        kb.id === kbId
+          ? { ...kb, documents: kb.documents.filter((d) => d.id !== docId) }
+          : kb,
+      );
+      const totalDocs = updated.reduce(
+        (sum, kb) => sum + kb.documents.length,
+        0,
+      );
+      setOrchestratorConfig((oc) => ({
+        ...oc,
+        documentsCount: totalDocs,
+        lastUpdated: new Date().toISOString(),
+      }));
       return updated;
     });
     if (viewingKB && viewingKB.id === kbId) {
-      setViewingKB((prev) => prev ? { ...prev, documents: prev.documents.filter((d) => d.id !== docId) } : null);
+      setViewingKB((prev) =>
+        prev
+          ? { ...prev, documents: prev.documents.filter((d) => d.id !== docId) }
+          : null,
+      );
     }
   };
 
@@ -742,18 +870,33 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
 
   const openEditArea = (area: AnalysisArea) => {
     setEditingArea(area);
-    setAreaForm({ title: area.title, definition: area.definition, goodExample: area.goodExample, badExample: area.badExample });
+    setAreaForm({
+      title: area.title,
+      definition: area.definition,
+      goodExample: area.goodExample,
+      badExample: area.badExample,
+    });
     setIsAreaDialogOpen(true);
   };
 
-  const allAreaFieldsFilled = !!(areaForm.title.trim() && areaForm.definition.trim() && areaForm.goodExample.trim() && areaForm.badExample.trim());
+  const allAreaFieldsFilled = !!(
+    areaForm.title.trim() &&
+    areaForm.definition.trim() &&
+    areaForm.goodExample.trim() &&
+    areaForm.badExample.trim()
+  );
 
   const saveArea = () => {
     if (!allAreaFieldsFilled) return;
     if (editingArea) {
-      setAnalysisAreas((prev) => prev.map((a) => a.id === editingArea.id ? { ...a, ...areaForm } : a));
+      setAnalysisAreas((prev) =>
+        prev.map((a) => (a.id === editingArea.id ? { ...a, ...areaForm } : a)),
+      );
     } else {
-      setAnalysisAreas((prev) => [...prev, { id: `aa_${Date.now()}`, ...areaForm }]);
+      setAnalysisAreas((prev) => [
+        ...prev,
+        { id: `aa_${Date.now()}`, ...areaForm },
+      ]);
     }
     setIsAreaDialogOpen(false);
   };
@@ -764,35 +907,51 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
     setAreaToDelete(null);
   };
 
-  const generateWithAI = async (field: "definition" | "goodExample" | "badExample") => {
+  const generateWithAI = async (
+    field: "definition" | "goodExample" | "badExample",
+  ) => {
     if (!areaForm.title.trim()) return;
     setGeneratingField(field);
     await new Promise((r) => setTimeout(r, 1400));
     const title = areaForm.title.toLowerCase();
     const suggestions: Record<string, Record<string, string>> = {
       definition: {
-        empathy: "Measures whether the agent acknowledges and validates the customer's feelings, adapts their communication style to the customer's emotional state, and ensures the customer feels genuinely heard throughout the interaction.",
-        resolution: "Evaluates whether the agent fully resolves the customer's issue within the interaction, confirms the resolution with the customer, and ensures no follow-up contact is needed.",
-        compliance: "Assesses whether the agent follows all mandatory compliance requirements, correctly discloses required information, and avoids statements that could create legal or regulatory risk.",
+        empathy:
+          "Measures whether the agent acknowledges and validates the customer's feelings, adapts their communication style to the customer's emotional state, and ensures the customer feels genuinely heard throughout the interaction.",
+        resolution:
+          "Evaluates whether the agent fully resolves the customer's issue within the interaction, confirms the resolution with the customer, and ensures no follow-up contact is needed.",
+        compliance:
+          "Assesses whether the agent follows all mandatory compliance requirements, correctly discloses required information, and avoids statements that could create legal or regulatory risk.",
         default: `Evaluates the degree to which the agent demonstrates ${areaForm.title} during customer interactions, based on observable behaviors, language choices, and outcomes achieved.`,
       },
       goodExample: {
         empathy: `"I can hear how stressful this has been — let me take ownership of this right now and walk you through exactly what I'm doing to fix it."`,
-        resolution: "Agent confirms the fix is applied, explains what was done, sets clear expectations for next steps, and asks if there's anything else before ending the call.",
+        resolution:
+          "Agent confirms the fix is applied, explains what was done, sets clear expectations for next steps, and asks if there's anything else before ending the call.",
         compliance: `"Before we proceed, I do need to let you know that this call may be recorded for quality and training purposes. Is that okay with you?"`,
         default: `Agent clearly demonstrates ${areaForm.title} by [specific observable action], resulting in a positive customer experience and measurable outcome.`,
       },
       badExample: {
         empathy: `"I understand." (said flatly with no follow-up). Agent moves immediately to troubleshooting without acknowledging the customer's frustration.`,
-        resolution: "Agent closes the contact without confirming the issue is resolved. Customer calls back within 24 hours with the same problem.",
-        compliance: "Agent skips required disclosure, makes a promise that contradicts policy, or shares account details without completing proper verification.",
+        resolution:
+          "Agent closes the contact without confirming the issue is resolved. Customer calls back within 24 hours with the same problem.",
+        compliance:
+          "Agent skips required disclosure, makes a promise that contradicts policy, or shares account details without completing proper verification.",
         default: `Agent fails to demonstrate ${areaForm.title}, resulting in customer dissatisfaction, escalation, or a missed opportunity to meet quality standards.`,
       },
     };
-    const key = title.includes("empathy") || title.includes("tone") ? "empathy"
-      : title.includes("resol") || title.includes("fcr") || title.includes("first contact") ? "resolution"
-      : title.includes("compli") || title.includes("legal") || title.includes("regulat") ? "compliance"
-      : "default";
+    const key =
+      title.includes("empathy") || title.includes("tone")
+        ? "empathy"
+        : title.includes("resol") ||
+            title.includes("fcr") ||
+            title.includes("first contact")
+          ? "resolution"
+          : title.includes("compli") ||
+              title.includes("legal") ||
+              title.includes("regulat")
+            ? "compliance"
+            : "default";
     setAreaForm((prev) => ({ ...prev, [field]: suggestions[field][key] }));
     setGeneratingField(null);
   };
@@ -872,9 +1031,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
   const handleSaveEditUser = () => {
     if (editingUser) {
       setUsers((prev) =>
-        prev.map((user) =>
-          user.id === editingUser.id ? editingUser : user,
-        ),
+        prev.map((user) => (user.id === editingUser.id ? editingUser : user)),
       );
       setIsEditUserOpen(false);
       setEditingUser(null);
@@ -1104,7 +1261,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
     return agents.filter(
       (agent) =>
         agent.fullName.toLowerCase().includes(query) ||
-        agent.email.toLowerCase().includes(query)
+        agent.email.toLowerCase().includes(query),
     );
   };
 
@@ -1132,7 +1289,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
     setNewTeamAgentIds((prev) =>
       prev.includes(agentId)
         ? prev.filter((id) => id !== agentId)
-        : [...prev, agentId]
+        : [...prev, agentId],
     );
   };
 
@@ -1143,9 +1300,15 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
       setTeams((prev) =>
         prev.map((t) =>
           t.id === editingTeam.id
-            ? { ...t, name: newTeamName.trim(), supervisorId: newTeamSupervisorId, agentIds: newTeamAgentIds, knowledgeBaseIds: newTeamKBIds }
-            : t
-        )
+            ? {
+                ...t,
+                name: newTeamName.trim(),
+                supervisorId: newTeamSupervisorId,
+                agentIds: newTeamAgentIds,
+                knowledgeBaseIds: newTeamKBIds,
+              }
+            : t,
+        ),
       );
     } else {
       const newTeam: Team = {
@@ -1825,518 +1988,522 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                     Create AI Agent
                   </Button>
                 </DialogTrigger>
-              <DialogContent className="!max-w-[93.6rem] sm:!max-w-[93.6rem] max-h-[90vh] overflow-y-auto">
-                <DialogHeader>
-                  <DialogTitle className="flex items-center gap-2">
-                    <Zap className="h-5 w-5 text-primary" />
-                    Smart Agent Creation Wizard
-                  </DialogTitle>
-                  <DialogDescription>
-                    Create and configure a new AI coaching agent with guided
-                    templates and intelligent suggestions
-                  </DialogDescription>
+                <DialogContent className="!max-w-[93.6rem] sm:!max-w-[93.6rem] max-h-[90vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle className="flex items-center gap-2">
+                      <Zap className="h-5 w-5 text-primary" />
+                      Smart Agent Creation Wizard
+                    </DialogTitle>
+                    <DialogDescription>
+                      Create and configure a new AI coaching agent with guided
+                      templates and intelligent suggestions
+                    </DialogDescription>
 
-                  {/* Progress Indicator */}
-                  <div className="flex items-center justify-center mt-4">
-                    <div className="flex items-center space-x-2">
-                      {[1, 2, 3, 4].map((step) => (
-                        <div key={step} className="flex items-center">
-                          <div
-                            className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
-                              step === wizardStep
-                                ? "bg-primary text-primary-foreground"
-                                : step < wizardStep
-                                  ? "bg-chart-4 text-white"
-                                  : "bg-muted text-muted-foreground"
-                            }`}
-                          >
-                            {step < wizardStep ? (
-                              <Check className="h-4 w-4" />
-                            ) : (
-                              step
+                    {/* Progress Indicator */}
+                    <div className="flex items-center justify-center mt-4">
+                      <div className="flex items-center space-x-2">
+                        {[1, 2, 3, 4].map((step) => (
+                          <div key={step} className="flex items-center">
+                            <div
+                              className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
+                                step === wizardStep
+                                  ? "bg-primary text-primary-foreground"
+                                  : step < wizardStep
+                                    ? "bg-chart-4 text-white"
+                                    : "bg-muted text-muted-foreground"
+                              }`}
+                            >
+                              {step < wizardStep ? (
+                                <Check className="h-4 w-4" />
+                              ) : (
+                                step
+                              )}
+                            </div>
+                            {step < 4 && (
+                              <div
+                                className={`w-8 h-0.5 ${
+                                  step < wizardStep ? "bg-chart-4" : "bg-muted"
+                                }`}
+                              />
                             )}
                           </div>
-                          {step < 4 && (
-                            <div
-                              className={`w-8 h-0.5 ${
-                                step < wizardStep ? "bg-chart-4" : "bg-muted"
-                              }`}
-                            />
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="text-center text-sm text-muted-foreground mt-2">
-                    Step {wizardStep} of 4:{" "}
-                    {wizardStep === 1
-                      ? "Start from Scratch"
-                      : wizardStep === 2
-                        ? "Documents"
-                        : wizardStep === 3
-                          ? "Instructions"
-                          : "Test & Activate"}
-                  </div>
-                </DialogHeader>
-
-                <div className="py-6">
-                  {/* Step 1: Quick Start (Start from Scratch only) */}
-                  {wizardStep === 1 && (
-                    <div className="space-y-6">
-                      <div className="text-center">
-                        <h3 className="text-lg font-semibold mb-2">
-                          Start from Scratch
-                        </h3>
-                        <p className="text-muted-foreground">
-                          Build a completely custom agent with full control over
-                          all configurations.
-                        </p>
-                      </div>
-
-                      <Card>
-                        <CardContent className="p-6">
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div className="space-y-2">
-                              <Label htmlFor="agentName">Agent Name *</Label>
-                              <Input
-                                id="agentName"
-                                placeholder="e.g., Billing Support Assistant"
-                                value={agentConfig.agentName}
-                                onChange={(e) => {
-                                  setAgentConfig({
-                                    ...agentConfig,
-                                    agentName: e.target.value,
-                                  });
-                                  if (
-                                    validationErrors.agentName &&
-                                    e.target.value.trim()
-                                  ) {
-                                    setValidationErrors({
-                                      ...validationErrors,
-                                      agentName: "",
-                                    });
-                                  }
-                                }}
-                                className={
-                                  validationErrors.agentName
-                                    ? "border-destructive"
-                                    : ""
-                                }
-                              />
-                              {validationErrors.agentName && (
-                                <p className="text-sm text-destructive">
-                                  {validationErrors.agentName}
-                                </p>
-                              )}
-                            </div>
-
-                            <div className="space-y-2">
-                              <Label htmlFor="topicCategory">
-                                Topic Category
-                              </Label>
-                              <Input
-                                id="topicCategory"
-                                placeholder="e.g., Financial Services"
-                                value={agentConfig.topicCategory}
-                                onChange={(e) =>
-                                  setAgentConfig({
-                                    ...agentConfig,
-                                    topicCategory: e.target.value,
-                                  })
-                                }
-                              />
-                            </div>
-
-                            <div className="space-y-2 md:col-span-2">
-                              <Label htmlFor="description">Description *</Label>
-                              <Textarea
-                                id="description"
-                                placeholder="Brief description of what this agent handles"
-                                rows={3}
-                                value={agentConfig.description}
-                                onChange={(e) => {
-                                  setAgentConfig({
-                                    ...agentConfig,
-                                    description: e.target.value,
-                                  });
-                                  if (
-                                    validationErrors.description &&
-                                    e.target.value.trim()
-                                  ) {
-                                    setValidationErrors({
-                                      ...validationErrors,
-                                      description: "",
-                                    });
-                                  }
-                                }}
-                                className={
-                                  validationErrors.description
-                                    ? "border-destructive"
-                                    : ""
-                                }
-                              />
-                              {validationErrors.description && (
-                                <p className="text-sm text-destructive">
-                                  {validationErrors.description}
-                                </p>
-                              )}
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    </div>
-                  )}
-
-                  {/* Step 2: Documents */}
-
-                  {/* Step 2: Documents */}
-                  {wizardStep === 2 && (
-                    <div className="space-y-6">
-                      <div>
-                        <h3 className="text-lg font-semibold mb-2">
-                          Knowledge Base Documents
-                        </h3>
-                        <p className="text-muted-foreground">
-                          Upload documents to train your agent with relevant
-                          knowledge
-                        </p>
-                      </div>
-
-                      <div className="space-y-4">
-                        {validationErrors.documents && (
-                          <div className="text-sm text-destructive bg-destructive/10 p-3 rounded-md">
-                            {validationErrors.documents}
-                          </div>
-                        )}
-                        <div
-                          className={`border-2 border-dashed rounded-lg p-8 text-center ${
-                            validationErrors.documents
-                              ? "border-destructive/50"
-                              : "border-muted-foreground/25"
-                          }`}
-                        >
-                          <Upload className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                          <Label
-                            htmlFor="fileUpload"
-                            className="cursor-pointer"
-                          >
-                            <span className="text-lg font-medium">
-                              Upload Documents
-                            </span>
-                            <p className="text-sm text-muted-foreground mt-1">
-                              Drag & drop files here, or click to browse
-                            </p>
-                            <p className="text-xs text-muted-foreground mt-2">
-                              Supports PDF, CSV, TXT, DOCX files
-                            </p>
-                          </Label>
-                          <Input
-                            id="fileUpload"
-                            type="file"
-                            accept=".pdf,.csv,.txt,.docx"
-                            onChange={handleFileUpload}
-                            className="hidden"
-                            multiple
-                          />
-                        </div>
-
-                        {agentConfig.documents.length > 0 && (
-                          <div className="space-y-3">
-                            <h4 className="font-medium">Uploaded Documents</h4>
-                            {agentConfig.documents.map((doc) => (
-                              <Card key={doc.id}>
-                                <CardContent className="p-4">
-                                  <div className="flex items-start justify-between">
-                                    <div className="flex items-start gap-3">
-                                      <FileText className="h-5 w-5 text-primary mt-1" />
-                                      <div className="flex-1">
-                                        <h5 className="font-medium">
-                                          {doc.name}
-                                        </h5>
-                                        <p className="text-sm text-muted-foreground">
-                                          {doc.type.charAt(0).toUpperCase() +
-                                            doc.type.slice(1)}{" "}
-                                          • {doc.size}
-                                        </p>
-
-                                        <div className="flex items-center gap-4 mt-2">
-                                          <div className="flex items-center gap-2">
-                                            <span className="text-xs text-muted-foreground">
-                                              Quality:
-                                            </span>
-                                            <Badge
-                                              variant={
-                                                doc.qualityScore >= 90
-                                                  ? "default"
-                                                  : doc.qualityScore >= 70
-                                                    ? "secondary"
-                                                    : "destructive"
-                                              }
-                                            >
-                                              {doc.qualityScore}/100
-                                            </Badge>
-                                          </div>
-                                          <div className="flex items-center gap-2">
-                                            <span className="text-xs text-muted-foreground">
-                                              Relevance:
-                                            </span>
-                                            <Badge
-                                              variant={
-                                                doc.relevanceScore >= 90
-                                                  ? "default"
-                                                  : doc.relevanceScore >= 70
-                                                    ? "secondary"
-                                                    : "destructive"
-                                              }
-                                            >
-                                              {doc.relevanceScore}/100
-                                            </Badge>
-                                          </div>
-                                        </div>
-
-                                        {doc.suggestions.length > 0 && (
-                                          <div className="mt-3">
-                                            <div className="flex items-center gap-2 mb-2">
-                                              <Lightbulb className="h-4 w-4 text-amber-500" />
-                                              <span className="text-sm font-medium">
-                                                Suggestions
-                                              </span>
-                                            </div>
-                                            {doc.suggestions.map(
-                                              (suggestion, index) => (
-                                                <p
-                                                  key={index}
-                                                  className="text-sm text-muted-foreground"
-                                                >
-                                                  • {suggestion}
-                                                </p>
-                                              ),
-                                            )}
-                                          </div>
-                                        )}
-                                      </div>
-                                    </div>
-                                    <Button
-                                      variant="ghost"
-                                      size="sm"
-                                      onClick={() => removeDocument(doc.id)}
-                                    >
-                                      <Trash2 className="h-4 w-4" />
-                                    </Button>
-                                  </div>
-                                </CardContent>
-                              </Card>
-                            ))}
-                          </div>
-                        )}
+                        ))}
                       </div>
                     </div>
-                  )}
 
-                  {/* Step 3: Instructions */}
-                  {wizardStep === 3 && (
-                    <div className="space-y-6">
-                      <div>
-                        <h3 className="text-lg font-semibold mb-2">
-                          Coaching Instructions
-                        </h3>
-                        <p className="text-muted-foreground">
-                          Configure how your agent should coach and respond
-                        </p>
-                      </div>
+                    <div className="text-center text-sm text-muted-foreground mt-2">
+                      Step {wizardStep} of 4:{" "}
+                      {wizardStep === 1
+                        ? "Start from Scratch"
+                        : wizardStep === 2
+                          ? "Documents"
+                          : wizardStep === 3
+                            ? "Instructions"
+                            : "Test & Activate"}
+                    </div>
+                  </DialogHeader>
 
+                  <div className="py-6">
+                    {/* Step 1: Quick Start (Start from Scratch only) */}
+                    {wizardStep === 1 && (
                       <div className="space-y-6">
-                        {validationErrors.instructions && (
-                          <div className="text-sm text-destructive bg-destructive/10 p-3 rounded-md">
-                            {validationErrors.instructions}
-                          </div>
-                        )}
-                        <div className="space-y-2">
-                          <Label>Instructions and Guidelines *</Label>
-                          <Textarea
-                            placeholder="Provide clear guidance for how the agent should respond. Include tone, structure, must/avoid behaviors, compliance notes, escalation thresholds, and example phrasing."
-                            rows={3}
-                            value={agentConfig.instructions.generalApproach}
-                            onChange={(e) => {
-                              setAgentConfig({
-                                ...agentConfig,
-                                instructions: {
-                                  ...agentConfig.instructions,
-                                  generalApproach: e.target.value,
-                                },
-                              });
-                              if (
-                                validationErrors.instructions &&
-                                e.target.value.trim()
-                              ) {
-                                setValidationErrors({
-                                  ...validationErrors,
-                                  instructions: "",
-                                });
-                              }
-                            }}
-                            className={
-                              validationErrors.instructions
-                                ? "border-destructive"
-                                : ""
-                            }
-                          />
+                        <div className="text-center">
+                          <h3 className="text-lg font-semibold mb-2">
+                            Start from Scratch
+                          </h3>
+                          <p className="text-muted-foreground">
+                            Build a completely custom agent with full control
+                            over all configurations.
+                          </p>
                         </div>
-                        <div className="space-y-2">
-                          <div className="rounded-md border bg-muted/20 p-3">
-                            <p className="text-sm font-medium mb-1">
-                              Sample instructions and guidelines
-                            </p>
-                            <ul className="list-disc pl-5 space-y-1 text-sm text-muted-foreground">
-                              <li>
-                                Tone: empathetic, professional, concise. Avoid
-                                jargon unless explained.
-                              </li>
-                              <li>
-                                Structure: greet, confirm context, propose
-                                solution, confirm resolution, close.
-                              </li>
-                              <li>
-                                Must do: verify identity before account details;
-                                summarize next steps.
-                              </li>
-                              <li>
-                                Must avoid: promising refunds without approval;
-                                sharing other customers' data.
-                              </li>
-                              <li>
-                                Compliance: follow PCI/GDPR; never store full
-                                card numbers.
-                              </li>
-                              <li>
-                                Escalation: transfer if security concern or
-                                out-of-policy request.
-                              </li>
-                              <li>
-                                Example phrase: "I understand how frustrating
-                                this is; here’s what I can do right now…"
-                              </li>
-                            </ul>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
 
-                  {/* Step 4: Review & Save */}
-                  {wizardStep === 4 && (
-                    <div className="space-y-6">
-                      <div>
-                        <h3 className="text-lg font-semibold mb-2">
-                          Review & Save
-                        </h3>
-                        <p className="text-muted-foreground">
-                          Review details and save the agent
-                        </p>
-                      </div>
-                      <Card>
-                        <CardHeader>
-                          <CardTitle className="text-base">
-                            Agent Preview
-                          </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                              <Label className="text-sm font-medium">
-                                Name
-                              </Label>
-                              <p className="text-sm">
-                                {agentConfig.agentName || "Untitled Agent"}
-                              </p>
-                            </div>
-                            <div>
-                              <Label className="text-sm font-medium">
-                                Category
-                              </Label>
-                              <p className="text-sm">
-                                {agentConfig.topicCategory || "General"}
-                              </p>
-                            </div>
-                            <div>
-                              <Label className="text-sm font-medium">
-                                Documents
-                              </Label>
-                              <p className="text-sm">
-                                {agentConfig.documents.length} document(s)
-                                uploaded
-                              </p>
-                            </div>
-                            <div className="md:col-span-2">
-                              <Label className="text-sm font-medium">
-                                Instructions
-                              </Label>
-                              <p className="text-sm whitespace-pre-wrap">
-                                {agentConfig.instructions.generalApproach ||
-                                  "No instructions provided"}
-                              </p>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
+                        <Card>
+                          <CardContent className="p-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                              <div className="space-y-2">
+                                <Label htmlFor="agentName">Agent Name *</Label>
+                                <Input
+                                  id="agentName"
+                                  placeholder="e.g., Billing Support Assistant"
+                                  value={agentConfig.agentName}
+                                  onChange={(e) => {
+                                    setAgentConfig({
+                                      ...agentConfig,
+                                      agentName: e.target.value,
+                                    });
+                                    if (
+                                      validationErrors.agentName &&
+                                      e.target.value.trim()
+                                    ) {
+                                      setValidationErrors({
+                                        ...validationErrors,
+                                        agentName: "",
+                                      });
+                                    }
+                                  }}
+                                  className={
+                                    validationErrors.agentName
+                                      ? "border-destructive"
+                                      : ""
+                                  }
+                                />
+                                {validationErrors.agentName && (
+                                  <p className="text-sm text-destructive">
+                                    {validationErrors.agentName}
+                                  </p>
+                                )}
+                              </div>
 
-                      {agentConfig.readyToActivate && (
-                        <Card className="border-chart-4">
-                          <CardContent className="p-6 text-center">
-                            <CheckCircle className="h-12 w-12 text-chart-4 mx-auto mb-4" />
-                            <h4 className="font-semibold mb-2 text-chart-4">
-                              Ready for Activation
-                            </h4>
-                            <p className="text-muted-foreground mb-4">
-                              All tests passed! Your agent is ready to be
-                              activated and start coaching.
-                            </p>
+                              <div className="space-y-2">
+                                <Label htmlFor="topicCategory">
+                                  Topic Category
+                                </Label>
+                                <Input
+                                  id="topicCategory"
+                                  placeholder="e.g., Financial Services"
+                                  value={agentConfig.topicCategory}
+                                  onChange={(e) =>
+                                    setAgentConfig({
+                                      ...agentConfig,
+                                      topicCategory: e.target.value,
+                                    })
+                                  }
+                                />
+                              </div>
+
+                              <div className="space-y-2 md:col-span-2">
+                                <Label htmlFor="description">
+                                  Description *
+                                </Label>
+                                <Textarea
+                                  id="description"
+                                  placeholder="Brief description of what this agent handles"
+                                  rows={3}
+                                  value={agentConfig.description}
+                                  onChange={(e) => {
+                                    setAgentConfig({
+                                      ...agentConfig,
+                                      description: e.target.value,
+                                    });
+                                    if (
+                                      validationErrors.description &&
+                                      e.target.value.trim()
+                                    ) {
+                                      setValidationErrors({
+                                        ...validationErrors,
+                                        description: "",
+                                      });
+                                    }
+                                  }}
+                                  className={
+                                    validationErrors.description
+                                      ? "border-destructive"
+                                      : ""
+                                  }
+                                />
+                                {validationErrors.description && (
+                                  <p className="text-sm text-destructive">
+                                    {validationErrors.description}
+                                  </p>
+                                )}
+                              </div>
+                            </div>
                           </CardContent>
                         </Card>
+                      </div>
+                    )}
+
+                    {/* Step 2: Documents */}
+
+                    {/* Step 2: Documents */}
+                    {wizardStep === 2 && (
+                      <div className="space-y-6">
+                        <div>
+                          <h3 className="text-lg font-semibold mb-2">
+                            Knowledge Base Documents
+                          </h3>
+                          <p className="text-muted-foreground">
+                            Upload documents to train your agent with relevant
+                            knowledge
+                          </p>
+                        </div>
+
+                        <div className="space-y-4">
+                          {validationErrors.documents && (
+                            <div className="text-sm text-destructive bg-destructive/10 p-3 rounded-md">
+                              {validationErrors.documents}
+                            </div>
+                          )}
+                          <div
+                            className={`border-2 border-dashed rounded-lg p-8 text-center ${
+                              validationErrors.documents
+                                ? "border-destructive/50"
+                                : "border-muted-foreground/25"
+                            }`}
+                          >
+                            <Upload className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                            <Label
+                              htmlFor="fileUpload"
+                              className="cursor-pointer"
+                            >
+                              <span className="text-lg font-medium">
+                                Upload Documents
+                              </span>
+                              <p className="text-sm text-muted-foreground mt-1">
+                                Drag & drop files here, or click to browse
+                              </p>
+                              <p className="text-xs text-muted-foreground mt-2">
+                                Supports PDF, CSV, TXT, DOCX files
+                              </p>
+                            </Label>
+                            <Input
+                              id="fileUpload"
+                              type="file"
+                              accept=".pdf,.csv,.txt,.docx"
+                              onChange={handleFileUpload}
+                              className="hidden"
+                              multiple
+                            />
+                          </div>
+
+                          {agentConfig.documents.length > 0 && (
+                            <div className="space-y-3">
+                              <h4 className="font-medium">
+                                Uploaded Documents
+                              </h4>
+                              {agentConfig.documents.map((doc) => (
+                                <Card key={doc.id}>
+                                  <CardContent className="p-4">
+                                    <div className="flex items-start justify-between">
+                                      <div className="flex items-start gap-3">
+                                        <FileText className="h-5 w-5 text-primary mt-1" />
+                                        <div className="flex-1">
+                                          <h5 className="font-medium">
+                                            {doc.name}
+                                          </h5>
+                                          <p className="text-sm text-muted-foreground">
+                                            {doc.type.charAt(0).toUpperCase() +
+                                              doc.type.slice(1)}{" "}
+                                            • {doc.size}
+                                          </p>
+
+                                          <div className="flex items-center gap-4 mt-2">
+                                            <div className="flex items-center gap-2">
+                                              <span className="text-xs text-muted-foreground">
+                                                Quality:
+                                              </span>
+                                              <Badge
+                                                variant={
+                                                  doc.qualityScore >= 90
+                                                    ? "default"
+                                                    : doc.qualityScore >= 70
+                                                      ? "secondary"
+                                                      : "destructive"
+                                                }
+                                              >
+                                                {doc.qualityScore}/100
+                                              </Badge>
+                                            </div>
+                                            <div className="flex items-center gap-2">
+                                              <span className="text-xs text-muted-foreground">
+                                                Relevance:
+                                              </span>
+                                              <Badge
+                                                variant={
+                                                  doc.relevanceScore >= 90
+                                                    ? "default"
+                                                    : doc.relevanceScore >= 70
+                                                      ? "secondary"
+                                                      : "destructive"
+                                                }
+                                              >
+                                                {doc.relevanceScore}/100
+                                              </Badge>
+                                            </div>
+                                          </div>
+
+                                          {doc.suggestions.length > 0 && (
+                                            <div className="mt-3">
+                                              <div className="flex items-center gap-2 mb-2">
+                                                <Lightbulb className="h-4 w-4 text-amber-500" />
+                                                <span className="text-sm font-medium">
+                                                  Suggestions
+                                                </span>
+                                              </div>
+                                              {doc.suggestions.map(
+                                                (suggestion, index) => (
+                                                  <p
+                                                    key={index}
+                                                    className="text-sm text-muted-foreground"
+                                                  >
+                                                    • {suggestion}
+                                                  </p>
+                                                ),
+                                              )}
+                                            </div>
+                                          )}
+                                        </div>
+                                      </div>
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => removeDocument(doc.id)}
+                                      >
+                                        <Trash2 className="h-4 w-4" />
+                                      </Button>
+                                    </div>
+                                  </CardContent>
+                                </Card>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Step 3: Instructions */}
+                    {wizardStep === 3 && (
+                      <div className="space-y-6">
+                        <div>
+                          <h3 className="text-lg font-semibold mb-2">
+                            Coaching Instructions
+                          </h3>
+                          <p className="text-muted-foreground">
+                            Configure how your agent should coach and respond
+                          </p>
+                        </div>
+
+                        <div className="space-y-6">
+                          {validationErrors.instructions && (
+                            <div className="text-sm text-destructive bg-destructive/10 p-3 rounded-md">
+                              {validationErrors.instructions}
+                            </div>
+                          )}
+                          <div className="space-y-2">
+                            <Label>Instructions and Guidelines *</Label>
+                            <Textarea
+                              placeholder="Provide clear guidance for how the agent should respond. Include tone, structure, must/avoid behaviors, compliance notes, escalation thresholds, and example phrasing."
+                              rows={3}
+                              value={agentConfig.instructions.generalApproach}
+                              onChange={(e) => {
+                                setAgentConfig({
+                                  ...agentConfig,
+                                  instructions: {
+                                    ...agentConfig.instructions,
+                                    generalApproach: e.target.value,
+                                  },
+                                });
+                                if (
+                                  validationErrors.instructions &&
+                                  e.target.value.trim()
+                                ) {
+                                  setValidationErrors({
+                                    ...validationErrors,
+                                    instructions: "",
+                                  });
+                                }
+                              }}
+                              className={
+                                validationErrors.instructions
+                                  ? "border-destructive"
+                                  : ""
+                              }
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <div className="rounded-md border bg-muted/20 p-3">
+                              <p className="text-sm font-medium mb-1">
+                                Sample instructions and guidelines
+                              </p>
+                              <ul className="list-disc pl-5 space-y-1 text-sm text-muted-foreground">
+                                <li>
+                                  Tone: empathetic, professional, concise. Avoid
+                                  jargon unless explained.
+                                </li>
+                                <li>
+                                  Structure: greet, confirm context, propose
+                                  solution, confirm resolution, close.
+                                </li>
+                                <li>
+                                  Must do: verify identity before account
+                                  details; summarize next steps.
+                                </li>
+                                <li>
+                                  Must avoid: promising refunds without
+                                  approval; sharing other customers' data.
+                                </li>
+                                <li>
+                                  Compliance: follow PCI/GDPR; never store full
+                                  card numbers.
+                                </li>
+                                <li>
+                                  Escalation: transfer if security concern or
+                                  out-of-policy request.
+                                </li>
+                                <li>
+                                  Example phrase: "I understand how frustrating
+                                  this is; here’s what I can do right now…"
+                                </li>
+                              </ul>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Step 4: Review & Save */}
+                    {wizardStep === 4 && (
+                      <div className="space-y-6">
+                        <div>
+                          <h3 className="text-lg font-semibold mb-2">
+                            Review & Save
+                          </h3>
+                          <p className="text-muted-foreground">
+                            Review details and save the agent
+                          </p>
+                        </div>
+                        <Card>
+                          <CardHeader>
+                            <CardTitle className="text-base">
+                              Agent Preview
+                            </CardTitle>
+                          </CardHeader>
+                          <CardContent>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <div>
+                                <Label className="text-sm font-medium">
+                                  Name
+                                </Label>
+                                <p className="text-sm">
+                                  {agentConfig.agentName || "Untitled Agent"}
+                                </p>
+                              </div>
+                              <div>
+                                <Label className="text-sm font-medium">
+                                  Category
+                                </Label>
+                                <p className="text-sm">
+                                  {agentConfig.topicCategory || "General"}
+                                </p>
+                              </div>
+                              <div>
+                                <Label className="text-sm font-medium">
+                                  Documents
+                                </Label>
+                                <p className="text-sm">
+                                  {agentConfig.documents.length} document(s)
+                                  uploaded
+                                </p>
+                              </div>
+                              <div className="md:col-span-2">
+                                <Label className="text-sm font-medium">
+                                  Instructions
+                                </Label>
+                                <p className="text-sm whitespace-pre-wrap">
+                                  {agentConfig.instructions.generalApproach ||
+                                    "No instructions provided"}
+                                </p>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+
+                        {agentConfig.readyToActivate && (
+                          <Card className="border-chart-4">
+                            <CardContent className="p-6 text-center">
+                              <CheckCircle className="h-12 w-12 text-chart-4 mx-auto mb-4" />
+                              <h4 className="font-semibold mb-2 text-chart-4">
+                                Ready for Activation
+                              </h4>
+                              <p className="text-muted-foreground mb-4">
+                                All tests passed! Your agent is ready to be
+                                activated and start coaching.
+                              </p>
+                            </CardContent>
+                          </Card>
+                        )}
+                      </div>
+                    )}
+                  </div>
+
+                  <DialogFooter className="flex justify-between">
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        onClick={() => setIsCreateWizardOpen(false)}
+                      >
+                        Cancel
+                      </Button>
+                      {wizardStep > 1 && (
+                        <Button variant="outline" onClick={prevStep}>
+                          <ChevronLeft className="h-4 w-4 mr-2" />
+                          Previous
+                        </Button>
                       )}
                     </div>
-                  )}
-                </div>
 
-                <DialogFooter className="flex justify-between">
-                  <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      onClick={() => setIsCreateWizardOpen(false)}
-                    >
-                      Cancel
-                    </Button>
-                    {wizardStep > 1 && (
-                      <Button variant="outline" onClick={prevStep}>
-                        <ChevronLeft className="h-4 w-4 mr-2" />
-                        Previous
-                      </Button>
-                    )}
-                  </div>
-
-                  <div className="flex gap-2">
-                    {wizardStep < 4 ? (
-                      <Button onClick={nextStep}>
-                        Next
-                        <ChevronRight className="h-4 w-4 ml-2" />
-                      </Button>
-                    ) : (
-                      <Button
-                        onClick={handleCreateAgent}
-                        disabled={
-                          !agentConfig.agentName.trim() ||
-                          !agentConfig.description.trim()
-                        }
-                      >
-                        <Save className="h-4 w-4 mr-2" />
-                        Save Agent
-                      </Button>
-                    )}
-                  </div>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
+                    <div className="flex gap-2">
+                      {wizardStep < 4 ? (
+                        <Button onClick={nextStep}>
+                          Next
+                          <ChevronRight className="h-4 w-4 ml-2" />
+                        </Button>
+                      ) : (
+                        <Button
+                          onClick={handleCreateAgent}
+                          disabled={
+                            !agentConfig.agentName.trim() ||
+                            !agentConfig.description.trim()
+                          }
+                        >
+                          <Save className="h-4 w-4 mr-2" />
+                          Save Agent
+                        </Button>
+                      )}
+                    </div>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
             )}
           </div>
 
@@ -2676,7 +2843,9 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                       Analysis Areas
                     </CardTitle>
                     <CardDescription>
-                      Define the dimensions TrAIna uses when evaluating agent contacts. Each area shapes how interactions are scored and coached.
+                      Define the dimensions TrAIna uses when evaluating agent
+                      contacts. Each area shapes how interactions are scored and
+                      coached.
                     </CardDescription>
                   </div>
                   <Button onClick={openAddArea}>
@@ -2689,9 +2858,19 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                 {analysisAreas.length === 0 ? (
                   <div className="text-center py-10 text-muted-foreground border-2 border-dashed rounded-lg">
                     <Target className="h-10 w-10 mx-auto mb-2 opacity-40" />
-                    <p className="text-sm font-medium">No analysis areas defined yet</p>
-                    <p className="text-xs mt-1">Add an area to tell TrAIna what to look for when reviewing contacts.</p>
-                    <Button variant="outline" size="sm" className="mt-4" onClick={openAddArea}>
+                    <p className="text-sm font-medium">
+                      No analysis areas defined yet
+                    </p>
+                    <p className="text-xs mt-1">
+                      Add an area to tell TrAIna what to look for when reviewing
+                      contacts.
+                    </p>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="mt-4"
+                      onClick={openAddArea}
+                    >
                       <Plus className="h-4 w-4 mr-2" />
                       Add your first area
                     </Button>
@@ -2701,23 +2880,43 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                     {analysisAreas.map((area) => {
                       const isExpanded = expandedAreaId === area.id;
                       return (
-                        <div key={area.id} className="border rounded-lg overflow-hidden">
+                        <div
+                          key={area.id}
+                          className="border rounded-lg overflow-hidden"
+                        >
                           {/* Row header */}
                           <div
                             className="flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-muted/40 transition-colors"
-                            onClick={() => setExpandedAreaId(isExpanded ? null : area.id)}
+                            onClick={() =>
+                              setExpandedAreaId(isExpanded ? null : area.id)
+                            }
                           >
                             <div className="flex items-center gap-3">
-                              {isExpanded
-                                ? <ChevronUp className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-                                : <ChevronDown className="h-4 w-4 text-muted-foreground flex-shrink-0" />}
+                              {isExpanded ? (
+                                <ChevronUp className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                              ) : (
+                                <ChevronDown className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                              )}
                               <span className="font-medium">{area.title}</span>
                             </div>
-                            <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
-                              <Button variant="ghost" size="sm" className="h-8 px-2 text-muted-foreground hover:text-foreground" onClick={() => openEditArea(area)}>
+                            <div
+                              className="flex items-center gap-1"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-8 px-2 text-muted-foreground hover:text-foreground"
+                                onClick={() => openEditArea(area)}
+                              >
                                 <Edit className="h-3.5 w-3.5" />
                               </Button>
-                              <Button variant="ghost" size="sm" className="h-8 px-2 text-muted-foreground hover:text-red-600" onClick={() => setAreaToDelete(area)}>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-8 px-2 text-muted-foreground hover:text-red-600"
+                                onClick={() => setAreaToDelete(area)}
+                              >
                                 <Trash2 className="h-3.5 w-3.5" />
                               </Button>
                             </div>
@@ -2727,17 +2926,41 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                           {isExpanded && (
                             <div className="px-4 pb-4 pt-1 border-t bg-muted/20 space-y-4">
                               <div>
-                                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">Definition</p>
-                                <p className="text-sm">{area.definition || <span className="italic text-muted-foreground">Not provided</span>}</p>
+                                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">
+                                  Definition
+                                </p>
+                                <p className="text-sm">
+                                  {area.definition || (
+                                    <span className="italic text-muted-foreground">
+                                      Not provided
+                                    </span>
+                                  )}
+                                </p>
                               </div>
                               <div className="grid grid-cols-2 gap-4">
                                 <div className="bg-green-50 border border-green-200 rounded-lg p-3">
-                                  <p className="text-xs font-semibold text-green-700 uppercase tracking-wide mb-1">Good Example</p>
-                                  <p className="text-sm text-green-900">{area.goodExample || <span className="italic text-muted-foreground">Not provided</span>}</p>
+                                  <p className="text-xs font-semibold text-green-700 uppercase tracking-wide mb-1">
+                                    Good Example
+                                  </p>
+                                  <p className="text-sm text-green-900">
+                                    {area.goodExample || (
+                                      <span className="italic text-muted-foreground">
+                                        Not provided
+                                      </span>
+                                    )}
+                                  </p>
                                 </div>
                                 <div className="bg-red-50 border border-red-200 rounded-lg p-3">
-                                  <p className="text-xs font-semibold text-red-700 uppercase tracking-wide mb-1">Bad Example</p>
-                                  <p className="text-sm text-red-900">{area.badExample || <span className="italic text-muted-foreground">Not provided</span>}</p>
+                                  <p className="text-xs font-semibold text-red-700 uppercase tracking-wide mb-1">
+                                    Bad Example
+                                  </p>
+                                  <p className="text-sm text-red-900">
+                                    {area.badExample || (
+                                      <span className="italic text-muted-foreground">
+                                        Not provided
+                                      </span>
+                                    )}
+                                  </p>
                                 </div>
                               </div>
                             </div>
@@ -2752,42 +2975,62 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
 
             {/* Add / Edit Analysis Area Dialog */}
             <Dialog open={isAreaDialogOpen} onOpenChange={setIsAreaDialogOpen}>
-              <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+              <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
-                  <DialogTitle>{editingArea ? "Edit Analysis Area" : "Add Analysis Area"}</DialogTitle>
+                  <DialogTitle>
+                    {editingArea ? "Edit Analysis Area" : "Add Analysis Area"}
+                  </DialogTitle>
                   <DialogDescription>
-                    {editingArea ? "Update this analysis dimension." : "Define a new dimension TrAIna will use when evaluating agent contacts."}
+                    {editingArea
+                      ? "Update this analysis dimension."
+                      : "Define a new dimension TrAIna will use when evaluating agent contacts."}
                   </DialogDescription>
                 </DialogHeader>
 
                 <div className="space-y-5 py-2">
                   {/* Title */}
                   <div className="space-y-2">
-                    <Label htmlFor="area-title">Title <span className="text-red-500">*</span> <span className="text-xs font-normal text-muted-foreground">(all fields required)</span></Label>
+                    <Label htmlFor="area-title">
+                      Title <span className="text-red-500">*</span>{" "}
+                      {/* <span className="text-xs font-normal text-muted-foreground">
+                        (all fields required)
+                      </span> */}
+                    </Label>
                     <Input
                       id="area-title"
                       placeholder="e.g. Empathy & Tone, First Contact Resolution, Compliance Adherence"
                       value={areaForm.title}
-                      onChange={(e) => setAreaForm((f) => ({ ...f, title: e.target.value }))}
+                      onChange={(e) =>
+                        setAreaForm((f) => ({ ...f, title: e.target.value }))
+                      }
                     />
                   </div>
 
                   {/* Definition */}
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <Label htmlFor="area-definition">Definition <span className="text-red-500">*</span></Label>
+                      <Label htmlFor="area-definition">
+                        Definition <span className="text-red-500">*</span>
+                      </Label>
                       <Button
                         type="button"
                         variant="outline"
                         size="sm"
                         className="h-7 text-xs gap-1.5"
-                        disabled={!areaForm.title.trim() || generatingField === "definition"}
+                        disabled={
+                          !areaForm.title.trim() ||
+                          generatingField === "definition"
+                        }
                         onClick={() => generateWithAI("definition")}
                       >
+                        {generatingField === "definition" ? (
+                          <Loader2 className="h-3 w-3 animate-spin" />
+                        ) : (
+                          <Wand2 className="h-3 w-3" />
+                        )}
                         {generatingField === "definition"
-                          ? <Loader2 className="h-3 w-3 animate-spin" />
-                          : <Wand2 className="h-3 w-3" />}
-                        {generatingField === "definition" ? "Generating…" : "Generate with AI"}
+                          ? "Generating…"
+                          : "Generate with AI"}
                       </Button>
                     </div>
                     <Textarea
@@ -2795,26 +3038,40 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                       rows={3}
                       placeholder="Describe what this area measures and how agents are evaluated against it…"
                       value={areaForm.definition}
-                      onChange={(e) => setAreaForm((f) => ({ ...f, definition: e.target.value }))}
+                      onChange={(e) =>
+                        setAreaForm((f) => ({
+                          ...f,
+                          definition: e.target.value,
+                        }))
+                      }
                     />
                   </div>
 
                   {/* Good Example */}
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <Label htmlFor="area-good" className="text-green-700">Good Example <span className="text-red-500">*</span></Label>
+                      <Label htmlFor="area-good" className="text-green-700">
+                        Good Example <span className="text-red-500">*</span>
+                      </Label>
                       <Button
                         type="button"
                         variant="outline"
                         size="sm"
                         className="h-7 text-xs gap-1.5"
-                        disabled={!areaForm.title.trim() || generatingField === "goodExample"}
+                        disabled={
+                          !areaForm.title.trim() ||
+                          generatingField === "goodExample"
+                        }
                         onClick={() => generateWithAI("goodExample")}
                       >
+                        {generatingField === "goodExample" ? (
+                          <Loader2 className="h-3 w-3 animate-spin" />
+                        ) : (
+                          <Wand2 className="h-3 w-3" />
+                        )}
                         {generatingField === "goodExample"
-                          ? <Loader2 className="h-3 w-3 animate-spin" />
-                          : <Wand2 className="h-3 w-3" />}
-                        {generatingField === "goodExample" ? "Generating…" : "Generate with AI"}
+                          ? "Generating…"
+                          : "Generate with AI"}
                       </Button>
                     </div>
                     <Textarea
@@ -2823,26 +3080,40 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                       placeholder="Show what excellent performance looks like for this area…"
                       className="border-green-200 focus-visible:ring-green-400"
                       value={areaForm.goodExample}
-                      onChange={(e) => setAreaForm((f) => ({ ...f, goodExample: e.target.value }))}
+                      onChange={(e) =>
+                        setAreaForm((f) => ({
+                          ...f,
+                          goodExample: e.target.value,
+                        }))
+                      }
                     />
                   </div>
 
                   {/* Bad Example */}
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <Label htmlFor="area-bad" className="text-red-600">Bad Example <span className="text-red-500">*</span></Label>
+                      <Label htmlFor="area-bad" className="text-red-600">
+                        Bad Example <span className="text-red-500">*</span>
+                      </Label>
                       <Button
                         type="button"
                         variant="outline"
                         size="sm"
                         className="h-7 text-xs gap-1.5"
-                        disabled={!areaForm.title.trim() || generatingField === "badExample"}
+                        disabled={
+                          !areaForm.title.trim() ||
+                          generatingField === "badExample"
+                        }
                         onClick={() => generateWithAI("badExample")}
                       >
+                        {generatingField === "badExample" ? (
+                          <Loader2 className="h-3 w-3 animate-spin" />
+                        ) : (
+                          <Wand2 className="h-3 w-3" />
+                        )}
                         {generatingField === "badExample"
-                          ? <Loader2 className="h-3 w-3 animate-spin" />
-                          : <Wand2 className="h-3 w-3" />}
-                        {generatingField === "badExample" ? "Generating…" : "Generate with AI"}
+                          ? "Generating…"
+                          : "Generate with AI"}
                       </Button>
                     </div>
                     <Textarea
@@ -2851,20 +3122,31 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                       placeholder="Show what poor performance looks like for this area…"
                       className="border-red-200 focus-visible:ring-red-400"
                       value={areaForm.badExample}
-                      onChange={(e) => setAreaForm((f) => ({ ...f, badExample: e.target.value }))}
+                      onChange={(e) =>
+                        setAreaForm((f) => ({
+                          ...f,
+                          badExample: e.target.value,
+                        }))
+                      }
                     />
                   </div>
 
                   {!areaForm.title.trim() && (
                     <p className="text-xs text-muted-foreground flex items-center gap-1">
                       <Wand2 className="h-3 w-3" />
-                      Enter a title first to enable AI generation for Definition, Good Example, and Bad Example.
+                      Enter a title first to enable AI generation for
+                      Definition, Good Example, and Bad Example.
                     </p>
                   )}
                 </div>
 
                 <DialogFooter>
-                  <Button variant="outline" onClick={() => setIsAreaDialogOpen(false)}>Cancel</Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => setIsAreaDialogOpen(false)}
+                  >
+                    Cancel
+                  </Button>
                   <Button onClick={saveArea} disabled={!allAreaFieldsFilled}>
                     <Save className="h-4 w-4 mr-2" />
                     {editingArea ? "Save Changes" : "Add Area"}
@@ -2874,17 +3156,25 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
             </Dialog>
 
             {/* Delete Confirmation */}
-            <AlertDialog open={!!areaToDelete} onOpenChange={(open) => !open && setAreaToDelete(null)}>
+            <AlertDialog
+              open={!!areaToDelete}
+              onOpenChange={(open) => !open && setAreaToDelete(null)}
+            >
               <AlertDialogContent>
                 <AlertDialogHeader>
                   <AlertDialogTitle>Remove Analysis Area</AlertDialogTitle>
                   <AlertDialogDescription>
-                    Are you sure you want to remove <strong>{areaToDelete?.title}</strong>? This area will no longer be used when TrAIna scores agent contacts.
+                    Are you sure you want to remove{" "}
+                    <strong>{areaToDelete?.title}</strong>? This area will no
+                    longer be used when TrAIna analyse agent contacts.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                   <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction className="bg-red-600 hover:bg-red-700" onClick={confirmDeleteArea}>
+                  <AlertDialogAction
+                    className="bg-red-600 hover:bg-red-700"
+                    onClick={confirmDeleteArea}
+                  >
                     Remove
                   </AlertDialogAction>
                 </AlertDialogFooter>
@@ -2902,7 +3192,8 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                         Knowledge Bases
                       </CardTitle>
                       <CardDescription>
-                        Knowledge Bases help organize documents by topic and can be assigned to teams or AI agents.
+                        Knowledge Bases help organize documents by topic and can
+                        be assigned to teams or AI agents.
                       </CardDescription>
                     </div>
                     <Button onClick={handleOpenCreateKB}>
@@ -2935,22 +3226,35 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                                 {kb.name}
                               </div>
                             </TableCell>
-                            <TableCell className="text-muted-foreground">{kb.description}</TableCell>
+                            <TableCell className="text-muted-foreground">
+                              {kb.description}
+                            </TableCell>
                             <TableCell>
                               <Badge variant="secondary">
-                                {kb.documents.length} {kb.documents.length === 1 ? "Document" : "Documents"}
+                                {kb.documents.length}{" "}
+                                {kb.documents.length === 1
+                                  ? "Document"
+                                  : "Documents"}
                               </Badge>
                             </TableCell>
-                            <TableCell className="text-muted-foreground">{kb.createdDate}</TableCell>
+                            <TableCell className="text-muted-foreground">
+                              {kb.createdDate}
+                            </TableCell>
                             <TableCell className="text-right">
                               <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
-                                  <Button variant="ghost" size="icon" className="h-8 w-8">
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-8 w-8"
+                                  >
                                     <MoreHorizontal className="h-4 w-4" />
                                   </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
-                                  <DropdownMenuItem onClick={() => handleOpenEditKB(kb)}>
+                                  <DropdownMenuItem
+                                    onClick={() => handleOpenEditKB(kb)}
+                                  >
                                     <Edit className="h-4 w-4 mr-2" />
                                     Edit
                                   </DropdownMenuItem>
@@ -2971,8 +3275,13 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                   ) : (
                     <div className="text-center py-8 text-muted-foreground">
                       <FolderOpen className="h-10 w-10 mx-auto mb-2 opacity-50" />
-                      <p className="text-sm font-medium">No Knowledge Bases yet</p>
-                      <p className="text-xs">Create a knowledge base to organize your documents by topic.</p>
+                      <p className="text-sm font-medium">
+                        No Knowledge Bases yet
+                      </p>
+                      <p className="text-xs">
+                        Create a knowledge base to organize your documents by
+                        topic.
+                      </p>
                     </div>
                   )}
                 </CardContent>
@@ -2981,14 +3290,21 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
               <Card>
                 <CardHeader>
                   <div>
-                    <Button variant="ghost" size="sm" className="mb-2" onClick={() => setViewingKB(null)}>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="mb-2"
+                      onClick={() => setViewingKB(null)}
+                    >
                       <ChevronLeft className="h-4 w-4 mr-1" />
                       Back to Knowledge Bases
                     </Button>
                     <CardTitle>{viewingKB.name}</CardTitle>
                     <CardDescription>{viewingKB.description}</CardDescription>
                     {viewingKB.intendedUse && (
-                      <p className="text-xs text-muted-foreground mt-1">{viewingKB.intendedUse}</p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {viewingKB.intendedUse}
+                      </p>
                     )}
                   </div>
                 </CardHeader>
@@ -2998,7 +3314,9 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                       <Upload className="h-8 w-8 mx-auto text-muted-foreground" />
                       <div>
                         <p className="text-sm font-medium">Upload Documents</p>
-                        <p className="text-xs text-muted-foreground">Supports PDF, DOCX, and TXT files</p>
+                        <p className="text-xs text-muted-foreground">
+                          Supports PDF, DOCX, and TXT files
+                        </p>
                       </div>
                       <Input
                         type="file"
@@ -3016,7 +3334,9 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                       <Button
                         variant="outline"
                         onClick={() =>
-                          document.getElementById(`kb-doc-upload-${viewingKB.id}`)?.click()
+                          document
+                            .getElementById(`kb-doc-upload-${viewingKB.id}`)
+                            ?.click()
                         }
                         disabled={isUploadingKBDoc}
                       >
@@ -3037,7 +3357,9 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
 
                   {viewingKB.documents.length > 0 ? (
                     <div className="space-y-3">
-                      <h4 className="font-medium">Documents ({viewingKB.documents.length})</h4>
+                      <h4 className="font-medium">
+                        Documents ({viewingKB.documents.length})
+                      </h4>
                       <div className="grid gap-3">
                         {viewingKB.documents.map((doc) => (
                           <div
@@ -3082,7 +3404,9 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                onClick={() => setKbDocToDelete({ kbId: viewingKB.id, doc })}
+                                onClick={() =>
+                                  setKbDocToDelete({ kbId: viewingKB.id, doc })
+                                }
                               >
                                 <Trash2 className="h-4 w-4" />
                               </Button>
@@ -3094,8 +3418,12 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                   ) : (
                     <div className="text-center py-6 text-muted-foreground">
                       <FileText className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                      <p className="text-sm">No documents in this knowledge base yet</p>
-                      <p className="text-xs">Upload documents above to get started.</p>
+                      <p className="text-sm">
+                        No documents in this knowledge base yet
+                      </p>
+                      <p className="text-xs">
+                        Upload documents above to get started.
+                      </p>
                     </div>
                   )}
                 </CardContent>
@@ -3106,9 +3434,15 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
             <Dialog open={isCreateKBOpen} onOpenChange={setIsCreateKBOpen}>
               <DialogContent>
                 <DialogHeader>
-                  <DialogTitle>{editingKB ? "Edit Knowledge Base" : "Create Knowledge Base"}</DialogTitle>
+                  <DialogTitle>
+                    {editingKB
+                      ? "Edit Knowledge Base"
+                      : "Create Knowledge Base"}
+                  </DialogTitle>
                   <DialogDescription>
-                    {editingKB ? "Update the knowledge base details." : "Create a new knowledge base to organize documents by topic."}
+                    {editingKB
+                      ? "Update the knowledge base details."
+                      : "Create a new knowledge base to organize documents by topic."}
                   </DialogDescription>
                 </DialogHeader>
                 <div className="space-y-4 py-4">
@@ -3132,7 +3466,12 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                   </div>
                 </div>
                 <DialogFooter>
-                  <Button variant="outline" onClick={() => setIsCreateKBOpen(false)}>Cancel</Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => setIsCreateKBOpen(false)}
+                  >
+                    Cancel
+                  </Button>
                   <Button
                     onClick={editingKB ? handleEditKB : handleCreateKB}
                     disabled={!newKBName.trim()}
@@ -3144,17 +3483,25 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
             </Dialog>
 
             {/* Delete Knowledge Base Confirmation Dialog */}
-            <AlertDialog open={kbToDelete !== null} onOpenChange={(open) => !open && setKbToDelete(null)}>
+            <AlertDialog
+              open={kbToDelete !== null}
+              onOpenChange={(open) => !open && setKbToDelete(null)}
+            >
               <AlertDialogContent>
                 <AlertDialogHeader>
                   <AlertDialogTitle>Delete Knowledge Base</AlertDialogTitle>
                   <AlertDialogDescription>
-                    Are you sure you want to delete &quot;{kbToDelete?.name}&quot;? This will remove the knowledge base and all its documents. This action cannot be undone.
+                    Are you sure you want to delete &quot;{kbToDelete?.name}
+                    &quot;? This will remove the knowledge base and all its
+                    documents. This action cannot be undone.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                   <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction className="bg-red-600 hover:bg-red-700" onClick={handleDeleteKB}>
+                  <AlertDialogAction
+                    className="bg-red-600 hover:bg-red-700"
+                    onClick={handleDeleteKB}
+                  >
                     Delete
                   </AlertDialogAction>
                 </AlertDialogFooter>
@@ -3162,12 +3509,17 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
             </AlertDialog>
 
             {/* Delete KB Document Confirmation Dialog */}
-            <AlertDialog open={kbDocToDelete !== null} onOpenChange={(open) => !open && setKbDocToDelete(null)}>
+            <AlertDialog
+              open={kbDocToDelete !== null}
+              onOpenChange={(open) => !open && setKbDocToDelete(null)}
+            >
               <AlertDialogContent>
                 <AlertDialogHeader>
                   <AlertDialogTitle>Delete Document</AlertDialogTitle>
                   <AlertDialogDescription>
-                    Are you sure you want to delete &quot;{kbDocToDelete?.doc.name}&quot;? This action cannot be undone and will remove the document from the knowledge base.
+                    Are you sure you want to delete &quot;
+                    {kbDocToDelete?.doc.name}&quot;? This action cannot be
+                    undone and will remove the document from the knowledge base.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
@@ -3176,7 +3528,10 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                     className="bg-red-600 hover:bg-red-700"
                     onClick={() => {
                       if (kbDocToDelete) {
-                        handleDeleteKBDocument(kbDocToDelete.kbId, kbDocToDelete.doc.id);
+                        handleDeleteKBDocument(
+                          kbDocToDelete.kbId,
+                          kbDocToDelete.doc.id,
+                        );
                         setKbDocToDelete(null);
                       }
                     }}
@@ -3186,7 +3541,6 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
-
           </TabsContent>
 
           {/* User Management Tab */}
@@ -3234,10 +3588,14 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                     </div>
                     <h3 className="text-lg font-medium mb-1">No users yet</h3>
                     <p className="text-sm text-muted-foreground mb-4 max-w-sm">
-                      Get started by creating your first user or importing users from a CSV file.
+                      Get started by creating your first user or importing users
+                      from a CSV file.
                     </p>
                     <div className="flex gap-2">
-                      <Button variant="outline" onClick={() => setIsImportModalOpen(true)}>
+                      <Button
+                        variant="outline"
+                        onClick={() => setIsImportModalOpen(true)}
+                      >
                         <Upload className="h-4 w-4 mr-2" />
                         Import Users
                       </Button>
@@ -3248,102 +3606,108 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                     </div>
                   </div>
                 ) : (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Full Name</TableHead>
-                      <TableHead>Email</TableHead>
-                      <TableHead>Role</TableHead>
-                      <TableHead>Amazon Connect User ID</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead className="text-right">Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {users.map((user) => (
-                      <TableRow key={user.id}>
-                        <TableCell className="font-medium">
-                          <div className="flex items-center gap-2">
-                            <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
-                              <span className="text-xs font-medium text-primary">
-                                {user.fullName
-                                  .split(" ")
-                                  .map((n) => n[0])
-                                  .join("")}
-                              </span>
-                            </div>
-                            {user.fullName}
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-1">
-                            <Mail className="h-3 w-3 text-muted-foreground" />
-                            {user.email}
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <Badge
-                            variant={
-                              user.role === "Admin"
-                                ? "default"
-                                : user.role === "Supervisor"
-                                  ? "secondary"
-                                  : "outline"
-                            }
-                          >
-                            <Shield className="h-3 w-3 mr-1" />
-                            {user.role}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="font-mono text-sm">
-                          {user.amazonConnectUserId}
-                        </TableCell>
-                        <TableCell>
-                          <Badge
-                            variant={
-                              user.status === "Active" ? "default" : "secondary"
-                            }
-                            className={
-                              user.status === "Active"
-                                ? "bg-green-100 text-green-800"
-                                : "bg-gray-100 text-gray-800"
-                            }
-                          >
-                            {user.status}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="sm">
-                                <MoreHorizontal className="h-4 w-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuItem onClick={() => handleEditUserOpen(user)}>
-                                <Edit className="h-4 w-4 mr-2" />
-                                Edit
-                              </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => setUserToToggle(user)}>
-                                <Power className="h-4 w-4 mr-2" />
-                                {user.status === "Active"
-                                  ? "Deactivate"
-                                  : "Activate"}
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                className="text-red-600"
-                                onClick={() => setUserToDelete(user)}
-                              >
-                                <Trash2 className="h-4 w-4 mr-2" />
-                                Delete
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </TableCell>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Full Name</TableHead>
+                        <TableHead>Email</TableHead>
+                        <TableHead>Role</TableHead>
+                        <TableHead>Amazon Connect User ID</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                    </TableHeader>
+                    <TableBody>
+                      {users.map((user) => (
+                        <TableRow key={user.id}>
+                          <TableCell className="font-medium">
+                            <div className="flex items-center gap-2">
+                              <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+                                <span className="text-xs font-medium text-primary">
+                                  {user.fullName
+                                    .split(" ")
+                                    .map((n) => n[0])
+                                    .join("")}
+                                </span>
+                              </div>
+                              {user.fullName}
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-1">
+                              <Mail className="h-3 w-3 text-muted-foreground" />
+                              {user.email}
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <Badge
+                              variant={
+                                user.role === "Admin"
+                                  ? "default"
+                                  : user.role === "Supervisor"
+                                    ? "secondary"
+                                    : "outline"
+                              }
+                            >
+                              <Shield className="h-3 w-3 mr-1" />
+                              {user.role}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="font-mono text-sm">
+                            {user.amazonConnectUserId}
+                          </TableCell>
+                          <TableCell>
+                            <Badge
+                              variant={
+                                user.status === "Active"
+                                  ? "default"
+                                  : "secondary"
+                              }
+                              className={
+                                user.status === "Active"
+                                  ? "bg-green-100 text-green-800"
+                                  : "bg-gray-100 text-gray-800"
+                              }
+                            >
+                              {user.status}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="sm">
+                                  <MoreHorizontal className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem
+                                  onClick={() => handleEditUserOpen(user)}
+                                >
+                                  <Edit className="h-4 w-4 mr-2" />
+                                  Edit
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() => setUserToToggle(user)}
+                                >
+                                  <Power className="h-4 w-4 mr-2" />
+                                  {user.status === "Active"
+                                    ? "Deactivate"
+                                    : "Activate"}
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  className="text-red-600"
+                                  onClick={() => setUserToDelete(user)}
+                                >
+                                  <Trash2 className="h-4 w-4 mr-2" />
+                                  Delete
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
                 )}
               </CardContent>
             </Card>
@@ -3738,17 +4102,24 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
             </Dialog>
 
             {/* Delete User Confirmation */}
-            <AlertDialog open={userToDelete !== null} onOpenChange={(open) => !open && setUserToDelete(null)}>
+            <AlertDialog
+              open={userToDelete !== null}
+              onOpenChange={(open) => !open && setUserToDelete(null)}
+            >
               <AlertDialogContent>
                 <AlertDialogHeader>
                   <AlertDialogTitle>Delete User</AlertDialogTitle>
                   <AlertDialogDescription>
-                    Are you sure you want to delete {userToDelete?.fullName}? This action cannot be undone.
+                    Are you sure you want to delete {userToDelete?.fullName}?
+                    This action cannot be undone.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                   <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction className="bg-red-600 hover:bg-red-700" onClick={handleDeleteUser}>
+                  <AlertDialogAction
+                    className="bg-red-600 hover:bg-red-700"
+                    onClick={handleDeleteUser}
+                  >
                     Delete
                   </AlertDialogAction>
                 </AlertDialogFooter>
@@ -3756,15 +4127,25 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
             </AlertDialog>
 
             {/* Toggle Status Confirmation */}
-            <AlertDialog open={userToToggle !== null} onOpenChange={(open) => !open && setUserToToggle(null)}>
+            <AlertDialog
+              open={userToToggle !== null}
+              onOpenChange={(open) => !open && setUserToToggle(null)}
+            >
               <AlertDialogContent>
                 <AlertDialogHeader>
                   <AlertDialogTitle>
-                    {userToToggle?.status === "Active" ? "Deactivate" : "Activate"} User
+                    {userToToggle?.status === "Active"
+                      ? "Deactivate"
+                      : "Activate"}{" "}
+                    User
                   </AlertDialogTitle>
                   <AlertDialogDescription>
-                    Are you sure you want to {userToToggle?.status === "Active" ? "deactivate" : "activate"} {userToToggle?.fullName}?
-                    {userToToggle?.status === "Active" 
+                    Are you sure you want to{" "}
+                    {userToToggle?.status === "Active"
+                      ? "deactivate"
+                      : "activate"}{" "}
+                    {userToToggle?.fullName}?
+                    {userToToggle?.status === "Active"
                       ? " They will no longer be able to access the platform."
                       : " They will regain access to the platform."}
                   </AlertDialogDescription>
@@ -3772,23 +4153,31 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                 <AlertDialogFooter>
                   <AlertDialogCancel>Cancel</AlertDialogCancel>
                   <AlertDialogAction onClick={handleToggleUserStatus}>
-                    {userToToggle?.status === "Active" ? "Deactivate" : "Activate"}
+                    {userToToggle?.status === "Active"
+                      ? "Deactivate"
+                      : "Activate"}
                   </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
 
             {/* Edit User Dialog */}
-            <Dialog open={isEditUserOpen} onOpenChange={(open) => { if (!open) { setIsEditUserOpen(false); setEditingUser(null); }}}>
+            <Dialog
+              open={isEditUserOpen}
+              onOpenChange={(open) => {
+                if (!open) {
+                  setIsEditUserOpen(false);
+                  setEditingUser(null);
+                }
+              }}
+            >
               <DialogContent className="sm:max-w-[500px]">
                 <DialogHeader>
                   <DialogTitle className="flex items-center gap-2">
                     <Edit className="h-5 w-5 text-primary" />
                     Edit User
                   </DialogTitle>
-                  <DialogDescription>
-                    Update user information
-                  </DialogDescription>
+                  <DialogDescription>Update user information</DialogDescription>
                 </DialogHeader>
                 {editingUser && (
                   <div className="space-y-4 py-4">
@@ -3798,7 +4187,12 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                         id="editFullName"
                         placeholder="Enter full name"
                         value={editingUser.fullName}
-                        onChange={(e) => setEditingUser({ ...editingUser, fullName: e.target.value })}
+                        onChange={(e) =>
+                          setEditingUser({
+                            ...editingUser,
+                            fullName: e.target.value,
+                          })
+                        }
                       />
                     </div>
                     <div className="space-y-2">
@@ -3808,14 +4202,21 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                         type="email"
                         placeholder="Enter email address"
                         value={editingUser.email}
-                        onChange={(e) => setEditingUser({ ...editingUser, email: e.target.value })}
+                        onChange={(e) =>
+                          setEditingUser({
+                            ...editingUser,
+                            email: e.target.value,
+                          })
+                        }
                       />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="editRole">Role*</Label>
                       <Select
                         value={editingUser.role}
-                        onValueChange={(value: "Agent" | "Supervisor" | "Admin") => setEditingUser({ ...editingUser, role: value })}
+                        onValueChange={(
+                          value: "Agent" | "Supervisor" | "Admin",
+                        ) => setEditingUser({ ...editingUser, role: value })}
                       >
                         <SelectTrigger className="w-full">
                           <SelectValue placeholder="Select role" />
@@ -3828,21 +4229,37 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                       </Select>
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="editAmazonConnectId">Amazon Connect User ID</Label>
+                      <Label htmlFor="editAmazonConnectId">
+                        Amazon Connect User ID
+                      </Label>
                       <Input
                         id="editAmazonConnectId"
                         placeholder="e.g., AC-001-XX"
                         value={editingUser.amazonConnectUserId}
-                        onChange={(e) => setEditingUser({ ...editingUser, amazonConnectUserId: e.target.value })}
+                        onChange={(e) =>
+                          setEditingUser({
+                            ...editingUser,
+                            amazonConnectUserId: e.target.value,
+                          })
+                        }
                       />
                     </div>
                   </div>
                 )}
                 <DialogFooter>
-                  <Button variant="outline" onClick={() => { setIsEditUserOpen(false); setEditingUser(null); }}>
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setIsEditUserOpen(false);
+                      setEditingUser(null);
+                    }}
+                  >
                     Cancel
                   </Button>
-                  <Button onClick={handleSaveEditUser} disabled={!editingUser?.fullName || !editingUser?.email}>
+                  <Button
+                    onClick={handleSaveEditUser}
+                    disabled={!editingUser?.fullName || !editingUser?.email}
+                  >
                     Save Changes
                   </Button>
                 </DialogFooter>
@@ -3898,21 +4315,30 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                           {team.name}
                         </div>
                       </TableCell>
-                      <TableCell>{getSupervisorName(team.supervisorId)}</TableCell>
+                      <TableCell>
+                        {getSupervisorName(team.supervisorId)}
+                      </TableCell>
                       <TableCell>
                         <Badge variant="secondary">
-                          {team.agentIds.length} {team.agentIds.length === 1 ? "Agent" : "Agents"}
+                          {team.agentIds.length}{" "}
+                          {team.agentIds.length === 1 ? "Agent" : "Agents"}
                         </Badge>
                       </TableCell>
                       <TableCell className="text-right">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-8 w-8">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8"
+                            >
                               <MoreHorizontal className="h-4 w-4" />
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => handleOpenEditTeam(team)}>
+                            <DropdownMenuItem
+                              onClick={() => handleOpenEditTeam(team)}
+                            >
                               <Edit className="h-4 w-4 mr-2" />
                               Edit
                             </DropdownMenuItem>
@@ -3971,7 +4397,9 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                     {editingTeam ? "Edit Team" : "Create Team"}
                   </DialogTitle>
                   <DialogDescription>
-                    {editingTeam ? "Update team details and agent assignments" : "Set up a new team with a supervisor and agents"}
+                    {editingTeam
+                      ? "Update team details and agent assignments"
+                      : "Set up a new team with a supervisor and agents"}
                   </DialogDescription>
                 </DialogHeader>
 
@@ -3990,7 +4418,10 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                   {/* Supervisor Dropdown */}
                   <div className="space-y-2 w-full">
                     <Label>Supervisor</Label>
-                    <Select value={newTeamSupervisorId} onValueChange={setNewTeamSupervisorId}>
+                    <Select
+                      value={newTeamSupervisorId}
+                      onValueChange={setNewTeamSupervisorId}
+                    >
                       <SelectTrigger className="w-full">
                         <SelectValue placeholder="Select a supervisor" />
                       </SelectTrigger>
@@ -4007,7 +4438,9 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                   {/* Knowledge Bases Selection */}
                   <div className="space-y-2">
                     <Label>Knowledge Bases</Label>
-                    <p className="text-xs text-muted-foreground">Select knowledge bases to assign to this team</p>
+                    <p className="text-xs text-muted-foreground">
+                      Select knowledge bases to assign to this team
+                    </p>
                     {knowledgeBases.length > 0 ? (
                       <div className="border rounded-lg max-h-[160px] overflow-y-auto">
                         {knowledgeBases.map((kb) => (
@@ -4015,20 +4448,20 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                             key={kb.id}
                             className="flex items-center gap-3 p-3 hover:bg-muted border-b last:border-b-0 cursor-pointer transition-colors"
                             onClick={() => {
-                              setNewTeamKBIds(prev =>
+                              setNewTeamKBIds((prev) =>
                                 prev.includes(kb.id)
-                                  ? prev.filter(id => id !== kb.id)
-                                  : [...prev, kb.id]
+                                  ? prev.filter((id) => id !== kb.id)
+                                  : [...prev, kb.id],
                               );
                             }}
                           >
                             <Checkbox
                               checked={newTeamKBIds.includes(kb.id)}
                               onCheckedChange={() => {
-                                setNewTeamKBIds(prev =>
+                                setNewTeamKBIds((prev) =>
                                   prev.includes(kb.id)
-                                    ? prev.filter(id => id !== kb.id)
-                                    : [...prev, kb.id]
+                                    ? prev.filter((id) => id !== kb.id)
+                                    : [...prev, kb.id],
                                 );
                               }}
                             />
@@ -4042,12 +4475,19 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                     ) : (
                       <div className="border rounded-lg p-4 text-center text-muted-foreground">
                         <FolderOpen className="h-6 w-6 mx-auto mb-1 opacity-50" />
-                        <p className="text-sm">No knowledge bases created yet</p>
-                        <p className="text-xs">Create knowledge bases in the LLM Agent section first</p>
+                        <p className="text-sm">
+                          No knowledge bases created yet
+                        </p>
+                        <p className="text-xs">
+                          Create knowledge bases in the LLM Agent section first
+                        </p>
                       </div>
                     )}
                     {newTeamKBIds.length > 0 && (
-                      <p className="text-xs text-muted-foreground">{newTeamKBIds.length} knowledge base{newTeamKBIds.length !== 1 ? "s" : ""} selected</p>
+                      <p className="text-xs text-muted-foreground">
+                        {newTeamKBIds.length} knowledge base
+                        {newTeamKBIds.length !== 1 ? "s" : ""} selected
+                      </p>
                     )}
                   </div>
 
@@ -4064,7 +4504,9 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                       <Input
                         placeholder="Search agents..."
                         value={createTeamAgentSearch}
-                        onChange={(e) => setCreateTeamAgentSearch(e.target.value)}
+                        onChange={(e) =>
+                          setCreateTeamAgentSearch(e.target.value)
+                        }
                         className="pl-9"
                       />
                     </div>
@@ -4078,11 +4520,17 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                           >
                             <Checkbox
                               checked={newTeamAgentIds.includes(agent.id)}
-                              onCheckedChange={() => handleToggleAgent(agent.id)}
+                              onCheckedChange={() =>
+                                handleToggleAgent(agent.id)
+                              }
                             />
                             <div className="flex-1">
-                              <p className="font-medium text-sm">{agent.fullName}</p>
-                              <p className="text-xs text-muted-foreground">{agent.email}</p>
+                              <p className="font-medium text-sm">
+                                {agent.fullName}
+                              </p>
+                              <p className="text-xs text-muted-foreground">
+                                {agent.email}
+                              </p>
                             </div>
                           </div>
                         ))
@@ -4097,7 +4545,10 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                 </div>
 
                 <DialogFooter>
-                  <Button variant="outline" onClick={() => setIsCreateTeamOpen(false)}>
+                  <Button
+                    variant="outline"
+                    onClick={() => setIsCreateTeamOpen(false)}
+                  >
                     Cancel
                   </Button>
                   <Button
@@ -4111,12 +4562,16 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
             </Dialog>
 
             {/* Delete Team Confirmation Dialog */}
-            <AlertDialog open={!!teamToDelete} onOpenChange={(open) => !open && setTeamToDelete(null)}>
+            <AlertDialog
+              open={!!teamToDelete}
+              onOpenChange={(open) => !open && setTeamToDelete(null)}
+            >
               <AlertDialogContent>
                 <AlertDialogHeader>
                   <AlertDialogTitle>Delete Team</AlertDialogTitle>
                   <AlertDialogDescription>
-                    Are you sure you want to delete "{teamToDelete?.name}"? This action cannot be undone.
+                    Are you sure you want to delete "{teamToDelete?.name}"? This
+                    action cannot be undone.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
