@@ -4444,60 +4444,56 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                     </Select>
                   </div>
 
-                  {/* Knowledge Bases Selection */}
-                  <div className="space-y-2">
-                    <Label>Knowledge Bases</Label>
-                    <p className="text-xs text-muted-foreground">
-                      Select knowledge bases to assign to this team
-                    </p>
-                    {knowledgeBases.length > 0 ? (
-                      <div className="border rounded-lg max-h-[160px] overflow-y-auto">
-                        {knowledgeBases.map((kb) => (
+                  {/* Add Agents Section */}
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <Label>Add Agents</Label>
+                      <span className="text-sm text-muted-foreground">
+                        {newTeamAgentIds.length} selected
+                      </span>
+                    </div>
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        placeholder="Search agents..."
+                        value={createTeamAgentSearch}
+                        onChange={(e) =>
+                          setCreateTeamAgentSearch(e.target.value)
+                        }
+                        className="pl-9"
+                      />
+                    </div>
+                    <div className="border rounded-lg max-h-[200px] overflow-y-auto">
+                      {getFilteredAgentsForCreate().length > 0 ? (
+                        getFilteredAgentsForCreate().map((agent) => (
                           <div
-                            key={kb.id}
+                            key={agent.id}
                             className="flex items-center gap-3 p-3 hover:bg-muted border-b last:border-b-0 cursor-pointer transition-colors"
-                            onClick={() => {
-                              setNewTeamKBIds((prev) =>
-                                prev.includes(kb.id)
-                                  ? prev.filter((id) => id !== kb.id)
-                                  : [...prev, kb.id],
-                              );
-                            }}
+                            onClick={() => handleToggleAgent(agent.id)}
                           >
                             <Checkbox
-                              checked={newTeamKBIds.includes(kb.id)}
-                              onCheckedChange={() => {
-                                setNewTeamKBIds((prev) =>
-                                  prev.includes(kb.id)
-                                    ? prev.filter((id) => id !== kb.id)
-                                    : [...prev, kb.id],
-                                );
-                              }}
+                              checked={newTeamAgentIds.includes(agent.id)}
+                              onCheckedChange={() =>
+                                handleToggleAgent(agent.id)
+                              }
                             />
-                            <FolderOpen className="h-4 w-4 text-muted-foreground" />
                             <div className="flex-1">
-                              <p className="font-medium text-sm">{kb.name}</p>
+                              <p className="font-medium text-sm">
+                                {agent.fullName}
+                              </p>
+                              <p className="text-xs text-muted-foreground">
+                                {agent.email}
+                              </p>
                             </div>
                           </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <div className="border rounded-lg p-4 text-center text-muted-foreground">
-                        <FolderOpen className="h-6 w-6 mx-auto mb-1 opacity-50" />
-                        <p className="text-sm">
-                          No knowledge bases created yet
-                        </p>
-                        <p className="text-xs">
-                          Create knowledge bases in the LLM Agent section first
-                        </p>
-                      </div>
-                    )}
-                    {newTeamKBIds.length > 0 && (
-                      <p className="text-xs text-muted-foreground">
-                        {newTeamKBIds.length} knowledge base
-                        {newTeamKBIds.length !== 1 ? "s" : ""} selected
-                      </p>
-                    )}
+                        ))
+                      ) : (
+                        <div className="p-6 text-center text-muted-foreground">
+                          <Users className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                          <p className="text-sm">No agents available</p>
+                        </div>
+                      )}
+                    </div>
                   </div>
 
                   {/* Analysis Areas Selection */}
@@ -4557,56 +4553,60 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                     )}
                   </div>
 
-                  {/* Add Agents Section */}
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <Label>Add Agents</Label>
-                      <span className="text-sm text-muted-foreground">
-                        {newTeamAgentIds.length} selected
-                      </span>
-                    </div>
-                    <div className="relative">
-                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        placeholder="Search agents..."
-                        value={createTeamAgentSearch}
-                        onChange={(e) =>
-                          setCreateTeamAgentSearch(e.target.value)
-                        }
-                        className="pl-9"
-                      />
-                    </div>
-                    <div className="border rounded-lg max-h-[200px] overflow-y-auto">
-                      {getFilteredAgentsForCreate().length > 0 ? (
-                        getFilteredAgentsForCreate().map((agent) => (
+                  {/* Knowledge Bases Selection */}
+                  <div className="space-y-2">
+                    <Label>Knowledge Bases</Label>
+                    <p className="text-xs text-muted-foreground">
+                      Select knowledge bases to assign to this team
+                    </p>
+                    {knowledgeBases.length > 0 ? (
+                      <div className="border rounded-lg max-h-[160px] overflow-y-auto">
+                        {knowledgeBases.map((kb) => (
                           <div
-                            key={agent.id}
+                            key={kb.id}
                             className="flex items-center gap-3 p-3 hover:bg-muted border-b last:border-b-0 cursor-pointer transition-colors"
-                            onClick={() => handleToggleAgent(agent.id)}
+                            onClick={() => {
+                              setNewTeamKBIds((prev) =>
+                                prev.includes(kb.id)
+                                  ? prev.filter((id) => id !== kb.id)
+                                  : [...prev, kb.id],
+                              );
+                            }}
                           >
                             <Checkbox
-                              checked={newTeamAgentIds.includes(agent.id)}
-                              onCheckedChange={() =>
-                                handleToggleAgent(agent.id)
-                              }
+                              checked={newTeamKBIds.includes(kb.id)}
+                              onCheckedChange={() => {
+                                setNewTeamKBIds((prev) =>
+                                  prev.includes(kb.id)
+                                    ? prev.filter((id) => id !== kb.id)
+                                    : [...prev, kb.id],
+                                );
+                              }}
                             />
+                            <FolderOpen className="h-4 w-4 text-muted-foreground" />
                             <div className="flex-1">
-                              <p className="font-medium text-sm">
-                                {agent.fullName}
-                              </p>
-                              <p className="text-xs text-muted-foreground">
-                                {agent.email}
-                              </p>
+                              <p className="font-medium text-sm">{kb.name}</p>
                             </div>
                           </div>
-                        ))
-                      ) : (
-                        <div className="p-6 text-center text-muted-foreground">
-                          <Users className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                          <p className="text-sm">No agents available</p>
-                        </div>
-                      )}
-                    </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="border rounded-lg p-4 text-center text-muted-foreground">
+                        <FolderOpen className="h-6 w-6 mx-auto mb-1 opacity-50" />
+                        <p className="text-sm">
+                          No knowledge bases created yet
+                        </p>
+                        <p className="text-xs">
+                          Create knowledge bases in the LLM Agent section first
+                        </p>
+                      </div>
+                    )}
+                    {newTeamKBIds.length > 0 && (
+                      <p className="text-xs text-muted-foreground">
+                        {newTeamKBIds.length} knowledge base
+                        {newTeamKBIds.length !== 1 ? "s" : ""} selected
+                      </p>
+                    )}
                   </div>
                 </div>
 
