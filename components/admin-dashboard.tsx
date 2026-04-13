@@ -536,6 +536,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
     supervisorId: string;
     agentIds: string[];
     knowledgeBaseIds: string[];
+    analysisAreaIds: string[];
   }
   const [teams, setTeams] = useState<Team[]>([
     {
@@ -544,6 +545,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
       supervisorId: "usr_003",
       agentIds: ["usr_001", "usr_002"],
       knowledgeBaseIds: [],
+      analysisAreaIds: ["aa_1"],
     },
     {
       id: "team_002",
@@ -551,6 +553,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
       supervisorId: "usr_007",
       agentIds: ["usr_006", "usr_008"],
       knowledgeBaseIds: [],
+      analysisAreaIds: ["aa_1", "aa_2"],
     },
   ]);
   const [teamListSearchQuery, setTeamListSearchQuery] = useState("");
@@ -561,6 +564,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
   const [newTeamAgentIds, setNewTeamAgentIds] = useState<string[]>([]);
   const [createTeamAgentSearch, setCreateTeamAgentSearch] = useState("");
   const [newTeamKBIds, setNewTeamKBIds] = useState<string[]>([]);
+  const [newTeamAreaIds, setNewTeamAreaIds] = useState<string[]>([]);
   const [teamToDelete, setTeamToDelete] = useState<Team | null>(null);
 
   // Sample routing analytics data (in a real app, this would come from API)
@@ -1271,6 +1275,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
     setNewTeamSupervisorId("");
     setNewTeamAgentIds([]);
     setNewTeamKBIds([]);
+    setNewTeamAreaIds([]);
     setCreateTeamAgentSearch("");
     setIsCreateTeamOpen(true);
   };
@@ -1281,6 +1286,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
     setNewTeamSupervisorId(team.supervisorId);
     setNewTeamAgentIds([...team.agentIds]);
     setNewTeamKBIds([...(team.knowledgeBaseIds || [])]);
+    setNewTeamAreaIds([...(team.analysisAreaIds || [])]);
     setCreateTeamAgentSearch("");
     setIsCreateTeamOpen(true);
   };
@@ -1306,6 +1312,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                 supervisorId: newTeamSupervisorId,
                 agentIds: newTeamAgentIds,
                 knowledgeBaseIds: newTeamKBIds,
+                analysisAreaIds: newTeamAreaIds,
               }
             : t,
         ),
@@ -1317,6 +1324,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
         supervisorId: newTeamSupervisorId,
         agentIds: newTeamAgentIds,
         knowledgeBaseIds: newTeamKBIds,
+        analysisAreaIds: newTeamAreaIds,
       };
       setTeams((prev) => [...prev, newTeam]);
     }
@@ -1327,6 +1335,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
     setNewTeamSupervisorId("");
     setNewTeamAgentIds([]);
     setNewTeamKBIds([]);
+    setNewTeamAreaIds([]);
   };
 
   const handleDeleteTeam = () => {
@@ -4487,6 +4496,63 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                       <p className="text-xs text-muted-foreground">
                         {newTeamKBIds.length} knowledge base
                         {newTeamKBIds.length !== 1 ? "s" : ""} selected
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Analysis Areas Selection */}
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <Label>Analysis Areas</Label>
+                      <span className="text-xs text-muted-foreground font-normal">(optional)</span>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Select the performance dimensions TrAIna will evaluate for this team's contacts
+                    </p>
+                    {analysisAreas.length > 0 ? (
+                      <div className="border rounded-lg max-h-[180px] overflow-y-auto">
+                        {analysisAreas.map((area) => (
+                          <div
+                            key={area.id}
+                            className="flex items-start gap-3 p-3 hover:bg-muted border-b last:border-b-0 cursor-pointer transition-colors"
+                            onClick={() =>
+                              setNewTeamAreaIds((prev) =>
+                                prev.includes(area.id)
+                                  ? prev.filter((id) => id !== area.id)
+                                  : [...prev, area.id]
+                              )
+                            }
+                          >
+                            <Checkbox
+                              checked={newTeamAreaIds.includes(area.id)}
+                              onCheckedChange={() =>
+                                setNewTeamAreaIds((prev) =>
+                                  prev.includes(area.id)
+                                    ? prev.filter((id) => id !== area.id)
+                                    : [...prev, area.id]
+                                )
+                              }
+                              className="mt-0.5"
+                            />
+                            <div className="flex-1 min-w-0">
+                              <p className="font-medium text-sm">{area.title}</p>
+                              {area.definition && (
+                                <p className="text-xs text-muted-foreground line-clamp-1 mt-0.5">{area.definition}</p>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="border rounded-lg p-4 text-center text-muted-foreground">
+                        <Target className="h-6 w-6 mx-auto mb-1 opacity-50" />
+                        <p className="text-sm">No analysis areas defined yet</p>
+                        <p className="text-xs">Create analysis areas in the LLM Agent section first</p>
+                      </div>
+                    )}
+                    {newTeamAreaIds.length > 0 && (
+                      <p className="text-xs text-muted-foreground">
+                        {newTeamAreaIds.length} area{newTeamAreaIds.length !== 1 ? "s" : ""} selected
                       </p>
                     )}
                   </div>
