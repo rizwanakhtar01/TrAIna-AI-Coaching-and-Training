@@ -907,7 +907,14 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
 
   const confirmDeleteArea = () => {
     if (!areaToDelete) return;
-    setAnalysisAreas((prev) => prev.filter((a) => a.id !== areaToDelete.id));
+    const deletedId = areaToDelete.id;
+    setAnalysisAreas((prev) => prev.filter((a) => a.id !== deletedId));
+    setTeams((prev) =>
+      prev.map((t) => ({
+        ...t,
+        analysisAreaIds: (t.analysisAreaIds || []).filter((id) => id !== deletedId),
+      }))
+    );
     setAreaToDelete(null);
   };
 
@@ -3172,10 +3179,27 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
               <AlertDialogContent>
                 <AlertDialogHeader>
                   <AlertDialogTitle>Remove Analysis Area</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    Are you sure you want to remove{" "}
-                    <strong>{areaToDelete?.title}</strong>? This area will no
-                    longer be used when TrAIna analyse agent contacts.
+                  <AlertDialogDescription asChild>
+                    <div className="space-y-2 text-sm text-muted-foreground">
+                      <p>
+                        Are you sure you want to remove{" "}
+                        <strong className="text-foreground">{areaToDelete?.title}</strong>?
+                      </p>
+                      {(() => {
+                        const assignedCount = teams.filter((t) =>
+                          (t.analysisAreaIds || []).includes(areaToDelete?.id ?? "")
+                        ).length;
+                        return assignedCount > 0 ? (
+                          <p className="text-amber-700 font-medium">
+                            This area is assigned to {assignedCount} team{assignedCount !== 1 ? "s" : ""}. Deleting it will remove it from all of them. This cannot be undone.
+                          </p>
+                        ) : (
+                          <p>
+                            This area will no longer be used when TrAIna evaluates agent contacts.
+                          </p>
+                        );
+                      })()}
+                    </div>
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
