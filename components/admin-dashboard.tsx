@@ -109,7 +109,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { EvaluationFormsTab } from "@/components/evaluation-forms";
+import { EvaluationFormsTab, EvaluationForm, initialEvaluationForms } from "@/components/evaluation-forms";
 
 interface AdminDashboardProps {
   onLogout: () => void;
@@ -538,6 +538,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
     agentIds: string[];
     knowledgeBaseIds: string[];
     analysisAreaIds: string[];
+    evaluationFormId?: string;
   }
   const [teams, setTeams] = useState<Team[]>([
     {
@@ -566,6 +567,8 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
   const [createTeamAgentSearch, setCreateTeamAgentSearch] = useState("");
   const [newTeamKBIds, setNewTeamKBIds] = useState<string[]>([]);
   const [newTeamAreaIds, setNewTeamAreaIds] = useState<string[]>([]);
+  const [newTeamEvaluationFormId, setNewTeamEvaluationFormId] = useState<string>("");
+  const [evaluationForms] = useState<EvaluationForm[]>(initialEvaluationForms);
   const [teamToDelete, setTeamToDelete] = useState<Team | null>(null);
 
   // Sample routing analytics data (in a real app, this would come from API)
@@ -1284,6 +1287,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
     setNewTeamAgentIds([]);
     setNewTeamKBIds([]);
     setNewTeamAreaIds([]);
+    setNewTeamEvaluationFormId("");
     setCreateTeamAgentSearch("");
     setIsCreateTeamOpen(true);
   };
@@ -1295,6 +1299,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
     setNewTeamAgentIds([...team.agentIds]);
     setNewTeamKBIds([...(team.knowledgeBaseIds || [])]);
     setNewTeamAreaIds([...(team.analysisAreaIds || [])]);
+    setNewTeamEvaluationFormId(team.evaluationFormId ?? "");
     setCreateTeamAgentSearch("");
     setIsCreateTeamOpen(true);
   };
@@ -1321,6 +1326,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                 agentIds: newTeamAgentIds,
                 knowledgeBaseIds: newTeamKBIds,
                 analysisAreaIds: newTeamAreaIds,
+                evaluationFormId: newTeamEvaluationFormId || undefined,
               }
             : t,
         ),
@@ -1333,6 +1339,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
         agentIds: newTeamAgentIds,
         knowledgeBaseIds: newTeamKBIds,
         analysisAreaIds: newTeamAreaIds,
+        evaluationFormId: newTeamEvaluationFormId || undefined,
       };
       setTeams((prev) => [...prev, newTeam]);
     }
@@ -1344,6 +1351,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
     setNewTeamAgentIds([]);
     setNewTeamKBIds([]);
     setNewTeamAreaIds([]);
+    setNewTeamEvaluationFormId("");
   };
 
   const handleDeleteTeam = () => {
@@ -4631,6 +4639,38 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                       <p className="text-xs text-muted-foreground">
                         {newTeamKBIds.length} knowledge base
                         {newTeamKBIds.length !== 1 ? "s" : ""} selected
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Quality Evaluation Form */}
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <Label>Quality Evaluation Form</Label>
+                      <span className="text-xs text-muted-foreground font-normal">(optional)</span>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Link an evaluation form to automatically score contacts for this team via Amazon Connect
+                    </p>
+                    <Select
+                      value={newTeamEvaluationFormId}
+                      onValueChange={setNewTeamEvaluationFormId}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="No evaluation form" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="">No evaluation form</SelectItem>
+                        {evaluationForms.map((form) => (
+                          <SelectItem key={form.id} value={form.id}>
+                            {form.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    {newTeamEvaluationFormId && (
+                      <p className="text-xs text-primary">
+                        ✓ Evaluation enabled — contacts will be auto-scored using the selected form
                       </p>
                     )}
                   </div>

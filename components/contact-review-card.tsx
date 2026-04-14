@@ -51,19 +51,25 @@ import { format, isToday, isYesterday, isSameDay, subDays } from "date-fns";
 const getToday = () => format(new Date(), "yyyy-MM-dd");
 const getYesterday = () => format(subDays(new Date(), 1), "yyyy-MM-dd");
 
-interface EvaluationScore {
-  criterionId: string;
-  criterionName: string;
-  scoringType?: "numeric" | "pass-fail";
+interface EvaluationQuestionResult {
+  questionId: string;
+  questionText: string;
+  scoringType: "numeric" | "pass-fail";
   score: number;
   maxScore: number;
   notes?: string;
 }
 
+interface EvaluationSectionResult {
+  sectionId: string;
+  sectionName: string;
+  questions: EvaluationQuestionResult[];
+}
+
 interface EvaluationResult {
   formName: string;
   evaluationDate: string;
-  scores: EvaluationScore[];
+  sections: EvaluationSectionResult[];
 }
 
 interface ContactReview {
@@ -158,11 +164,31 @@ const sampleReviews: ContactReview[] = [
     evaluation: {
       formName: "Billing & Refunds Quality Scorecard",
       evaluationDate: "Today, 14:35",
-      scores: [
-        { criterionId: "c1", criterionName: "Empathy & Tone", scoringType: "numeric", score: 7, maxScore: 10, notes: "Empathetic opening but missed a key retention moment" },
-        { criterionId: "c2", criterionName: "Policy Compliance", scoringType: "numeric", score: 9, maxScore: 10, notes: "Refund timeline communicated correctly" },
-        { criterionId: "c3", criterionName: "First Contact Resolution", scoringType: "pass-fail", score: 10, maxScore: 10, notes: "Issue resolved in single interaction" },
-        { criterionId: "c4", criterionName: "Communication Clarity", scoringType: "numeric", score: 8, maxScore: 10, notes: "Clear and easy to follow throughout" },
+      sections: [
+        {
+          sectionId: "sec_01",
+          sectionName: "Opening & Empathy",
+          questions: [
+            { questionId: "q01", questionText: "Agent greeted the customer professionally and introduced themselves", scoringType: "pass-fail", score: 10, maxScore: 10, notes: "Professional and warm greeting" },
+            { questionId: "q02", questionText: "Agent acknowledged the customer's concern with empathy before moving to resolution", scoringType: "numeric", score: 7, maxScore: 10, notes: "Empathetic opening but missed a key retention moment" },
+          ],
+        },
+        {
+          sectionId: "sec_02",
+          sectionName: "Policy & Resolution",
+          questions: [
+            { questionId: "q03", questionText: "Agent followed correct refund authorization and verification steps", scoringType: "pass-fail", score: 10, maxScore: 10, notes: "Correct process followed" },
+            { questionId: "q04", questionText: "Agent communicated refund timeline clearly and accurately to the customer", scoringType: "numeric", score: 9, maxScore: 10, notes: "Refund timeline communicated correctly" },
+          ],
+        },
+        {
+          sectionId: "sec_03",
+          sectionName: "Closing",
+          questions: [
+            { questionId: "q05", questionText: "Agent confirmed the issue was fully resolved before ending the contact", scoringType: "pass-fail", score: 10, maxScore: 10, notes: "Customer confirmed resolution" },
+            { questionId: "q06", questionText: "Agent summarized the action taken and set clear next-step expectations", scoringType: "numeric", score: 8, maxScore: 10, notes: "Clear summary and timeline provided" },
+          ],
+        },
       ],
     },
   },
@@ -223,11 +249,31 @@ const sampleReviews: ContactReview[] = [
     evaluation: {
       formName: "Billing & Refunds Quality Scorecard",
       evaluationDate: "Today, 14:17",
-      scores: [
-        { criterionId: "c1", criterionName: "Empathy & Tone", scoringType: "numeric", score: 5, maxScore: 10, notes: "Did not acknowledge frustration before jumping to account lookup" },
-        { criterionId: "c2", criterionName: "Policy Compliance", scoringType: "numeric", score: 9, maxScore: 10, notes: "Refund timeline explained correctly and escalation initiated" },
-        { criterionId: "c3", criterionName: "First Contact Resolution", scoringType: "pass-fail", score: 0, maxScore: 10, notes: "Escalated correctly but final resolution pending" },
-        { criterionId: "c4", criterionName: "Communication Clarity", scoringType: "numeric", score: 8, maxScore: 10, notes: "Clear explanation of refund timeline" },
+      sections: [
+        {
+          sectionId: "sec_01",
+          sectionName: "Opening & Empathy",
+          questions: [
+            { questionId: "q01", questionText: "Agent greeted the customer professionally and introduced themselves", scoringType: "pass-fail", score: 10, maxScore: 10, notes: "Basic greeting completed" },
+            { questionId: "q02", questionText: "Agent acknowledged the customer's concern with empathy before moving to resolution", scoringType: "numeric", score: 4, maxScore: 10, notes: "Jumped straight to account lookup without acknowledging frustration" },
+          ],
+        },
+        {
+          sectionId: "sec_02",
+          sectionName: "Policy & Resolution",
+          questions: [
+            { questionId: "q03", questionText: "Agent followed correct refund authorization and verification steps", scoringType: "pass-fail", score: 10, maxScore: 10, notes: "Escalation initiated correctly" },
+            { questionId: "q04", questionText: "Agent communicated refund timeline clearly and accurately to the customer", scoringType: "numeric", score: 9, maxScore: 10, notes: "Refund timeline explained correctly and escalation initiated" },
+          ],
+        },
+        {
+          sectionId: "sec_03",
+          sectionName: "Closing",
+          questions: [
+            { questionId: "q05", questionText: "Agent confirmed the issue was fully resolved before ending the contact", scoringType: "pass-fail", score: 0, maxScore: 10, notes: "Contact ended while resolution still pending escalation" },
+            { questionId: "q06", questionText: "Agent summarized the action taken and set clear next-step expectations", scoringType: "numeric", score: 7, maxScore: 10, notes: "Escalation explained, but no clear timeline given for follow-up" },
+          ],
+        },
       ],
     },
   },
@@ -297,13 +343,15 @@ const sampleReviews: ContactReview[] = [
 
 function EvaluationScoresPanel({ evaluation }: { evaluation: EvaluationResult }) {
   const [isOpen, setIsOpen] = useState(false);
-  const { formName, evaluationDate, scores } = evaluation;
+  const { formName, evaluationDate, sections } = evaluation;
 
-  const numericScores = scores.filter((s) => s.scoringType !== "pass-fail");
-  const weightedAvg =
-    numericScores.length > 0
-      ? numericScores.reduce((sum, s) => sum + (s.score / s.maxScore) * 100, 0) / numericScores.length
-      : scores.reduce((sum, s) => sum + (s.score / s.maxScore) * 100, 0) / scores.length;
+  const allQuestions = sections.flatMap((s) => s.questions);
+  const numericQs = allQuestions.filter((q) => q.scoringType !== "pass-fail");
+  const overallPct = Math.round(
+    numericQs.length > 0
+      ? numericQs.reduce((sum, q) => sum + (q.score / q.maxScore) * 100, 0) / numericQs.length
+      : allQuestions.reduce((sum, q) => sum + (q.score / q.maxScore) * 100, 0) / allQuestions.length
+  );
 
   const getScoreBadgeClass = (pct: number) => {
     if (pct >= 80) return "bg-green-100 text-green-800 border-green-200";
@@ -317,7 +365,11 @@ function EvaluationScoresPanel({ evaluation }: { evaluation: EvaluationResult })
     return "[&>div]:bg-red-500";
   };
 
-  const overallPct = Math.round(weightedAvg);
+  const getSectionAvgPct = (section: EvaluationSectionResult) => {
+    const numQs = section.questions.filter((q) => q.scoringType !== "pass-fail");
+    if (numQs.length === 0) return null;
+    return Math.round(numQs.reduce((sum, q) => sum + (q.score / q.maxScore) * 100, 0) / numQs.length);
+  };
 
   return (
     <Collapsible open={isOpen} onOpenChange={setIsOpen}>
@@ -327,10 +379,7 @@ function EvaluationScoresPanel({ evaluation }: { evaluation: EvaluationResult })
             <div className="flex items-center gap-2 flex-wrap">
               <ClipboardList className="h-4 w-4 text-primary flex-shrink-0" />
               <span className="text-sm font-medium">Quality Evaluation</span>
-              <Badge
-                className={`text-xs border ${getScoreBadgeClass(overallPct)}`}
-                variant="outline"
-              >
+              <Badge className={`text-xs border ${getScoreBadgeClass(overallPct)}`} variant="outline">
                 {overallPct}% overall
               </Badge>
               <span className="text-xs text-muted-foreground">· Evaluated by Amazon Connect AI · {evaluationDate}</span>
@@ -343,51 +392,61 @@ function EvaluationScoresPanel({ evaluation }: { evaluation: EvaluationResult })
         </CollapsibleTrigger>
         <CollapsibleContent>
           <div className="border-t bg-white">
+            {/* Form header */}
             <div className="px-4 py-2 border-b bg-slate-50/50 flex items-center gap-2">
               <span className="text-xs text-muted-foreground font-medium">Form:</span>
-              <span className="text-xs text-foreground">{formName}</span>
+              <span className="text-xs text-foreground font-medium">{formName}</span>
             </div>
-            <div className="p-4 space-y-4">
-              {scores.map((s) => {
-                const isPassFail = s.scoringType === "pass-fail";
-                const passed = s.score >= s.maxScore * 0.5;
-                const pct = Math.round((s.score / s.maxScore) * 100);
+            {/* Sections */}
+            <div className="divide-y">
+              {sections.map((section, sIdx) => {
+                const sectionPct = getSectionAvgPct(section);
                 return (
-                  <div key={s.criterionId} className="space-y-1">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium">{s.criterionName}</span>
+                  <div key={section.sectionId} className="p-4">
+                    <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center gap-2">
-                        {isPassFail ? (
-                          <Badge
-                            variant="outline"
-                            className={`text-xs border ${passed ? "bg-green-100 text-green-800 border-green-200" : "bg-red-100 text-red-800 border-red-200"}`}
-                          >
-                            {passed ? "Pass" : "Fail"}
-                          </Badge>
-                        ) : (
-                          <>
-                            <span className="text-xs text-muted-foreground">
-                              {s.score}/{s.maxScore}
-                            </span>
-                            <Badge
-                              variant="outline"
-                              className={`text-xs border ${getScoreBadgeClass(pct)}`}
-                            >
-                              {pct}%
-                            </Badge>
-                          </>
-                        )}
+                        <span className="text-xs font-bold text-muted-foreground bg-muted rounded px-1.5 py-0.5">{sIdx + 1}</span>
+                        <span className="text-sm font-semibold text-foreground">{section.sectionName}</span>
                       </div>
+                      {sectionPct !== null && (
+                        <Badge className={`text-xs border ${getScoreBadgeClass(sectionPct)}`} variant="outline">
+                          {sectionPct}% avg
+                        </Badge>
+                      )}
                     </div>
-                    {!isPassFail && (
-                      <Progress
-                        value={pct}
-                        className={`h-1.5 ${getBarColor(pct)}`}
-                      />
-                    )}
-                    {s.notes && (
-                      <p className="text-xs text-muted-foreground">{s.notes}</p>
-                    )}
+                    <div className="space-y-3 pl-2">
+                      {section.questions.map((q, qIdx) => {
+                        const isPassFail = q.scoringType === "pass-fail";
+                        const passed = q.score >= q.maxScore * 0.5;
+                        const pct = Math.round((q.score / q.maxScore) * 100);
+                        return (
+                          <div key={q.questionId} className="space-y-1">
+                            <div className="flex items-start justify-between gap-3">
+                              <span className="text-xs text-muted-foreground mt-0.5 w-4 flex-shrink-0">{qIdx + 1}.</span>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-start justify-between gap-2">
+                                  <p className="text-xs text-foreground leading-relaxed">{q.questionText}</p>
+                                  <div className="flex items-center gap-1.5 flex-shrink-0">
+                                    {isPassFail ? (
+                                      <Badge variant="outline" className={`text-xs border ${passed ? "bg-green-100 text-green-800 border-green-200" : "bg-red-100 text-red-800 border-red-200"}`}>
+                                        {passed ? "Pass" : "Fail"}
+                                      </Badge>
+                                    ) : (
+                                      <>
+                                        <span className="text-xs text-muted-foreground">{q.score}/{q.maxScore}</span>
+                                        <Badge variant="outline" className={`text-xs border ${getScoreBadgeClass(pct)}`}>{pct}%</Badge>
+                                      </>
+                                    )}
+                                  </div>
+                                </div>
+                                {!isPassFail && <Progress value={pct} className={`h-1 mt-1 ${getBarColor(pct)}`} />}
+                                {q.notes && <p className="text-xs text-muted-foreground mt-0.5 italic">{q.notes}</p>}
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
                 );
               })}
@@ -525,7 +584,7 @@ function ContactReviewCard({ review }: ContactReviewCardProps) {
           </div>
         </div>
 
-        {review.evaluation && review.evaluation.scores.length > 0 && (
+        {review.evaluation && review.evaluation.sections.length > 0 && (
           <EvaluationScoresPanel evaluation={review.evaluation} />
         )}
 

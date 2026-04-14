@@ -79,6 +79,7 @@ import {
   Pause,
   Search,
   Calendar as CalendarIcon,
+  ClipboardList,
 } from "lucide-react";
 
 // Contact Review interface for supervisor view
@@ -2258,6 +2259,47 @@ export function SupervisorDashboard({ onLogout, onSwitchToAgent }: SupervisorDas
               </div>
             </CardContent>
           </Card>
+
+          {/* Evaluation Source Context (only for evaluation-triggered patterns) */}
+          {pattern.source === "evaluation" && pattern.evaluationContext && (
+            <Card className="border-purple-200 bg-purple-50/30">
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center gap-2 text-purple-800">
+                  <ClipboardList className="h-5 w-5 text-purple-600" />
+                  Evaluation Source
+                  <Badge className="bg-purple-100 text-purple-800 border-purple-200 border text-xs ml-1">Evaluation-triggered</Badge>
+                </CardTitle>
+                <CardDescription className="text-purple-700">
+                  This pattern was detected from quality evaluation scores, not from AI conversation analysis.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <p className="text-xs text-purple-700 font-medium">Evaluation Form</p>
+                    <p className="text-sm text-foreground font-semibold">{pattern.evaluationContext.formName}</p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-xs text-purple-700 font-medium">Low-Scoring Criterion</p>
+                    <p className="text-sm text-foreground font-semibold">{pattern.evaluationContext.criterionName}</p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-xs text-purple-700 font-medium">Average Score</p>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-semibold text-foreground">{pattern.evaluationContext.avgScore}/{pattern.evaluationContext.maxScore}</span>
+                      <Badge className="bg-red-100 text-red-800 border-red-200 border text-xs">
+                        {Math.round((pattern.evaluationContext.avgScore / pattern.evaluationContext.maxScore) * 100)}% — Below threshold
+                      </Badge>
+                    </div>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-xs text-purple-700 font-medium">Contacts Flagged</p>
+                    <p className="text-sm font-semibold text-foreground">{pattern.frequency} contacts in the last 7 days</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Root Cause Analysis */}
           <Card>

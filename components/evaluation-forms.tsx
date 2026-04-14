@@ -31,14 +31,6 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
   Select,
   SelectContent,
   SelectItem,
@@ -51,651 +43,769 @@ import {
   Edit,
   Trash2,
   ClipboardList,
+  ChevronDown,
   ChevronRight,
   Info,
   Check,
   Hash,
   ToggleLeft,
+  GripVertical,
+  FilePlus2,
 } from "lucide-react";
-import { Switch } from "@/components/ui/switch";
 import { Progress } from "@/components/ui/progress";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
-export interface EvaluationCriterion {
+// ─── Interfaces ───────────────────────────────────────────────────────────────
+
+export interface EvaluationQuestion {
+  id: string;
+  text: string;
+  description?: string;
+  scoringType: "numeric" | "pass-fail";
+  maxScore: number;
+  weight: number;
+}
+
+export interface EvaluationFormSection {
   id: string;
   name: string;
+  questions: EvaluationQuestion[];
+}
+
+export interface EvaluationForm {
+  id: string;
+  name: string;
+  sections: EvaluationFormSection[];
+  lastUpdated: string;
+}
+
+// ─── Initial Data ─────────────────────────────────────────────────────────────
+
+export const initialEvaluationForms: EvaluationForm[] = [
+  {
+    id: "form_001",
+    name: "Billing & Refunds Quality Scorecard",
+    lastUpdated: "2 days ago",
+    sections: [
+      {
+        id: "sec_01",
+        name: "Opening & Empathy",
+        questions: [
+          {
+            id: "q01",
+            text: "Agent greeted the customer professionally and introduced themselves",
+            description: "Standard greeting per company script",
+            scoringType: "pass-fail",
+            maxScore: 10,
+            weight: 30,
+          },
+          {
+            id: "q02",
+            text: "Agent acknowledged the customer's concern with empathy before moving to resolution",
+            description: "Look for empathic language before jumping to solution steps",
+            scoringType: "numeric",
+            maxScore: 10,
+            weight: 70,
+          },
+        ],
+      },
+      {
+        id: "sec_02",
+        name: "Policy & Resolution",
+        questions: [
+          {
+            id: "q03",
+            text: "Agent followed correct refund authorization and verification steps",
+            description: "All required verification steps completed before processing refund",
+            scoringType: "pass-fail",
+            maxScore: 10,
+            weight: 50,
+          },
+          {
+            id: "q04",
+            text: "Agent communicated refund timeline clearly and accurately to the customer",
+            description: "Timeline stated must match company policy (5–7 business days)",
+            scoringType: "numeric",
+            maxScore: 10,
+            weight: 50,
+          },
+        ],
+      },
+      {
+        id: "sec_03",
+        name: "Closing",
+        questions: [
+          {
+            id: "q05",
+            text: "Agent confirmed the issue was fully resolved before ending the contact",
+            description: "Customer verbally confirmed issue resolved or agreed to pending action",
+            scoringType: "pass-fail",
+            maxScore: 10,
+            weight: 50,
+          },
+          {
+            id: "q06",
+            text: "Agent summarized the action taken and set clear next-step expectations",
+            description: "Summary covers what was done and what happens next",
+            scoringType: "numeric",
+            maxScore: 10,
+            weight: 50,
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "form_002",
+    name: "Technical Support Quality Scorecard",
+    lastUpdated: "Yesterday",
+    sections: [
+      {
+        id: "sec_01",
+        name: "Opening & Empathy",
+        questions: [
+          {
+            id: "q01",
+            text: "Agent greeted customer and acknowledged their technical issue",
+            scoringType: "pass-fail",
+            maxScore: 10,
+            weight: 40,
+          },
+          {
+            id: "q02",
+            text: "Agent demonstrated empathy when customer expressed frustration",
+            description: "Empathy phrases such as 'I understand how frustrating that must be'",
+            scoringType: "numeric",
+            maxScore: 10,
+            weight: 60,
+          },
+        ],
+      },
+      {
+        id: "sec_02",
+        name: "Troubleshooting Methodology",
+        questions: [
+          {
+            id: "q03",
+            text: "Agent followed a structured approach: verify → isolate → resolve",
+            description: "Troubleshooting steps are methodical, not random",
+            scoringType: "numeric",
+            maxScore: 10,
+            weight: 50,
+          },
+          {
+            id: "q04",
+            text: "Agent escalated to technical team at the correct threshold",
+            description: "Escalation criteria: 2+ failed troubleshooting attempts on same issue",
+            scoringType: "pass-fail",
+            maxScore: 10,
+            weight: 50,
+          },
+        ],
+      },
+      {
+        id: "sec_03",
+        name: "Technical Accuracy",
+        questions: [
+          {
+            id: "q05",
+            text: "All technical guidance provided was accurate and up to date",
+            description: "No misleading or outdated information given to the customer",
+            scoringType: "numeric",
+            maxScore: 10,
+            weight: 60,
+          },
+          {
+            id: "q06",
+            text: "Agent documented the issue and troubleshooting steps in the system",
+            description: "Case notes include error details, steps tried, and outcome",
+            scoringType: "pass-fail",
+            maxScore: 10,
+            weight: 40,
+          },
+        ],
+      },
+    ],
+  },
+];
+
+// ─── Component ────────────────────────────────────────────────────────────────
+
+type View = "forms-list" | "form-detail";
+
+interface QuestionDialogState {
+  open: boolean;
+  sectionId: string | null;
+  editing: EvaluationQuestion | null;
+}
+
+interface QuestionFormState {
+  text: string;
   description: string;
   scoringType: "numeric" | "pass-fail";
   maxScore: number;
   weight: number;
 }
 
-export interface TeamEvaluationConfig {
-  teamId: string;
-  teamName: string;
-  supervisorName: string;
-  agentCount: number;
-  enabled: boolean;
-  formName: string;
-  criteria: EvaluationCriterion[];
-  lastUpdated: string;
-}
-
-const initialTeamConfigs: TeamEvaluationConfig[] = [
-  {
-    teamId: "team_001",
-    teamName: "Billing & Refunds Team",
-    supervisorName: "Sarah Johnson",
-    agentCount: 4,
-    enabled: true,
-    formName: "Billing & Refunds Quality Scorecard",
-    lastUpdated: "2 days ago",
-    criteria: [
-      {
-        id: "c1",
-        name: "Empathy & Tone",
-        description: "Agent demonstrates genuine understanding of customer emotions and maintains a professional, warm tone throughout.",
-        scoringType: "numeric",
-        maxScore: 10,
-        weight: 25,
-      },
-      {
-        id: "c2",
-        name: "Policy Compliance",
-        description: "Agent follows all required verification steps, refund policies, and compliance protocols without skipping.",
-        scoringType: "numeric",
-        maxScore: 10,
-        weight: 25,
-      },
-      {
-        id: "c3",
-        name: "First Contact Resolution",
-        description: "Customer's issue is fully resolved in the interaction without requiring a callback or additional contacts.",
-        scoringType: "pass-fail",
-        maxScore: 10,
-        weight: 30,
-      },
-      {
-        id: "c4",
-        name: "Communication Clarity",
-        description: "Agent explains processes and next steps in clear, accessible language. Customer confirms understanding.",
-        scoringType: "numeric",
-        maxScore: 10,
-        weight: 20,
-      },
-    ],
-  },
-  {
-    teamId: "team_002",
-    teamName: "Technical Support Team",
-    supervisorName: "Emily Rodriguez",
-    agentCount: 3,
-    enabled: true,
-    formName: "Technical Support Quality Scorecard",
-    lastUpdated: "Yesterday",
-    criteria: [
-      {
-        id: "c1",
-        name: "Empathy & Tone",
-        description: "Agent demonstrates genuine understanding of customer emotions and maintains a professional, warm tone throughout.",
-        scoringType: "numeric",
-        maxScore: 10,
-        weight: 20,
-      },
-      {
-        id: "c2",
-        name: "Troubleshooting Methodology",
-        description: "Agent follows structured troubleshooting steps, documents each step, and escalates at the correct threshold.",
-        scoringType: "numeric",
-        maxScore: 10,
-        weight: 35,
-      },
-      {
-        id: "c3",
-        name: "Escalation Handling",
-        description: "Escalations are triggered at the right time, with a complete case handover and clear customer communication.",
-        scoringType: "pass-fail",
-        maxScore: 10,
-        weight: 25,
-      },
-      {
-        id: "c4",
-        name: "Technical Accuracy",
-        description: "Agent provides technically correct information and does not give misleading guidance on product functionality.",
-        scoringType: "numeric",
-        maxScore: 10,
-        weight: 20,
-      },
-    ],
-  },
-  {
-    teamId: "team_003",
-    teamName: "Customer Experience Team",
-    supervisorName: "James Wilson",
-    agentCount: 5,
-    enabled: false,
-    formName: "",
-    lastUpdated: "5 days ago",
-    criteria: [],
-  },
-];
+const BLANK_QUESTION: QuestionFormState = {
+  text: "",
+  description: "",
+  scoringType: "numeric",
+  maxScore: 10,
+  weight: 50,
+};
 
 export function EvaluationFormsTab() {
-  const [teamConfigs, setTeamConfigs] = useState<TeamEvaluationConfig[]>(initialTeamConfigs);
-  const [selectedTeam, setSelectedTeam] = useState<TeamEvaluationConfig | null>(null);
-  const [criterionDialogOpen, setCriterionDialogOpen] = useState(false);
-  const [editingCriterion, setEditingCriterion] = useState<EvaluationCriterion | null>(null);
-  const [criterionToDelete, setCriterionToDelete] = useState<EvaluationCriterion | null>(null);
-  const [criterionForm, setCriterionForm] = useState({
-    name: "",
-    description: "",
-    scoringType: "numeric" as "numeric" | "pass-fail",
-    maxScore: 10,
-    weight: 20,
-  });
-  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+  const [forms, setForms] = useState<EvaluationForm[]>(initialEvaluationForms);
+  const [view, setView] = useState<View>("forms-list");
+  const [selectedFormId, setSelectedFormId] = useState<string | null>(null);
+  const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set());
+
+  // Form-level editing
   const [editingFormName, setEditingFormName] = useState(false);
   const [formNameDraft, setFormNameDraft] = useState("");
 
-  const toggleTeamEnabled = (teamId: string) => {
-    setTeamConfigs((prev) =>
-      prev.map((t) =>
-        t.teamId === teamId ? { ...t, enabled: !t.enabled } : t
-      )
-    );
-    if (selectedTeam?.teamId === teamId) {
-      setSelectedTeam((prev) => prev ? { ...prev, enabled: !prev.enabled } : null);
+  // New form dialog
+  const [newFormDialogOpen, setNewFormDialogOpen] = useState(false);
+  const [newFormName, setNewFormName] = useState("");
+
+  // Section editing
+  const [editingSectionId, setEditingSectionId] = useState<string | null>(null);
+  const [sectionNameDraft, setSectionNameDraft] = useState("");
+  const [addingSectionName, setAddingSectionName] = useState("");
+  const [showAddSection, setShowAddSection] = useState(false);
+
+  // Question dialog
+  const [questionDialog, setQuestionDialog] = useState<QuestionDialogState>({
+    open: false,
+    sectionId: null,
+    editing: null,
+  });
+  const [questionForm, setQuestionForm] = useState<QuestionFormState>({ ...BLANK_QUESTION });
+  const [questionErrors, setQuestionErrors] = useState<Record<string, string>>({});
+
+  // Delete states
+  const [formToDelete, setFormToDelete] = useState<EvaluationForm | null>(null);
+  const [sectionToDelete, setSectionToDelete] = useState<{ formId: string; sectionId: string; name: string } | null>(null);
+  const [questionToDelete, setQuestionToDelete] = useState<{ formId: string; sectionId: string; question: EvaluationQuestion } | null>(null);
+
+  const selectedForm = forms.find((f) => f.id === selectedFormId) ?? null;
+
+  // ─── Helpers ──────────────────────────────────────────────────────────────
+
+  const updateForm = (formId: string, updater: (f: EvaluationForm) => EvaluationForm) => {
+    setForms((prev) => prev.map((f) => (f.id === formId ? updater(f) : f)));
+    if (selectedFormId === formId) {
+      // trigger re-render via setSelectedFormId (same id)
     }
   };
 
-  const openAddCriterion = () => {
-    setEditingCriterion(null);
-    setCriterionForm({ name: "", description: "", scoringType: "numeric", maxScore: 10, weight: 20 });
-    setFormErrors({});
-    setCriterionDialogOpen(true);
-  };
-
-  const openEditCriterion = (criterion: EvaluationCriterion) => {
-    setEditingCriterion(criterion);
-    setCriterionForm({
-      name: criterion.name,
-      description: criterion.description,
-      scoringType: criterion.scoringType,
-      maxScore: criterion.maxScore,
-      weight: criterion.weight,
+  const toggleSection = (sectionId: string) => {
+    setExpandedSections((prev) => {
+      const next = new Set(prev);
+      if (next.has(sectionId)) next.delete(sectionId);
+      else next.add(sectionId);
+      return next;
     });
-    setFormErrors({});
-    setCriterionDialogOpen(true);
   };
 
-  const validateCriterionForm = () => {
-    const errors: Record<string, string> = {};
-    if (!criterionForm.name.trim()) errors.name = "Name is required.";
-    if (!criterionForm.description.trim()) errors.description = "Description is required.";
-    if (criterionForm.scoringType === "numeric" && (criterionForm.maxScore < 1 || criterionForm.maxScore > 100)) {
-      errors.maxScore = "Max score must be between 1 and 100.";
+  // ─── Form-level CRUD ──────────────────────────────────────────────────────
+
+  const createForm = () => {
+    if (!newFormName.trim()) return;
+    const f: EvaluationForm = {
+      id: `form_${Date.now()}`,
+      name: newFormName.trim(),
+      sections: [],
+      lastUpdated: "Just now",
+    };
+    setForms((prev) => [...prev, f]);
+    setNewFormName("");
+    setNewFormDialogOpen(false);
+  };
+
+  const deleteForm = () => {
+    if (!formToDelete) return;
+    setForms((prev) => prev.filter((f) => f.id !== formToDelete.id));
+    setFormToDelete(null);
+    if (selectedFormId === formToDelete.id) {
+      setView("forms-list");
+      setSelectedFormId(null);
     }
-    if (criterionForm.weight < 1 || criterionForm.weight > 100) errors.weight = "Weight must be between 1 and 100.";
-    setFormErrors(errors);
-    return Object.keys(errors).length === 0;
-  };
-
-  const saveCriterion = () => {
-    if (!validateCriterionForm() || !selectedTeam) return;
-
-    const updatedTeams = teamConfigs.map((team) => {
-      if (team.teamId !== selectedTeam.teamId) return team;
-      let newCriteria: EvaluationCriterion[];
-      if (editingCriterion) {
-        newCriteria = team.criteria.map((c) =>
-          c.id === editingCriterion.id
-            ? { ...c, ...criterionForm }
-            : c
-        );
-      } else {
-        newCriteria = [
-          ...team.criteria,
-          {
-            id: `c${Date.now()}`,
-            ...criterionForm,
-          },
-        ];
-      }
-      return { ...team, criteria: newCriteria, lastUpdated: "Just now" };
-    });
-
-    setTeamConfigs(updatedTeams);
-    const updated = updatedTeams.find((t) => t.teamId === selectedTeam.teamId)!;
-    setSelectedTeam(updated);
-    setCriterionDialogOpen(false);
-  };
-
-  const deleteCriterion = () => {
-    if (!criterionToDelete || !selectedTeam) return;
-    const updatedTeams = teamConfigs.map((team) => {
-      if (team.teamId !== selectedTeam.teamId) return team;
-      return {
-        ...team,
-        criteria: team.criteria.filter((c) => c.id !== criterionToDelete.id),
-        lastUpdated: "Just now",
-      };
-    });
-    setTeamConfigs(updatedTeams);
-    const updated = updatedTeams.find((t) => t.teamId === selectedTeam.teamId)!;
-    setSelectedTeam(updated);
-    setCriterionToDelete(null);
   };
 
   const saveFormName = () => {
-    if (!selectedTeam) return;
-    const updatedTeams = teamConfigs.map((t) =>
-      t.teamId === selectedTeam.teamId ? { ...t, formName: formNameDraft, lastUpdated: "Just now" } : t
-    );
-    setTeamConfigs(updatedTeams);
-    setSelectedTeam({ ...selectedTeam, formName: formNameDraft });
+    if (!selectedFormId || !formNameDraft.trim()) return;
+    updateForm(selectedFormId, (f) => ({ ...f, name: formNameDraft.trim(), lastUpdated: "Just now" }));
     setEditingFormName(false);
   };
 
-  const totalWeight = selectedTeam
-    ? selectedTeam.criteria.reduce((sum, c) => sum + c.weight, 0)
-    : 0;
+  // ─── Section CRUD ─────────────────────────────────────────────────────────
 
-  // ─── List view ───────────────────────────────────────────────────────────────
-  if (!selectedTeam) {
+  const addSection = () => {
+    if (!addingSectionName.trim() || !selectedFormId) return;
+    const sec: EvaluationFormSection = {
+      id: `sec_${Date.now()}`,
+      name: addingSectionName.trim(),
+      questions: [],
+    };
+    updateForm(selectedFormId, (f) => ({
+      ...f,
+      sections: [...f.sections, sec],
+      lastUpdated: "Just now",
+    }));
+    setExpandedSections((prev) => new Set(prev).add(sec.id));
+    setAddingSectionName("");
+    setShowAddSection(false);
+  };
+
+  const saveSectionName = (formId: string, sectionId: string) => {
+    if (!sectionNameDraft.trim()) return;
+    updateForm(formId, (f) => ({
+      ...f,
+      sections: f.sections.map((s) =>
+        s.id === sectionId ? { ...s, name: sectionNameDraft.trim() } : s
+      ),
+      lastUpdated: "Just now",
+    }));
+    setEditingSectionId(null);
+  };
+
+  const deleteSection = () => {
+    if (!sectionToDelete) return;
+    updateForm(sectionToDelete.formId, (f) => ({
+      ...f,
+      sections: f.sections.filter((s) => s.id !== sectionToDelete.sectionId),
+      lastUpdated: "Just now",
+    }));
+    setSectionToDelete(null);
+  };
+
+  // ─── Question CRUD ────────────────────────────────────────────────────────
+
+  const openAddQuestion = (sectionId: string) => {
+    setQuestionForm({ ...BLANK_QUESTION });
+    setQuestionErrors({});
+    setQuestionDialog({ open: true, sectionId, editing: null });
+  };
+
+  const openEditQuestion = (sectionId: string, question: EvaluationQuestion) => {
+    setQuestionForm({
+      text: question.text,
+      description: question.description ?? "",
+      scoringType: question.scoringType,
+      maxScore: question.maxScore,
+      weight: question.weight,
+    });
+    setQuestionErrors({});
+    setQuestionDialog({ open: true, sectionId, editing: question });
+  };
+
+  const validateQuestion = () => {
+    const errors: Record<string, string> = {};
+    if (!questionForm.text.trim()) errors.text = "Question text is required.";
+    if (questionForm.scoringType === "numeric" && (questionForm.maxScore < 1 || questionForm.maxScore > 100)) {
+      errors.maxScore = "Max score must be between 1 and 100.";
+    }
+    if (questionForm.weight < 1 || questionForm.weight > 100) errors.weight = "Weight must be between 1 and 100.";
+    setQuestionErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const saveQuestion = () => {
+    if (!validateQuestion() || !selectedFormId || !questionDialog.sectionId) return;
+    updateForm(selectedFormId, (f) => ({
+      ...f,
+      sections: f.sections.map((s) => {
+        if (s.id !== questionDialog.sectionId) return s;
+        const q: EvaluationQuestion = {
+          id: questionDialog.editing?.id ?? `q${Date.now()}`,
+          text: questionForm.text.trim(),
+          description: questionForm.description.trim() || undefined,
+          scoringType: questionForm.scoringType,
+          maxScore: questionForm.scoringType === "pass-fail" ? 10 : questionForm.maxScore,
+          weight: questionForm.weight,
+        };
+        return {
+          ...s,
+          questions: questionDialog.editing
+            ? s.questions.map((qn) => (qn.id === q.id ? q : qn))
+            : [...s.questions, q],
+        };
+      }),
+      lastUpdated: "Just now",
+    }));
+    setQuestionDialog({ open: false, sectionId: null, editing: null });
+  };
+
+  const deleteQuestion = () => {
+    if (!questionToDelete) return;
+    updateForm(questionToDelete.formId, (f) => ({
+      ...f,
+      sections: f.sections.map((s) =>
+        s.id === questionToDelete.sectionId
+          ? { ...s, questions: s.questions.filter((q) => q.id !== questionToDelete.question.id) }
+          : s
+      ),
+      lastUpdated: "Just now",
+    }));
+    setQuestionToDelete(null);
+  };
+
+  // ─── Views ────────────────────────────────────────────────────────────────
+
+  if (view === "forms-list") {
     return (
       <div className="space-y-6">
-        <div>
-          <h2 className="text-2xl font-bold text-foreground">Evaluation Forms</h2>
-          <p className="text-muted-foreground">
-            Configure quality evaluation criteria for each team. Criteria are applied automatically to agent contacts via Amazon Connect.
-          </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-2xl font-bold text-foreground">Evaluation Forms</h2>
+            <p className="text-muted-foreground">
+              Build quality scorecards with sections and scored questions. Assign forms to teams via Team Management.
+            </p>
+          </div>
+          <Button onClick={() => setNewFormDialogOpen(true)}>
+            <FilePlus2 className="h-4 w-4 mr-2" />
+            New Form
+          </Button>
         </div>
 
-        <div className="grid gap-4">
-          {teamConfigs.map((team) => (
-            <Card
-              key={team.teamId}
-              className="hover:border-primary/40 transition-colors cursor-pointer group"
-              onClick={() => setSelectedTeam(team)}
-            >
-              <CardContent className="p-5">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                      <ClipboardList className="h-5 w-5 text-primary" />
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <p className="font-semibold text-foreground">{team.teamName}</p>
-                        {team.enabled ? (
-                          <Badge className="bg-green-100 text-green-800 border-green-200 text-xs">
-                            Evaluation On
-                          </Badge>
-                        ) : (
-                          <Badge variant="secondary" className="text-xs">
-                            Evaluation Off
-                          </Badge>
-                        )}
+        {forms.length === 0 ? (
+          <Card>
+            <CardContent className="py-16 text-center">
+              <ClipboardList className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+              <p className="font-medium text-muted-foreground">No evaluation forms yet</p>
+              <p className="text-sm text-muted-foreground mt-1">Create a form to define quality criteria for your teams.</p>
+              <Button size="sm" variant="outline" className="mt-4" onClick={() => setNewFormDialogOpen(true)}>
+                <Plus className="h-4 w-4 mr-1" />
+                Create First Form
+              </Button>
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="grid gap-4">
+            {forms.map((form) => {
+              const totalQ = form.sections.reduce((n, s) => n + s.questions.length, 0);
+              return (
+                <Card key={form.id} className="hover:border-primary/40 transition-colors cursor-pointer group" onClick={() => { setSelectedFormId(form.id); setView("form-detail"); }}>
+                  <CardContent className="p-5">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-4">
+                        <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                          <ClipboardList className="h-5 w-5 text-primary" />
+                        </div>
+                        <div>
+                          <p className="font-semibold text-foreground">{form.name}</p>
+                          <p className="text-sm text-muted-foreground">
+                            {form.sections.length} {form.sections.length === 1 ? "section" : "sections"} · {totalQ} {totalQ === 1 ? "question" : "questions"} · Updated {form.lastUpdated}
+                          </p>
+                        </div>
                       </div>
-                      <p className="text-sm text-muted-foreground">
-                        Supervisor: {team.supervisorName} · {team.agentCount} agents ·{" "}
-                        {team.criteria.length} {team.criteria.length === 1 ? "criterion" : "criteria"}{" "}
-                        {team.formName ? `· "${team.formName}"` : ""} ·{" "}
-                        Updated {team.lastUpdated}
-                      </p>
+                      <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive" onClick={() => setFormToDelete(form)}>
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                        <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors" />
+                      </div>
                     </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div onClick={(e) => e.stopPropagation()}>
-                      <Switch
-                        checked={team.enabled}
-                        onCheckedChange={() => toggleTeamEnabled(team.teamId)}
-                      />
-                    </div>
-                    <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        )}
+
+        {/* New Form Dialog */}
+        <Dialog open={newFormDialogOpen} onOpenChange={setNewFormDialogOpen}>
+          <DialogContent className="max-w-sm">
+            <DialogHeader><DialogTitle>New Evaluation Form</DialogTitle></DialogHeader>
+            <div className="space-y-3 py-2">
+              <Label htmlFor="new-form-name">Form Name <span className="text-destructive">*</span></Label>
+              <Input id="new-form-name" placeholder="e.g. Billing Quality Scorecard" value={newFormName} onChange={(e) => setNewFormName(e.target.value)} autoFocus onKeyDown={(e) => e.key === "Enter" && createForm()} />
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setNewFormDialogOpen(false)}>Cancel</Button>
+              <Button onClick={createForm} disabled={!newFormName.trim()}>Create</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Delete Form Confirm */}
+        <AlertDialog open={!!formToDelete} onOpenChange={(open) => !open && setFormToDelete(null)}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Delete Evaluation Form</AlertDialogTitle>
+              <AlertDialogDescription>
+                Delete <strong>"{formToDelete?.name}"</strong>? All sections and questions will be permanently removed. Teams assigned to this form will need to be re-linked.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction className="bg-destructive text-white hover:bg-destructive/90" onClick={deleteForm}>Delete</AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     );
   }
 
-  // ─── Detail view ─────────────────────────────────────────────────────────────
+  // ─── Form Detail View ─────────────────────────────────────────────────────
+
+  if (!selectedForm) return null;
+
+  const totalWeight = selectedForm.sections.reduce(
+    (sum, s) => sum + s.questions.reduce((sq, q) => sq + q.weight, 0),
+    0
+  );
+
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center gap-3">
-        <Button variant="ghost" size="sm" onClick={() => setSelectedTeam(null)}>
+      {/* Breadcrumb header */}
+      <div className="flex items-center gap-3 flex-wrap">
+        <Button variant="ghost" size="sm" onClick={() => { setView("forms-list"); setSelectedFormId(null); setEditingFormName(false); setShowAddSection(false); }}>
           <ArrowLeft className="h-4 w-4 mr-1" />
-          Back
+          Evaluation Forms
         </Button>
-        <div className="h-4 w-px bg-border" />
-        <div>
-          <h2 className="text-2xl font-bold text-foreground">{selectedTeam.teamName}</h2>
-          <p className="text-sm text-muted-foreground">
-            Supervisor: {selectedTeam.supervisorName} · {selectedTeam.agentCount} agents
-          </p>
-        </div>
-        <div className="ml-auto flex items-center gap-3">
+        <span className="text-muted-foreground">/</span>
+        {editingFormName ? (
           <div className="flex items-center gap-2">
-            <span className="text-sm text-muted-foreground">Evaluation</span>
-            <Switch
-              checked={selectedTeam.enabled}
-              onCheckedChange={() => toggleTeamEnabled(selectedTeam.teamId)}
-            />
-            {selectedTeam.enabled ? (
-              <Badge className="bg-green-100 text-green-800 border-green-200">On</Badge>
-            ) : (
-              <Badge variant="secondary">Off</Badge>
-            )}
+            <Input value={formNameDraft} onChange={(e) => setFormNameDraft(e.target.value)} className="h-8 text-sm max-w-xs" autoFocus onKeyDown={(e) => { if (e.key === "Enter") saveFormName(); if (e.key === "Escape") setEditingFormName(false); }} />
+            <Button size="sm" onClick={saveFormName}><Check className="h-4 w-4" /></Button>
+            <Button size="sm" variant="ghost" onClick={() => setEditingFormName(false)}>Cancel</Button>
           </div>
-        </div>
-      </div>
-
-      {/* Form Name */}
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-base">Evaluation Form Name</CardTitle>
-          <CardDescription>
-            This name appears on agent contact reviews to identify which form was used.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {editingFormName ? (
-            <div className="flex items-center gap-2">
-              <Input
-                value={formNameDraft}
-                onChange={(e) => setFormNameDraft(e.target.value)}
-                placeholder="e.g. Billing Quality Scorecard"
-                className="max-w-sm"
-                autoFocus
-              />
-              <Button size="sm" onClick={saveFormName}>
-                <Check className="h-4 w-4 mr-1" />
-                Save
-              </Button>
-              <Button size="sm" variant="ghost" onClick={() => setEditingFormName(false)}>
-                Cancel
-              </Button>
-            </div>
-          ) : (
-            <div className="flex items-center gap-3">
-              <span className="text-sm">
-                {selectedTeam.formName || (
-                  <span className="text-muted-foreground italic">No form name set</span>
-                )}
-              </span>
-              <Button
-                size="sm"
-                variant="ghost"
-                onClick={() => {
-                  setFormNameDraft(selectedTeam.formName);
-                  setEditingFormName(true);
-                }}
-              >
-                <Edit className="h-3 w-3 mr-1" />
-                Edit
-              </Button>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Weight distribution */}
-      {selectedTeam.criteria.length > 0 && (
-        <Card className={totalWeight === 100 ? "border-green-200 bg-green-50/30" : "border-amber-200 bg-amber-50/30"}>
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium">Total weight distribution</span>
-              <Badge
-                className={
-                  totalWeight === 100
-                    ? "bg-green-100 text-green-800"
-                    : "bg-amber-100 text-amber-800"
-                }
-              >
-                {totalWeight}% / 100%
-              </Badge>
-            </div>
-            <Progress value={Math.min(totalWeight, 100)} className="h-2" />
-            {totalWeight !== 100 && (
-              <p className="text-xs text-amber-700 mt-2 flex items-center gap-1">
-                <Info className="h-3 w-3" />
-                Weights should add up to 100%. Current total: {totalWeight}%.
-              </p>
-            )}
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Criteria list */}
-      <Card>
-        <CardHeader className="pb-3">
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle className="text-base">Evaluation Criteria</CardTitle>
-              <CardDescription>
-                Define the dimensions used to score agent contacts. Use numeric (0–max) or pass/fail scoring per criterion.
-              </CardDescription>
-            </div>
-            <Button size="sm" onClick={openAddCriterion}>
-              <Plus className="h-4 w-4 mr-1" />
-              Add Criterion
+        ) : (
+          <div className="flex items-center gap-2">
+            <span className="font-semibold text-foreground">{selectedForm.name}</span>
+            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => { setFormNameDraft(selectedForm.name); setEditingFormName(true); }}>
+              <Edit className="h-3.5 w-3.5" />
             </Button>
           </div>
-        </CardHeader>
-        <CardContent className="p-0">
-          {selectedTeam.criteria.length === 0 ? (
-            <div className="text-center py-12 px-6">
-              <ClipboardList className="h-10 w-10 text-muted-foreground mx-auto mb-3" />
-              <p className="font-medium text-muted-foreground">No criteria yet</p>
-              <p className="text-sm text-muted-foreground mt-1">
-                Add criteria to define how contacts for this team will be evaluated.
-              </p>
-              <Button size="sm" variant="outline" className="mt-4" onClick={openAddCriterion}>
-                <Plus className="h-4 w-4 mr-1" />
-                Add First Criterion
-              </Button>
-            </div>
-          ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Criterion</TableHead>
-                  <TableHead>Scoring</TableHead>
-                  <TableHead>Weight</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {selectedTeam.criteria.map((criterion) => (
-                  <TableRow key={criterion.id}>
-                    <TableCell>
-                      <div>
-                        <p className="font-medium">{criterion.name}</p>
-                        <p className="text-xs text-muted-foreground mt-0.5 max-w-md">
-                          {criterion.description}
-                        </p>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      {criterion.scoringType === "pass-fail" ? (
-                        <Badge variant="outline" className="flex items-center gap-1 w-fit">
-                          <ToggleLeft className="h-3 w-3" />
-                          Pass / Fail
-                        </Badge>
-                      ) : (
-                        <Badge variant="outline" className="flex items-center gap-1 w-fit">
-                          <Hash className="h-3 w-3" />
-                          0 – {criterion.maxScore}
-                        </Badge>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <Progress value={criterion.weight} className="h-1.5 w-16" />
-                        <span className="text-sm text-muted-foreground">{criterion.weight}%</span>
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-1">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8"
-                          onClick={() => openEditCriterion(criterion)}
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 text-destructive hover:text-destructive"
-                          onClick={() => setCriterionToDelete(criterion)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          )}
-        </CardContent>
-      </Card>
+        )}
+        <Badge variant="secondary" className="ml-auto">
+          {selectedForm.sections.length} {selectedForm.sections.length === 1 ? "section" : "sections"} · {selectedForm.sections.reduce((n, s) => n + s.questions.length, 0)} questions
+        </Badge>
+      </div>
 
-      {/* Amazon Connect info banner */}
+      {/* Amazon Connect banner */}
       <Card className="border-blue-200 bg-blue-50/30">
         <CardContent className="p-4">
           <div className="flex items-start gap-3">
             <Info className="h-4 w-4 text-blue-600 mt-0.5 flex-shrink-0" />
-            <div>
-              <p className="text-sm font-medium text-blue-800">Amazon Connect Integration</p>
-              <p className="text-xs text-blue-700 mt-0.5">
-                When enabled, these criteria are applied automatically to every contact handled by agents in this team. Scores appear in contact review cards and feed into challenge pattern detection and coaching plan generation.
-              </p>
-            </div>
+            <p className="text-xs text-blue-700">
+              <strong className="text-blue-800">Amazon Connect Integration: </strong>
+              This form is applied automatically to contacts handled by teams linked to it. Scores surface in contact review cards and drive challenge pattern detection and coaching plan creation.
+            </p>
           </div>
         </CardContent>
       </Card>
 
-      {/* Add/Edit Criterion Dialog */}
-      <Dialog open={criterionDialogOpen} onOpenChange={setCriterionDialogOpen}>
+      {/* Sections */}
+      {selectedForm.sections.length === 0 && !showAddSection && (
+        <Card>
+          <CardContent className="py-12 text-center">
+            <GripVertical className="h-10 w-10 text-muted-foreground mx-auto mb-3" />
+            <p className="font-medium text-muted-foreground">No sections yet</p>
+            <p className="text-sm text-muted-foreground mt-1">Add sections to organize your evaluation criteria (e.g. Opening, Resolution, Closing).</p>
+            <Button size="sm" variant="outline" className="mt-4" onClick={() => setShowAddSection(true)}>
+              <Plus className="h-4 w-4 mr-1" />
+              Add First Section
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
+      <div className="space-y-4">
+        {selectedForm.sections.map((section, sIndex) => {
+          const isExpanded = expandedSections.has(section.id);
+          const sectionWeight = section.questions.reduce((s, q) => s + q.weight, 0);
+          return (
+            <Card key={section.id} className="overflow-hidden">
+              <Collapsible open={isExpanded} onOpenChange={() => toggleSection(section.id)}>
+                <CollapsibleTrigger asChild>
+                  <div className="flex items-center gap-3 p-4 cursor-pointer hover:bg-muted/40 transition-colors select-none">
+                    <div className="h-7 w-7 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 text-xs font-semibold text-primary">{sIndex + 1}</div>
+                    {editingSectionId === section.id ? (
+                      <div className="flex items-center gap-2 flex-1" onClick={(e) => e.stopPropagation()}>
+                        <Input value={sectionNameDraft} onChange={(e) => setSectionNameDraft(e.target.value)} className="h-7 text-sm max-w-xs" autoFocus onKeyDown={(e) => { if (e.key === "Enter") saveSectionName(selectedForm.id, section.id); if (e.key === "Escape") setEditingSectionId(null); }} />
+                        <Button size="sm" className="h-7 px-2" onClick={() => saveSectionName(selectedForm.id, section.id)}><Check className="h-3 w-3" /></Button>
+                        <Button size="sm" variant="ghost" className="h-7 px-2" onClick={() => setEditingSectionId(null)}>Cancel</Button>
+                      </div>
+                    ) : (
+                      <div className="flex-1 flex items-center gap-2">
+                        <span className="font-medium text-sm">{section.name}</span>
+                        <Badge variant="outline" className="text-xs">{section.questions.length} questions</Badge>
+                      </div>
+                    )}
+                    <div className="flex items-center gap-1 ml-auto" onClick={(e) => e.stopPropagation()}>
+                      <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => { setSectionNameDraft(section.name); setEditingSectionId(section.id); }}>
+                        <Edit className="h-3.5 w-3.5" />
+                      </Button>
+                      <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:text-destructive" onClick={() => setSectionToDelete({ formId: selectedForm.id, sectionId: section.id, name: section.name })}>
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </Button>
+                      {isExpanded ? <ChevronDown className="h-4 w-4 text-muted-foreground ml-1" /> : <ChevronRight className="h-4 w-4 text-muted-foreground ml-1" />}
+                    </div>
+                  </div>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  <div className="border-t bg-white">
+                    {section.questions.length === 0 ? (
+                      <div className="py-6 text-center text-muted-foreground text-sm">No questions yet in this section.</div>
+                    ) : (
+                      <div className="divide-y">
+                        {section.questions.map((q, qIndex) => {
+                          const isPassFail = q.scoringType === "pass-fail";
+                          return (
+                            <div key={q.id} className="flex items-start gap-3 p-4 hover:bg-muted/20">
+                              <span className="text-xs text-muted-foreground font-mono mt-0.5 w-5 flex-shrink-0">{qIndex + 1}.</span>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm font-medium">{q.text}</p>
+                                {q.description && <p className="text-xs text-muted-foreground mt-0.5">{q.description}</p>}
+                                <div className="flex items-center gap-2 mt-1.5">
+                                  {isPassFail ? (
+                                    <Badge variant="outline" className="text-xs flex items-center gap-1 w-fit">
+                                      <ToggleLeft className="h-3 w-3" />Pass / Fail
+                                    </Badge>
+                                  ) : (
+                                    <Badge variant="outline" className="text-xs flex items-center gap-1 w-fit">
+                                      <Hash className="h-3 w-3" />0 – {q.maxScore}
+                                    </Badge>
+                                  )}
+                                  <span className="text-xs text-muted-foreground">Weight: {q.weight}%</span>
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-1 flex-shrink-0">
+                                <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => openEditQuestion(section.id, q)}>
+                                  <Edit className="h-3.5 w-3.5" />
+                                </Button>
+                                <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:text-destructive" onClick={() => setQuestionToDelete({ formId: selectedForm.id, sectionId: section.id, question: q })}>
+                                  <Trash2 className="h-3.5 w-3.5" />
+                                </Button>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                    <div className="p-3 border-t bg-muted/20 flex items-center justify-between">
+                      <Button size="sm" variant="outline" onClick={() => { openAddQuestion(section.id); setExpandedSections((p) => new Set(p).add(section.id)); }}>
+                        <Plus className="h-3.5 w-3.5 mr-1" />
+                        Add Question
+                      </Button>
+                      {section.questions.length > 0 && (
+                        <span className="text-xs text-muted-foreground">
+                          Section weight total: <span className={sectionWeight !== 100 ? "text-amber-600 font-medium" : "text-green-600 font-medium"}>{sectionWeight}%</span>
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </CollapsibleContent>
+              </Collapsible>
+            </Card>
+          );
+        })}
+      </div>
+
+      {/* Add Section UI */}
+      {showAddSection ? (
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center gap-2">
+              <Input
+                placeholder="Section name (e.g. Opening, Resolution, Closing)"
+                value={addingSectionName}
+                onChange={(e) => setAddingSectionName(e.target.value)}
+                className="flex-1"
+                autoFocus
+                onKeyDown={(e) => { if (e.key === "Enter") addSection(); if (e.key === "Escape") { setShowAddSection(false); setAddingSectionName(""); } }}
+              />
+              <Button size="sm" onClick={addSection} disabled={!addingSectionName.trim()}>
+                <Check className="h-4 w-4 mr-1" />
+                Add
+              </Button>
+              <Button size="sm" variant="ghost" onClick={() => { setShowAddSection(false); setAddingSectionName(""); }}>
+                Cancel
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      ) : (
+        <Button variant="outline" className="w-full" onClick={() => setShowAddSection(true)}>
+          <Plus className="h-4 w-4 mr-2" />
+          Add Section
+        </Button>
+      )}
+
+      {/* Question Dialog */}
+      <Dialog open={questionDialog.open} onOpenChange={(open) => !open && setQuestionDialog({ open: false, sectionId: null, editing: null })}>
         <DialogContent className="max-w-lg">
           <DialogHeader>
-            <DialogTitle>
-              {editingCriterion ? "Edit Criterion" : "Add Criterion"}
-            </DialogTitle>
+            <DialogTitle>{questionDialog.editing ? "Edit Question" : "Add Question"}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-2">
             <div className="space-y-1.5">
-              <Label htmlFor="crit-name">
-                Criterion Name <span className="text-destructive">*</span>
-              </Label>
-              <Input
-                id="crit-name"
-                placeholder="e.g. Empathy & Tone"
-                value={criterionForm.name}
-                onChange={(e) => setCriterionForm((p) => ({ ...p, name: e.target.value }))}
-              />
-              {formErrors.name && <p className="text-xs text-destructive">{formErrors.name}</p>}
+              <Label htmlFor="q-text">Question <span className="text-destructive">*</span></Label>
+              <Textarea id="q-text" placeholder="What is being evaluated?" rows={2} value={questionForm.text} onChange={(e) => setQuestionForm((p) => ({ ...p, text: e.target.value }))} />
+              {questionErrors.text && <p className="text-xs text-destructive">{questionErrors.text}</p>}
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="crit-desc">
-                Description <span className="text-destructive">*</span>
-              </Label>
-              <Textarea
-                id="crit-desc"
-                placeholder="Describe what this criterion measures and how it is evaluated..."
-                rows={3}
-                value={criterionForm.description}
-                onChange={(e) => setCriterionForm((p) => ({ ...p, description: e.target.value }))}
-              />
-              {formErrors.description && <p className="text-xs text-destructive">{formErrors.description}</p>}
+              <Label htmlFor="q-desc">Description / Evaluation Guidance <span className="text-muted-foreground text-xs font-normal">(optional)</span></Label>
+              <Textarea id="q-desc" placeholder="Guidance for evaluators on how to score this question..." rows={2} value={questionForm.description} onChange={(e) => setQuestionForm((p) => ({ ...p, description: e.target.value }))} />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="crit-scoring">
-                Scoring Type <span className="text-destructive">*</span>
-              </Label>
-              <Select
-                value={criterionForm.scoringType}
-                onValueChange={(val) => setCriterionForm((p) => ({ ...p, scoringType: val as "numeric" | "pass-fail" }))}
-              >
-                <SelectTrigger id="crit-scoring">
-                  <SelectValue placeholder="Choose scoring type" />
-                </SelectTrigger>
+              <Label htmlFor="q-scoring">Scoring Type <span className="text-destructive">*</span></Label>
+              <Select value={questionForm.scoringType} onValueChange={(val) => setQuestionForm((p) => ({ ...p, scoringType: val as "numeric" | "pass-fail" }))}>
+                <SelectTrigger id="q-scoring"><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="numeric">Numeric (0 – Max Score)</SelectItem>
                   <SelectItem value="pass-fail">Pass / Fail</SelectItem>
                 </SelectContent>
               </Select>
             </div>
-            {criterionForm.scoringType === "numeric" && (
+            {questionForm.scoringType === "numeric" && (
               <div className="space-y-1.5">
-                <Label htmlFor="crit-max">
-                  Max Score <span className="text-destructive">*</span>
-                </Label>
-                <Input
-                  id="crit-max"
-                  type="number"
-                  min={1}
-                  max={100}
-                  value={criterionForm.maxScore}
-                  onChange={(e) =>
-                    setCriterionForm((p) => ({ ...p, maxScore: Number(e.target.value) }))
-                  }
-                />
-                {formErrors.maxScore && <p className="text-xs text-destructive">{formErrors.maxScore}</p>}
+                <Label htmlFor="q-max">Max Score <span className="text-destructive">*</span></Label>
+                <Input id="q-max" type="number" min={1} max={100} value={questionForm.maxScore} onChange={(e) => setQuestionForm((p) => ({ ...p, maxScore: Number(e.target.value) }))} />
+                {questionErrors.maxScore && <p className="text-xs text-destructive">{questionErrors.maxScore}</p>}
               </div>
             )}
             <div className="space-y-1.5">
-              <Label htmlFor="crit-weight">
-                Weight (%) <span className="text-destructive">*</span>
-              </Label>
-              <Input
-                id="crit-weight"
-                type="number"
-                min={1}
-                max={100}
-                value={criterionForm.weight}
-                onChange={(e) =>
-                  setCriterionForm((p) => ({ ...p, weight: Number(e.target.value) }))
-                }
-              />
-              {formErrors.weight && <p className="text-xs text-destructive">{formErrors.weight}</p>}
+              <Label htmlFor="q-weight">Weight within section (%) <span className="text-destructive">*</span></Label>
+              <Input id="q-weight" type="number" min={1} max={100} value={questionForm.weight} onChange={(e) => setQuestionForm((p) => ({ ...p, weight: Number(e.target.value) }))} />
+              {questionErrors.weight && <p className="text-xs text-destructive">{questionErrors.weight}</p>}
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setCriterionDialogOpen(false)}>
-              Cancel
-            </Button>
-            <Button onClick={saveCriterion}>
-              {editingCriterion ? "Save Changes" : "Add Criterion"}
-            </Button>
+            <Button variant="outline" onClick={() => setQuestionDialog({ open: false, sectionId: null, editing: null })}>Cancel</Button>
+            <Button onClick={saveQuestion}>{questionDialog.editing ? "Save Changes" : "Add Question"}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {/* Delete Confirm */}
-      <AlertDialog open={!!criterionToDelete} onOpenChange={(open) => !open && setCriterionToDelete(null)}>
+      {/* Delete Section Confirm */}
+      <AlertDialog open={!!sectionToDelete} onOpenChange={(open) => !open && setSectionToDelete(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Criterion</AlertDialogTitle>
-            <AlertDialogDescription>
-              Are you sure you want to delete <strong>"{criterionToDelete?.name}"</strong>? This will remove it from the evaluation form and historical scores will no longer reference this criterion.
-            </AlertDialogDescription>
+            <AlertDialogTitle>Delete Section</AlertDialogTitle>
+            <AlertDialogDescription>Delete section <strong>"{sectionToDelete?.name}"</strong>? All questions within it will also be removed.</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              className="bg-destructive text-white hover:bg-destructive/90"
-              onClick={deleteCriterion}
-            >
-              Delete
-            </AlertDialogAction>
+            <AlertDialogAction className="bg-destructive text-white hover:bg-destructive/90" onClick={deleteSection}>Delete</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Delete Question Confirm */}
+      <AlertDialog open={!!questionToDelete} onOpenChange={(open) => !open && setQuestionToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Question</AlertDialogTitle>
+            <AlertDialogDescription>Delete this question from the evaluation form? Historical scores for this question will no longer be displayed.</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction className="bg-destructive text-white hover:bg-destructive/90" onClick={deleteQuestion}>Delete</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
