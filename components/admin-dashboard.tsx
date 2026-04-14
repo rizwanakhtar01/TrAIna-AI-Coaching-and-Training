@@ -1324,6 +1324,10 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
     if (!newTeamName.trim() || !newTeamSupervisorId) return;
     if (newTeamEvaluationEnabled && newTeamEvaluationFormId === "none") return;
 
+    const resolvedAgentNames = newTeamAgentIds
+      .map((id) => users.find((u) => u.id === id)?.fullName ?? "")
+      .filter(Boolean);
+
     if (editingTeam) {
       const resolvedFormId = newTeamEvaluationEnabled && newTeamEvaluationFormId !== "none"
         ? newTeamEvaluationFormId
@@ -1347,6 +1351,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
         editingTeam.id,
         newTeamEvaluationEnabled,
         resolvedFormId ?? null,
+        resolvedAgentNames,
       );
     } else {
       const newTeam: Team = {
@@ -1365,6 +1370,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
         newTeam.id,
         newTeamEvaluationEnabled,
         newTeamEvaluationEnabled && newTeamEvaluationFormId !== "none" ? newTeamEvaluationFormId : null,
+        resolvedAgentNames,
       );
     }
 

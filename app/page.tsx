@@ -63,6 +63,9 @@ export default function Home() {
       {viewMode === "dashboard" && userRole === "superadmin" && (
         <SuperAdminDashboard onLogout={handleLogout} />
       )}
+      {viewMode === "dashboard" && !userRole && (
+        <LoginScreen onLogin={handleLogin} onAgentDesktop={handleAgentDesktop} />
+      )}
     </TeamEvalProvider>
   )
 }

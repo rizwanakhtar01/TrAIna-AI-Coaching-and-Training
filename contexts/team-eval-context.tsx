@@ -7,6 +7,7 @@ export interface TeamEvalSetting {
   teamId: string;
   evaluationEnabled: boolean;
   evaluationFormId: string | null;
+  agentNames: string[];
 }
 
 interface TeamEvalContextValue {
@@ -15,9 +16,11 @@ interface TeamEvalContextValue {
     teamId: string,
     enabled: boolean,
     formId: string | null,
+    agentNames?: string[],
   ) => void;
   removeTeamEvalSetting: (teamId: string) => void;
   isEvaluationEnabledForTeam: (teamId: string) => boolean;
+  isEvaluationEnabledForAgentName: (agentName: string) => boolean;
   getFormIdForTeam: (teamId: string) => string | null;
 }
 
@@ -29,6 +32,7 @@ export function TeamEvalProvider({ children }: { children: ReactNode }) {
       teamId: t.teamId,
       evaluationEnabled: t.evaluationFormId !== null,
       evaluationFormId: t.evaluationFormId,
+      agentNames: t.agentNames,
     })),
   );
 
@@ -36,17 +40,31 @@ export function TeamEvalProvider({ children }: { children: ReactNode }) {
     teamId: string,
     enabled: boolean,
     formId: string | null,
+    agentNames?: string[],
   ) => {
     setTeamSettings((prev) => {
       const existing = prev.find((s) => s.teamId === teamId);
       if (existing) {
         return prev.map((s) =>
           s.teamId === teamId
-            ? { ...s, evaluationEnabled: enabled, evaluationFormId: formId }
+            ? {
+                ...s,
+                evaluationEnabled: enabled,
+                evaluationFormId: formId,
+                agentNames: agentNames ?? s.agentNames,
+              }
             : s,
         );
       }
-      return [...prev, { teamId, evaluationEnabled: enabled, evaluationFormId: formId }];
+      return [
+        ...prev,
+        {
+          teamId,
+          evaluationEnabled: enabled,
+          evaluationFormId: formId,
+          agentNames: agentNames ?? [],
+        },
+      ];
     });
   };
 
@@ -57,6 +75,13 @@ export function TeamEvalProvider({ children }: { children: ReactNode }) {
   const isEvaluationEnabledForTeam = (teamId: string): boolean => {
     const setting = teamSettings.find((s) => s.teamId === teamId);
     return setting?.evaluationEnabled ?? false;
+  };
+
+  const isEvaluationEnabledForAgentName = (agentName: string): boolean => {
+    const setting = teamSettings.find(
+      (s) => s.evaluationEnabled && s.agentNames.includes(agentName),
+    );
+    return setting !== undefined;
   };
 
   const getFormIdForTeam = (teamId: string): string | null => {
@@ -71,6 +96,7 @@ export function TeamEvalProvider({ children }: { children: ReactNode }) {
         upsertTeamEvalSetting,
         removeTeamEvalSetting,
         isEvaluationEnabledForTeam,
+        isEvaluationEnabledForAgentName,
         getFormIdForTeam,
       }}
     >

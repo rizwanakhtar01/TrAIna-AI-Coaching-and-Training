@@ -5,7 +5,6 @@ import { format, isToday, isYesterday, isSameDay, subDays } from "date-fns";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar as CalendarPicker } from "@/components/ui/calendar";
 import { ContactReviewsList } from "@/components/contact-review-card";
-import { teamEvalConfigs } from "@/lib/team-eval-config";
 import { useTeamEval } from "@/contexts/team-eval-context";
 import {
   AiRecommendationCard,
@@ -190,15 +189,10 @@ interface SupervisorDashboardProps {
 }
 
 export function SupervisorDashboard({ onLogout, onSwitchToAgent }: SupervisorDashboardProps) {
-  const { isEvaluationEnabledForTeam } = useTeamEval();
+  const { isEvaluationEnabledForAgentName } = useTeamEval();
 
-  const isEvalEnabledForAgent = (agentName: string): boolean => {
-    const agentTeamConfig = teamEvalConfigs.find((t) =>
-      t.agentNames.includes(agentName),
-    );
-    if (!agentTeamConfig) return false;
-    return isEvaluationEnabledForTeam(agentTeamConfig.teamId);
-  };
+  const isEvalEnabledForAgent = (agentName: string): boolean =>
+    isEvaluationEnabledForAgentName(agentName);
 
   const [activeTab, setActiveTab] = useState("dashboard");
   const [selectedAgent, setSelectedAgent] = useState<string | null>(null);
