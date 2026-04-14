@@ -140,6 +140,13 @@ interface ChallengingPattern {
   intents: string[];
   channels: string[];
   dateRange: string;
+  source?: "evaluation";
+  evaluationContext?: {
+    criterionName: string;
+    avgScore: number;
+    maxScore: number;
+    formName: string;
+  };
 }
 
 interface CoachingSession {
@@ -1214,6 +1221,46 @@ export function SupervisorDashboard({ onLogout, onSwitchToAgent }: SupervisorDas
       intents: ["supervisor_request", "complaint_escalation", "priority_case"],
       channels: ["phone", "chat"],
       dateRange: "Last 7 days",
+    },
+    {
+      id: "CP011",
+      name: "Empathy Deficit in Billing",
+      category: "Quality",
+      errorRate: 42,
+      frequency: 67,
+      trend: "up",
+      changePercent: 22,
+      affectedAgents: ["AGT001", "AGT002"],
+      intents: ["billing_dispute", "refund_request", "payment_issue"],
+      channels: ["phone", "chat"],
+      dateRange: "Last 7 days",
+      source: "evaluation",
+      evaluationContext: {
+        criterionName: "Empathy & Tone",
+        avgScore: 5.2,
+        maxScore: 10,
+        formName: "Billing & Refunds Quality Scorecard",
+      },
+    },
+    {
+      id: "CP012",
+      name: "FCR Failures — Technical Contacts",
+      category: "Quality",
+      errorRate: 38,
+      frequency: 44,
+      trend: "up",
+      changePercent: 14,
+      affectedAgents: ["AGT003", "AGT005"],
+      intents: ["tech_support", "troubleshooting", "device_setup"],
+      channels: ["phone"],
+      dateRange: "Last 7 days",
+      source: "evaluation",
+      evaluationContext: {
+        criterionName: "First Contact Resolution",
+        avgScore: 4.8,
+        maxScore: 10,
+        formName: "Technical Support Quality Scorecard",
+      },
     },
   ];
 
@@ -2949,17 +2996,22 @@ export function SupervisorDashboard({ onLogout, onSwitchToAgent }: SupervisorDas
               {getFilteredPatterns().map((pattern) => (
                 <Card
                   key={pattern.id}
-                  className="hover:shadow-md transition-shadow"
+                  className={`hover:shadow-md transition-shadow ${pattern.source === "evaluation" ? "border-purple-200" : ""}`}
                 >
                   <CardContent className="p-4">
                     <div className="flex items-center justify-between">
                       <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-2">
+                        <div className="flex items-center gap-3 mb-2 flex-wrap">
                           <h3 className="text-lg font-semibold text-foreground">
                             {pattern.name}
                           </h3>
+                          {pattern.source === "evaluation" && (
+                            <Badge className="bg-purple-100 text-purple-800 border-purple-200 border text-xs">
+                              Evaluation-triggered
+                            </Badge>
+                          )}
                         </div>
-                        <div className="flex gap-6 text-sm">
+                        <div className="flex gap-6 text-sm flex-wrap">
                           <div>
                             <span className="text-muted-foreground">Frequency: </span>
                             <span className="font-medium">{pattern.frequency} occurrences</span>
@@ -2968,7 +3020,20 @@ export function SupervisorDashboard({ onLogout, onSwitchToAgent }: SupervisorDas
                             <span className="text-muted-foreground">Channels: </span>
                             <span className="font-medium">{pattern.channels.join(", ")}</span>
                           </div>
+                          {pattern.evaluationContext && (
+                            <div>
+                              <span className="text-muted-foreground">Criterion: </span>
+                              <span className="font-medium">
+                                {pattern.evaluationContext.criterionName} — avg {pattern.evaluationContext.avgScore}/{pattern.evaluationContext.maxScore}
+                              </span>
+                            </div>
+                          )}
                         </div>
+                        {pattern.evaluationContext && (
+                          <p className="text-xs text-muted-foreground mt-1">
+                            Form: {pattern.evaluationContext.formName}
+                          </p>
+                        )}
                       </div>
                       <Button
                         variant="outline"

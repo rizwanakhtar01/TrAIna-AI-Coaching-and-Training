@@ -54,9 +54,16 @@ const getYesterday = () => format(subDays(new Date(), 1), "yyyy-MM-dd");
 interface EvaluationScore {
   criterionId: string;
   criterionName: string;
+  scoringType?: "numeric" | "pass-fail";
   score: number;
   maxScore: number;
   notes?: string;
+}
+
+interface EvaluationResult {
+  formName: string;
+  evaluationDate: string;
+  scores: EvaluationScore[];
 }
 
 interface ContactReview {
@@ -86,7 +93,7 @@ interface ContactReview {
     highlight?: "positive" | "negative" | "neutral";
     aiNote?: string;
   }[];
-  evaluationScores?: EvaluationScore[];
+  evaluation?: EvaluationResult;
 }
 
 const sampleReviews: ContactReview[] = [
@@ -148,12 +155,16 @@ const sampleReviews: ContactReview[] = [
         timestamp: "14:35",
       },
     ],
-    evaluationScores: [
-      { criterionId: "c1", criterionName: "Empathy & Tone", score: 7, maxScore: 10, notes: "Empathetic opening but missed a key retention moment" },
-      { criterionId: "c2", criterionName: "Policy Compliance", score: 9, maxScore: 10, notes: "Refund timeline communicated correctly" },
-      { criterionId: "c3", criterionName: "First Contact Resolution", score: 8, maxScore: 10, notes: "Issue resolved in single interaction" },
-      { criterionId: "c4", criterionName: "Communication Clarity", score: 8, maxScore: 10, notes: "Clear and easy to follow throughout" },
-    ],
+    evaluation: {
+      formName: "Billing & Refunds Quality Scorecard",
+      evaluationDate: "Today, 14:35",
+      scores: [
+        { criterionId: "c1", criterionName: "Empathy & Tone", scoringType: "numeric", score: 7, maxScore: 10, notes: "Empathetic opening but missed a key retention moment" },
+        { criterionId: "c2", criterionName: "Policy Compliance", scoringType: "numeric", score: 9, maxScore: 10, notes: "Refund timeline communicated correctly" },
+        { criterionId: "c3", criterionName: "First Contact Resolution", scoringType: "pass-fail", score: 10, maxScore: 10, notes: "Issue resolved in single interaction" },
+        { criterionId: "c4", criterionName: "Communication Clarity", scoringType: "numeric", score: 8, maxScore: 10, notes: "Clear and easy to follow throughout" },
+      ],
+    },
   },
   {
     id: "2",
@@ -209,12 +220,16 @@ const sampleReviews: ContactReview[] = [
         aiNote: "Good explanation and proactive solution",
       },
     ],
-    evaluationScores: [
-      { criterionId: "c1", criterionName: "Empathy & Tone", score: 5, maxScore: 10, notes: "Did not acknowledge frustration before jumping to account lookup" },
-      { criterionId: "c2", criterionName: "Policy Compliance", score: 9, maxScore: 10, notes: "Refund timeline explained correctly and escalation initiated" },
-      { criterionId: "c3", criterionName: "First Contact Resolution", score: 7, maxScore: 10, notes: "Escalated correctly but final resolution pending" },
-      { criterionId: "c4", criterionName: "Communication Clarity", score: 8, maxScore: 10, notes: "Clear explanation of refund timeline" },
-    ],
+    evaluation: {
+      formName: "Billing & Refunds Quality Scorecard",
+      evaluationDate: "Today, 14:17",
+      scores: [
+        { criterionId: "c1", criterionName: "Empathy & Tone", scoringType: "numeric", score: 5, maxScore: 10, notes: "Did not acknowledge frustration before jumping to account lookup" },
+        { criterionId: "c2", criterionName: "Policy Compliance", scoringType: "numeric", score: 9, maxScore: 10, notes: "Refund timeline explained correctly and escalation initiated" },
+        { criterionId: "c3", criterionName: "First Contact Resolution", scoringType: "pass-fail", score: 0, maxScore: 10, notes: "Escalated correctly but final resolution pending" },
+        { criterionId: "c4", criterionName: "Communication Clarity", scoringType: "numeric", score: 8, maxScore: 10, notes: "Clear explanation of refund timeline" },
+      ],
+    },
   },
   {
     id: "3",
@@ -280,12 +295,15 @@ const sampleReviews: ContactReview[] = [
 
 // ─── Evaluation Scores Panel ──────────────────────────────────────────────────
 
-function EvaluationScoresPanel({ scores }: { scores: EvaluationScore[] }) {
+function EvaluationScoresPanel({ evaluation }: { evaluation: EvaluationResult }) {
   const [isOpen, setIsOpen] = useState(false);
+  const { formName, evaluationDate, scores } = evaluation;
 
+  const numericScores = scores.filter((s) => s.scoringType !== "pass-fail");
   const weightedAvg =
-    scores.reduce((sum, s) => sum + (s.score / s.maxScore) * 100, 0) /
-    scores.length;
+    numericScores.length > 0
+      ? numericScores.reduce((sum, s) => sum + (s.score / s.maxScore) * 100, 0) / numericScores.length
+      : scores.reduce((sum, s) => sum + (s.score / s.maxScore) * 100, 0) / scores.length;
 
   const getScoreBadgeClass = (pct: number) => {
     if (pct >= 80) return "bg-green-100 text-green-800 border-green-200";
@@ -306,8 +324,8 @@ function EvaluationScoresPanel({ scores }: { scores: EvaluationScore[] }) {
       <div className="border rounded-lg overflow-hidden">
         <CollapsibleTrigger asChild>
           <button className="w-full flex items-center justify-between p-3 bg-slate-50/80 hover:bg-slate-100/80 transition-colors text-left">
-            <div className="flex items-center gap-2">
-              <ClipboardList className="h-4 w-4 text-primary" />
+            <div className="flex items-center gap-2 flex-wrap">
+              <ClipboardList className="h-4 w-4 text-primary flex-shrink-0" />
               <span className="text-sm font-medium">Quality Evaluation</span>
               <Badge
                 className={`text-xs border ${getScoreBadgeClass(overallPct)}`}
@@ -315,44 +333,65 @@ function EvaluationScoresPanel({ scores }: { scores: EvaluationScore[] }) {
               >
                 {overallPct}% overall
               </Badge>
-              <span className="text-xs text-muted-foreground">· Evaluated by Amazon Connect AI</span>
+              <span className="text-xs text-muted-foreground">· Evaluated by Amazon Connect AI · {evaluationDate}</span>
             </div>
-            <div className="flex items-center gap-1 text-muted-foreground">
+            <div className="flex items-center gap-1 text-muted-foreground flex-shrink-0 ml-2">
               <span className="text-xs">{isOpen ? "Hide" : "Show details"}</span>
               {isOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
             </div>
           </button>
         </CollapsibleTrigger>
         <CollapsibleContent>
-          <div className="p-4 space-y-3 border-t bg-white">
-            {scores.map((s) => {
-              const pct = Math.round((s.score / s.maxScore) * 100);
-              return (
-                <div key={s.criterionId} className="space-y-1">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">{s.criterionName}</span>
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs text-muted-foreground">
-                        {s.score}/{s.maxScore}
-                      </span>
-                      <Badge
-                        variant="outline"
-                        className={`text-xs border ${getScoreBadgeClass(pct)}`}
-                      >
-                        {pct}%
-                      </Badge>
+          <div className="border-t bg-white">
+            <div className="px-4 py-2 border-b bg-slate-50/50 flex items-center gap-2">
+              <span className="text-xs text-muted-foreground font-medium">Form:</span>
+              <span className="text-xs text-foreground">{formName}</span>
+            </div>
+            <div className="p-4 space-y-4">
+              {scores.map((s) => {
+                const isPassFail = s.scoringType === "pass-fail";
+                const passed = s.score >= s.maxScore * 0.5;
+                const pct = Math.round((s.score / s.maxScore) * 100);
+                return (
+                  <div key={s.criterionId} className="space-y-1">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium">{s.criterionName}</span>
+                      <div className="flex items-center gap-2">
+                        {isPassFail ? (
+                          <Badge
+                            variant="outline"
+                            className={`text-xs border ${passed ? "bg-green-100 text-green-800 border-green-200" : "bg-red-100 text-red-800 border-red-200"}`}
+                          >
+                            {passed ? "Pass" : "Fail"}
+                          </Badge>
+                        ) : (
+                          <>
+                            <span className="text-xs text-muted-foreground">
+                              {s.score}/{s.maxScore}
+                            </span>
+                            <Badge
+                              variant="outline"
+                              className={`text-xs border ${getScoreBadgeClass(pct)}`}
+                            >
+                              {pct}%
+                            </Badge>
+                          </>
+                        )}
+                      </div>
                     </div>
+                    {!isPassFail && (
+                      <Progress
+                        value={pct}
+                        className={`h-1.5 ${getBarColor(pct)}`}
+                      />
+                    )}
+                    {s.notes && (
+                      <p className="text-xs text-muted-foreground">{s.notes}</p>
+                    )}
                   </div>
-                  <Progress
-                    value={pct}
-                    className={`h-1.5 ${getBarColor(pct)}`}
-                  />
-                  {s.notes && (
-                    <p className="text-xs text-muted-foreground">{s.notes}</p>
-                  )}
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
         </CollapsibleContent>
       </div>
@@ -486,8 +525,8 @@ function ContactReviewCard({ review }: ContactReviewCardProps) {
           </div>
         </div>
 
-        {review.evaluationScores && review.evaluationScores.length > 0 && (
-          <EvaluationScoresPanel scores={review.evaluationScores} />
+        {review.evaluation && review.evaluation.scores.length > 0 && (
+          <EvaluationScoresPanel evaluation={review.evaluation} />
         )}
 
         <Collapsible open={isExpanded} onOpenChange={setIsExpanded}>

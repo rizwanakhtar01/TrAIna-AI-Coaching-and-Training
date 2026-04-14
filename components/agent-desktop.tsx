@@ -254,7 +254,7 @@ function FloatingCoachingWidget({
     challengingAreas: [
       "Showing empathy in tough conversations",
       "Explaining product policies clearly",
-      "Managing call resolution time efficiently",
+      "First contact resolution — 2 contacts escalated yesterday (Empathy & Tone: 5.2/10 on evaluation)",
     ],
     contactReferences: [
       {
@@ -276,7 +276,7 @@ function FloatingCoachingWidget({
     focusAreas: [
       "Practice active listening: repeat back what the customer says before replying",
       "Review product return policy (Knowledge Base > Policies)",
-      "Work on pacing: aim to resolve within target handle time",
+      "Empathy & Tone: your evaluation score was 5.2/10 — try acknowledging feelings before offering solutions",
     ],
     aiTip:
       "Use empathy phrases like “I completely understand how that feels” before explaining policies. This builds trust and makes customers more receptive.",
