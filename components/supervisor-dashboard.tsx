@@ -1017,9 +1017,6 @@ export function SupervisorDashboard({ onLogout, onSwitchToAgent }: SupervisorDas
             </div>
           </div>
           <div>
-            <h4 className="font-semibold text-foreground">
-              {review.customerIssue}
-            </h4>
             <p className="text-sm text-muted-foreground">
               {review.contactSummary}
             </p>

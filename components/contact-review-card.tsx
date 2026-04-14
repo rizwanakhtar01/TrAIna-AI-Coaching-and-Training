@@ -541,7 +541,6 @@ function ContactReviewCard({ review, evaluationEnabled = true }: ContactReviewCa
             </span>
           </div>
         </div>
-        <CardTitle className="text-base">{review.customerIssue}</CardTitle>
         <div className="bg-muted/30 p-3 rounded-md border-l-4 border-primary/30">
           <p className="text-sm text-foreground font-medium mb-1">
             Contact Summary
