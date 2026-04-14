@@ -148,6 +148,17 @@ interface ChallengingPattern {
     avgScore: number;
     maxScore: number;
     formName: string;
+    triggeringSections?: Array<{
+      sectionName: string;
+      sectionAvgScore: number;
+      sectionMaxScore: number;
+      questions: Array<{
+        questionText: string;
+        scoringType: "numeric" | "pass-fail";
+        avgScore: number;
+        maxScore: number;
+      }>;
+    }>;
   };
 }
 
@@ -1242,6 +1253,27 @@ export function SupervisorDashboard({ onLogout, onSwitchToAgent }: SupervisorDas
         avgScore: 5.2,
         maxScore: 10,
         formName: "Billing & Refunds Quality Scorecard",
+        triggeringSections: [
+          {
+            sectionName: "Opening & Empathy",
+            sectionAvgScore: 4.9,
+            sectionMaxScore: 10,
+            questions: [
+              {
+                questionText: "Agent acknowledged the customer's concern with empathy before moving to resolution",
+                scoringType: "numeric",
+                avgScore: 4.2,
+                maxScore: 10,
+              },
+              {
+                questionText: "Agent greeted the customer professionally and introduced themselves",
+                scoringType: "pass-fail",
+                avgScore: 6.5,
+                maxScore: 10,
+              },
+            ],
+          },
+        ],
       },
     },
     {
@@ -1262,6 +1294,40 @@ export function SupervisorDashboard({ onLogout, onSwitchToAgent }: SupervisorDas
         avgScore: 4.8,
         maxScore: 10,
         formName: "Technical Support Quality Scorecard",
+        triggeringSections: [
+          {
+            sectionName: "Troubleshooting Methodology",
+            sectionAvgScore: 5.1,
+            sectionMaxScore: 10,
+            questions: [
+              {
+                questionText: "Agent followed a structured approach: verify → isolate → resolve",
+                scoringType: "numeric",
+                avgScore: 4.8,
+                maxScore: 10,
+              },
+              {
+                questionText: "Agent escalated to technical team at the correct threshold",
+                scoringType: "pass-fail",
+                avgScore: 5.3,
+                maxScore: 10,
+              },
+            ],
+          },
+          {
+            sectionName: "Technical Accuracy",
+            sectionAvgScore: 5.4,
+            sectionMaxScore: 10,
+            questions: [
+              {
+                questionText: "All technical guidance provided was accurate and up to date",
+                scoringType: "numeric",
+                avgScore: 5.4,
+                maxScore: 10,
+              },
+            ],
+          },
+        ],
       },
     },
   ];
@@ -2298,6 +2364,37 @@ export function SupervisorDashboard({ onLogout, onSwitchToAgent }: SupervisorDas
                     <p className="text-sm font-semibold text-foreground">{pattern.frequency} contacts in the last 7 days</p>
                   </div>
                 </div>
+                {pattern.evaluationContext.triggeringSections && pattern.evaluationContext.triggeringSections.length > 0 && (
+                  <div className="mt-4 border-t border-purple-200 pt-4 space-y-3">
+                    <p className="text-xs text-purple-700 font-semibold uppercase tracking-wide">Triggering Sections &amp; Questions</p>
+                    {pattern.evaluationContext.triggeringSections.map((section) => (
+                      <div key={section.sectionName} className="rounded-md border border-purple-100 bg-white/60 p-3 space-y-2">
+                        <div className="flex items-center justify-between">
+                          <p className="text-sm font-semibold text-foreground">{section.sectionName}</p>
+                          <Badge className="bg-red-100 text-red-800 border-red-200 border text-xs">
+                            Avg {section.sectionAvgScore}/{section.sectionMaxScore}
+                          </Badge>
+                        </div>
+                        <div className="space-y-2">
+                          {section.questions.map((q) => (
+                            <div key={q.questionText} className="flex items-start justify-between gap-3">
+                              <p className="text-xs text-muted-foreground flex-1">{q.questionText}</p>
+                              {q.scoringType === "pass-fail" ? (
+                                <Badge variant="outline" className="text-xs shrink-0 border-orange-300 text-orange-700 bg-orange-50">
+                                  {Math.round((q.avgScore / q.maxScore) * 100)}% pass rate
+                                </Badge>
+                              ) : (
+                                <Badge variant="outline" className="text-xs shrink-0 border-red-300 text-red-700 bg-red-50">
+                                  {q.avgScore}/{q.maxScore}
+                                </Badge>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </CardContent>
             </Card>
           )}

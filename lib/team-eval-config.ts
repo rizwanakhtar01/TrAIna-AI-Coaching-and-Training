@@ -9,7 +9,7 @@ export const teamEvalConfigs: TeamEvalConfig[] = [
   {
     teamId: "team_001",
     teamName: "Billing Support Team",
-    evaluationFormId: "form_1",
+    evaluationFormId: "form_001",
     agentNames: ["Sarah Mitchell", "John Davis"],
   },
   {
@@ -25,4 +25,8 @@ export function isEvaluationEnabledForAgent(agentName: string): boolean {
     (team) =>
       team.evaluationFormId !== null && team.agentNames.includes(agentName),
   );
+}
+
+export function getTeamEvalFormId(teamId: string): string | null {
+  return teamEvalConfigs.find((t) => t.teamId === teamId)?.evaluationFormId ?? null;
 }

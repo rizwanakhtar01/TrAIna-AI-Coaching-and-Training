@@ -110,6 +110,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { EvaluationFormsTab, EvaluationForm, initialEvaluationForms } from "@/components/evaluation-forms";
+import { getTeamEvalFormId } from "@/lib/team-eval-config";
 
 interface AdminDashboardProps {
   onLogout: () => void;
@@ -548,7 +549,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
       agentIds: ["usr_001", "usr_002"],
       knowledgeBaseIds: [],
       analysisAreaIds: ["aa_1"],
-      evaluationFormId: "form_1",
+      evaluationFormId: getTeamEvalFormId("team_001") ?? undefined,
     },
     {
       id: "team_002",
