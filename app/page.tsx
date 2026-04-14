@@ -7,6 +7,7 @@ import { SupervisorDashboard } from "@/components/supervisor-dashboard"
 import { AdminDashboard } from "@/components/admin-dashboard"
 import { SuperAdminDashboard } from "@/components/super-admin-dashboard"
 import { AgentDesktop } from "@/components/agent-desktop"
+import { TeamEvalProvider } from "@/contexts/team-eval-context"
 
 type UserRole = "agent" | "supervisor" | "admin" | "superadmin" | null
 type ViewMode = "login" | "agentDesktop" | "dashboard" | null
@@ -32,38 +33,36 @@ export default function Home() {
   if (viewMode === "login") {
     return <LoginScreen onLogin={handleLogin} onAgentDesktop={handleAgentDesktop} />
   }
-  
-  if (viewMode === "agentDesktop") {
-    return <AgentDesktop onBack={() => setViewMode("login")} onCoachingDetails={() => {
-      setUserRole("agent")
-      setViewMode("dashboard")
-    }} />
-  }
 
-  if (viewMode === "dashboard" && userRole) {
-    switch (userRole) {
-      case "agent":
-        return (
-          <AiCoachingDashboard
-            onLogout={handleLogout}
-            onSwitchToSupervisor={() => setUserRole("supervisor")}
-          />
-        )
-      case "supervisor":
-        return (
-          <SupervisorDashboard
-            onLogout={handleLogout}
-            onSwitchToAgent={() => setUserRole("agent")}
-          />
-        )
-      case "admin":
-        return <AdminDashboard onLogout={handleLogout} />
-      case "superadmin":
-        return <SuperAdminDashboard onLogout={handleLogout} />
-      default:
-        return <LoginScreen onLogin={handleLogin} onAgentDesktop={handleAgentDesktop} />
-    }
-  }
-  
-  return <LoginScreen onLogin={handleLogin} onAgentDesktop={handleAgentDesktop} />
+  return (
+    <TeamEvalProvider>
+      {viewMode === "agentDesktop" && (
+        <AgentDesktop
+          onBack={() => setViewMode("login")}
+          onCoachingDetails={() => {
+            setUserRole("agent")
+            setViewMode("dashboard")
+          }}
+        />
+      )}
+      {viewMode === "dashboard" && userRole === "agent" && (
+        <AiCoachingDashboard
+          onLogout={handleLogout}
+          onSwitchToSupervisor={() => setUserRole("supervisor")}
+        />
+      )}
+      {viewMode === "dashboard" && userRole === "supervisor" && (
+        <SupervisorDashboard
+          onLogout={handleLogout}
+          onSwitchToAgent={() => setUserRole("agent")}
+        />
+      )}
+      {viewMode === "dashboard" && userRole === "admin" && (
+        <AdminDashboard onLogout={handleLogout} />
+      )}
+      {viewMode === "dashboard" && userRole === "superadmin" && (
+        <SuperAdminDashboard onLogout={handleLogout} />
+      )}
+    </TeamEvalProvider>
+  )
 }

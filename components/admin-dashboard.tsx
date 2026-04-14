@@ -111,6 +111,8 @@ import {
 } from "@/components/ui/select";
 import { EvaluationFormsTab, EvaluationForm, initialEvaluationForms } from "@/components/evaluation-forms";
 import { getTeamEvalFormId } from "@/lib/team-eval-config";
+import { useTeamEval } from "@/contexts/team-eval-context";
+import { Switch } from "@/components/ui/switch";
 
 interface AdminDashboardProps {
   onLogout: () => void;
@@ -256,6 +258,7 @@ interface AnalysisArea {
 }
 
 export function AdminDashboard({ onLogout }: AdminDashboardProps) {
+  const { upsertTeamEvalSetting, removeTeamEvalSetting, isEvaluationEnabledForTeam } = useTeamEval();
   const [activeTab, setActiveTab] = useState("overview");
   const [isCreateWizardOpen, setIsCreateWizardOpen] = useState(false);
   const [wizardStep, setWizardStep] = useState(1);
@@ -569,6 +572,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
   const [createTeamAgentSearch, setCreateTeamAgentSearch] = useState("");
   const [newTeamKBIds, setNewTeamKBIds] = useState<string[]>([]);
   const [newTeamAreaIds, setNewTeamAreaIds] = useState<string[]>([]);
+  const [newTeamEvaluationEnabled, setNewTeamEvaluationEnabled] = useState<boolean>(false);
   const [newTeamEvaluationFormId, setNewTeamEvaluationFormId] = useState<string>("none");
   const [evaluationForms, setEvaluationForms] = useState<EvaluationForm[]>(initialEvaluationForms);
   const [teamToDelete, setTeamToDelete] = useState<Team | null>(null);
@@ -1289,6 +1293,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
     setNewTeamAgentIds([]);
     setNewTeamKBIds([]);
     setNewTeamAreaIds([]);
+    setNewTeamEvaluationEnabled(false);
     setNewTeamEvaluationFormId("none");
     setCreateTeamAgentSearch("");
     setIsCreateTeamOpen(true);
@@ -1301,6 +1306,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
     setNewTeamAgentIds([...team.agentIds]);
     setNewTeamKBIds([...(team.knowledgeBaseIds || [])]);
     setNewTeamAreaIds([...(team.analysisAreaIds || [])]);
+    setNewTeamEvaluationEnabled(isEvaluationEnabledForTeam(team.id));
     setNewTeamEvaluationFormId(team.evaluationFormId ?? "none");
     setCreateTeamAgentSearch("");
     setIsCreateTeamOpen(true);
@@ -1318,6 +1324,9 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
     if (!newTeamName.trim() || !newTeamSupervisorId) return;
 
     if (editingTeam) {
+      const resolvedFormId = newTeamEvaluationEnabled && newTeamEvaluationFormId !== "none"
+        ? newTeamEvaluationFormId
+        : undefined;
       setTeams((prev) =>
         prev.map((t) =>
           t.id === editingTeam.id
@@ -1328,10 +1337,15 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                 agentIds: newTeamAgentIds,
                 knowledgeBaseIds: newTeamKBIds,
                 analysisAreaIds: newTeamAreaIds,
-                evaluationFormId: newTeamEvaluationFormId === "none" ? undefined : newTeamEvaluationFormId,
+                evaluationFormId: resolvedFormId,
               }
             : t,
         ),
+      );
+      upsertTeamEvalSetting(
+        editingTeam.id,
+        newTeamEvaluationEnabled,
+        resolvedFormId ?? null,
       );
     } else {
       const newTeam: Team = {
@@ -1341,9 +1355,16 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
         agentIds: newTeamAgentIds,
         knowledgeBaseIds: newTeamKBIds,
         analysisAreaIds: newTeamAreaIds,
-        evaluationFormId: newTeamEvaluationFormId === "none" ? undefined : newTeamEvaluationFormId,
+        evaluationFormId: newTeamEvaluationEnabled && newTeamEvaluationFormId !== "none"
+          ? newTeamEvaluationFormId
+          : undefined,
       };
       setTeams((prev) => [...prev, newTeam]);
+      upsertTeamEvalSetting(
+        newTeam.id,
+        newTeamEvaluationEnabled,
+        newTeamEvaluationEnabled && newTeamEvaluationFormId !== "none" ? newTeamEvaluationFormId : null,
+      );
     }
 
     setIsCreateTeamOpen(false);
@@ -1353,11 +1374,13 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
     setNewTeamAgentIds([]);
     setNewTeamKBIds([]);
     setNewTeamAreaIds([]);
+    setNewTeamEvaluationEnabled(false);
     setNewTeamEvaluationFormId("none");
   };
 
   const handleDeleteTeam = () => {
     if (!teamToDelete) return;
+    removeTeamEvalSetting(teamToDelete.id);
     setTeams((prev) => prev.filter((t) => t.id !== teamToDelete.id));
     setTeamToDelete(null);
   };
@@ -4348,6 +4371,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                     <TableHead>Team Name</TableHead>
                     <TableHead>Supervisor</TableHead>
                     <TableHead>Agents</TableHead>
+                    <TableHead>Evaluation</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -4368,6 +4392,15 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                           {team.agentIds.length}{" "}
                           {team.agentIds.length === 1 ? "Agent" : "Agents"}
                         </Badge>
+                      </TableCell>
+                      <TableCell>
+                        {isEvaluationEnabledForTeam(team.id) ? (
+                          <Badge className="bg-purple-100 text-purple-800 border-purple-200 border text-xs">
+                            Evaluation On
+                          </Badge>
+                        ) : (
+                          <span className="text-xs text-muted-foreground">—</span>
+                        )}
                       </TableCell>
                       <TableCell className="text-right">
                         <DropdownMenu>
@@ -4646,34 +4679,46 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                   </div>
 
                   {/* Quality Evaluation Form */}
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <Label>Quality Evaluation Form</Label>
-                      <span className="text-xs text-muted-foreground font-normal">(optional)</span>
+                  <div className="space-y-3 rounded-lg border border-border p-3">
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-0.5">
+                        <Label className="text-sm font-medium">Use Amazon Connect Evaluations</Label>
+                        <p className="text-xs text-muted-foreground">
+                          Automatically score contacts for this team using a quality scorecard
+                        </p>
+                      </div>
+                      <div onClick={(e) => e.stopPropagation()}>
+                        <Switch
+                          checked={newTeamEvaluationEnabled}
+                          onCheckedChange={setNewTeamEvaluationEnabled}
+                        />
+                      </div>
                     </div>
-                    <p className="text-xs text-muted-foreground">
-                      Link an evaluation form to automatically score contacts for this team via Amazon Connect
-                    </p>
-                    <Select
-                      value={newTeamEvaluationFormId}
-                      onValueChange={setNewTeamEvaluationFormId}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="No evaluation form" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="none">No evaluation form</SelectItem>
-                        {evaluationForms.map((form) => (
-                          <SelectItem key={form.id} value={form.id}>
-                            {form.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    {newTeamEvaluationFormId && newTeamEvaluationFormId !== "none" && (
-                      <p className="text-xs text-primary">
-                        ✓ Evaluation enabled — contacts will be auto-scored using the selected form
-                      </p>
+                    {newTeamEvaluationEnabled && (
+                      <div className="space-y-2 border-t border-border pt-3">
+                        <Label className="text-xs text-muted-foreground font-medium">Quality Evaluation Form</Label>
+                        <Select
+                          value={newTeamEvaluationFormId}
+                          onValueChange={setNewTeamEvaluationFormId}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a scorecard…" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="none">No form selected</SelectItem>
+                            {evaluationForms.map((form) => (
+                              <SelectItem key={form.id} value={form.id}>
+                                {form.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        {newTeamEvaluationFormId !== "none" && (
+                          <p className="text-xs text-primary">
+                            ✓ Contacts will be auto-scored using this scorecard
+                          </p>
+                        )}
+                      </div>
                     )}
                   </div>
                 </div>
