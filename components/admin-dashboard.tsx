@@ -1322,6 +1322,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
 
   const handleSaveTeam = () => {
     if (!newTeamName.trim() || !newTeamSupervisorId) return;
+    if (newTeamEvaluationEnabled && newTeamEvaluationFormId === "none") return;
 
     if (editingTeam) {
       const resolvedFormId = newTeamEvaluationEnabled && newTeamEvaluationFormId !== "none"
@@ -4701,7 +4702,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                           value={newTeamEvaluationFormId}
                           onValueChange={setNewTeamEvaluationFormId}
                         >
-                          <SelectTrigger>
+                          <SelectTrigger className={newTeamEvaluationFormId === "none" ? "border-amber-400" : ""}>
                             <SelectValue placeholder="Select a scorecard…" />
                           </SelectTrigger>
                           <SelectContent>
@@ -4713,7 +4714,11 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                             ))}
                           </SelectContent>
                         </Select>
-                        {newTeamEvaluationFormId !== "none" && (
+                        {newTeamEvaluationFormId === "none" ? (
+                          <p className="text-xs text-amber-600">
+                            A scorecard is required to save with evaluations enabled
+                          </p>
+                        ) : (
                           <p className="text-xs text-primary">
                             ✓ Contacts will be auto-scored using this scorecard
                           </p>
