@@ -5,6 +5,7 @@ import { format, isToday, isYesterday, isSameDay, subDays } from "date-fns";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar as CalendarPicker } from "@/components/ui/calendar";
 import { ContactReviewsList } from "@/components/contact-review-card";
+import { isEvaluationEnabledForAgent } from "@/lib/team-eval-config";
 import {
   AiRecommendationCard,
   CoachingCardReview,
@@ -175,9 +176,6 @@ interface SupervisorDashboardProps {
   onLogout: () => void;
   onSwitchToAgent?: () => void;
 }
-
-// Agents whose team has a linked Quality Evaluation Form in Admin → Team Management
-const EVAL_ENABLED_AGENTS = new Set(["Sarah Mitchell", "John Davis"]);
 
 export function SupervisorDashboard({ onLogout, onSwitchToAgent }: SupervisorDashboardProps) {
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -2646,7 +2644,7 @@ export function SupervisorDashboard({ onLogout, onSwitchToAgent }: SupervisorDas
             controlledFilterTime={agentDetailFilterTime}
             controlledCustomDate={agentDetailCustomDate}
             hideFilters={true}
-            evaluationEnabled={EVAL_ENABLED_AGENTS.has(agentInsight.agent)}
+            evaluationEnabled={isEvaluationEnabledForAgent(agentInsight.agent)}
           />
 
           {/* Coaching Preparation */}

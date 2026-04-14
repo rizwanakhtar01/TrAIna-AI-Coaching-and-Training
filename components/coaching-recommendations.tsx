@@ -192,6 +192,58 @@ const coachingCardsByPattern: Record<string, CoachingCardData> = {
     contactCountBasis: 41,
     aiConfidenceScore: "High (87%)",
   },
+  "Empathy Deficit in Billing": {
+    objective:
+      "Raise agent Empathy & Tone scores on billing contacts — currently averaging 5.2/10 on the Billing & Refunds Quality Scorecard. Build habits of emotional acknowledgement, patient language, and de-escalation so customers feel heard before solutions are offered. Targeted lift: achieve ≥7.5/10 within 30 days.",
+    talkTrackStandard:
+      '"I completely understand how frustrating it is when a billing issue isn\'t resolved quickly — I\'d feel the same way. Let me look into this with you right now and make sure we get it sorted."',
+    talkTrackEdge:
+      '"I hear you — this has clearly been stressful, and I\'m sorry it\'s taken this long. I\'m going to stay on this with you personally until we reach a resolution you\'re satisfied with."',
+    policyDocs: [
+      "Empathy Language Guide — Billing Contacts",
+      "Emotional Acknowledgement Techniques",
+      "Billing Dispute De-escalation Framework",
+      "Amazon Connect Quality Scorecard — Empathy & Tone Criteria",
+    ],
+    practiceScenario:
+      "A customer is upset about an unexpected charge on their account. They are speaking over the agent and expressing frustration about previous unresolved contacts. The agent has the information to resolve the issue but the customer won't slow down. Guide the agent to pause, acknowledge the emotion, validate the frustration, and then guide the conversation toward resolution — without skipping the empathy step.",
+    bestPractices: [
+      "Always acknowledge the emotion before the issue — 'I understand' before 'let me check'",
+      "Mirror the customer's urgency with calm — pace down, don't match their frustration",
+      "Avoid robotic scripted openers; personalise your empathy to what they actually said",
+      "Avoid phrases like 'as per policy' or 'unfortunately I cannot' — they escalate tension",
+      "End billing contacts with a genuine check-in: 'Does everything make sense now? I want to be sure you're satisfied before we close this.'",
+    ],
+    generationDate: "Yesterday at 10:18 AM",
+    contactCountBasis: 67,
+    aiConfidenceScore: "High (92%)",
+  },
+  "FCR Failures — Technical Contacts": {
+    objective:
+      "Improve First Contact Resolution rates on technical contacts — currently averaging 4.8/10 on the Technical Support Quality Scorecard. Equip agents with structured diagnostic habits, clear escalation thresholds, and commitment-setting language so technical issues are resolved or meaningfully advanced in a single contact. Targeted lift: achieve ≥7.0/10 within 30 days.",
+    talkTrackStandard:
+      '"Before we go any further, I want to make sure we resolve this for you today. Let me run through a structured set of checks — this should take about 5 minutes and in most cases we\'ll have you sorted before you hang up."',
+    talkTrackEdge:
+      '"I can see this hasn\'t been resolved in previous contacts. I\'m going to own this one personally — I\'ll document every step and if we need to escalate, I\'ll make sure the next team has full context so you don\'t have to start over."',
+    policyDocs: [
+      "Technical Troubleshooting Decision Tree",
+      "FCR Standards — Technical Support Team",
+      "Escalation Threshold Reference Guide",
+      "Amazon Connect Quality Scorecard — First Contact Resolution Criteria",
+    ],
+    practiceScenario:
+      "A customer contacts support for the second time about an intermittent connectivity issue. The first agent ran basic resets and closed the ticket without confirming resolution. The issue has returned. Guide the agent to acknowledge the repeat contact, commit to resolution or a clear next step, run a complete diagnostic before any escalation decision, and set a firm expectation about what happens next — no vague closings.",
+    bestPractices: [
+      "Never close a contact without confirming the issue is resolved — ask 'Has this been fully sorted for you?'",
+      "On repeat contacts, acknowledge the history: 'I can see you've contacted us before about this'",
+      "Exhaust all Tier 1 steps before escalating — document each step attempted",
+      "If you can't resolve it in one contact, set a specific callback or follow-up commitment",
+      "After complex technical resolutions, offer a brief summary of what was fixed and how to avoid recurrence",
+    ],
+    generationDate: "Today at 9:04 AM",
+    contactCountBasis: 44,
+    aiConfidenceScore: "High (89%)",
+  },
 }
 
 const defaultCoachingCard: CoachingCardData = {

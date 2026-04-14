@@ -548,6 +548,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
       agentIds: ["usr_001", "usr_002"],
       knowledgeBaseIds: [],
       analysisAreaIds: ["aa_1"],
+      evaluationFormId: "form_1",
     },
     {
       id: "team_002",
