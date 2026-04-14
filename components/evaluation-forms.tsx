@@ -255,8 +255,19 @@ const BLANK_QUESTION: QuestionFormState = {
   weight: 50,
 };
 
-export function EvaluationFormsTab() {
-  const [forms, setForms] = useState<EvaluationForm[]>(initialEvaluationForms);
+interface EvaluationFormsTabProps {
+  forms: EvaluationForm[];
+  onFormsChange: (forms: EvaluationForm[]) => void;
+}
+
+export function EvaluationFormsTab({ forms, onFormsChange }: EvaluationFormsTabProps) {
+  const setForms = (updater: EvaluationForm[] | ((prev: EvaluationForm[]) => EvaluationForm[])) => {
+    if (typeof updater === "function") {
+      onFormsChange(updater(forms));
+    } else {
+      onFormsChange(updater);
+    }
+  };
   const [view, setView] = useState<View>("forms-list");
   const [selectedFormId, setSelectedFormId] = useState<string | null>(null);
   const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set());

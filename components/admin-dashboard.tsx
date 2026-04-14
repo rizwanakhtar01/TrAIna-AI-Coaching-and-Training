@@ -567,8 +567,8 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
   const [createTeamAgentSearch, setCreateTeamAgentSearch] = useState("");
   const [newTeamKBIds, setNewTeamKBIds] = useState<string[]>([]);
   const [newTeamAreaIds, setNewTeamAreaIds] = useState<string[]>([]);
-  const [newTeamEvaluationFormId, setNewTeamEvaluationFormId] = useState<string>("");
-  const [evaluationForms] = useState<EvaluationForm[]>(initialEvaluationForms);
+  const [newTeamEvaluationFormId, setNewTeamEvaluationFormId] = useState<string>("none");
+  const [evaluationForms, setEvaluationForms] = useState<EvaluationForm[]>(initialEvaluationForms);
   const [teamToDelete, setTeamToDelete] = useState<Team | null>(null);
 
   // Sample routing analytics data (in a real app, this would come from API)
@@ -1287,7 +1287,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
     setNewTeamAgentIds([]);
     setNewTeamKBIds([]);
     setNewTeamAreaIds([]);
-    setNewTeamEvaluationFormId("");
+    setNewTeamEvaluationFormId("none");
     setCreateTeamAgentSearch("");
     setIsCreateTeamOpen(true);
   };
@@ -1299,7 +1299,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
     setNewTeamAgentIds([...team.agentIds]);
     setNewTeamKBIds([...(team.knowledgeBaseIds || [])]);
     setNewTeamAreaIds([...(team.analysisAreaIds || [])]);
-    setNewTeamEvaluationFormId(team.evaluationFormId ?? "");
+    setNewTeamEvaluationFormId(team.evaluationFormId ?? "none");
     setCreateTeamAgentSearch("");
     setIsCreateTeamOpen(true);
   };
@@ -1326,7 +1326,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                 agentIds: newTeamAgentIds,
                 knowledgeBaseIds: newTeamKBIds,
                 analysisAreaIds: newTeamAreaIds,
-                evaluationFormId: newTeamEvaluationFormId || undefined,
+                evaluationFormId: newTeamEvaluationFormId === "none" ? undefined : newTeamEvaluationFormId,
               }
             : t,
         ),
@@ -1339,7 +1339,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
         agentIds: newTeamAgentIds,
         knowledgeBaseIds: newTeamKBIds,
         analysisAreaIds: newTeamAreaIds,
-        evaluationFormId: newTeamEvaluationFormId || undefined,
+        evaluationFormId: newTeamEvaluationFormId === "none" ? undefined : newTeamEvaluationFormId,
       };
       setTeams((prev) => [...prev, newTeam]);
     }
@@ -1351,7 +1351,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
     setNewTeamAgentIds([]);
     setNewTeamKBIds([]);
     setNewTeamAreaIds([]);
-    setNewTeamEvaluationFormId("");
+    setNewTeamEvaluationFormId("none");
   };
 
   const handleDeleteTeam = () => {
@@ -4660,7 +4660,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                         <SelectValue placeholder="No evaluation form" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">No evaluation form</SelectItem>
+                        <SelectItem value="none">No evaluation form</SelectItem>
                         {evaluationForms.map((form) => (
                           <SelectItem key={form.id} value={form.id}>
                             {form.name}
@@ -4668,7 +4668,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                         ))}
                       </SelectContent>
                     </Select>
-                    {newTeamEvaluationFormId && (
+                    {newTeamEvaluationFormId && newTeamEvaluationFormId !== "none" && (
                       <p className="text-xs text-primary">
                         ✓ Evaluation enabled — contacts will be auto-scored using the selected form
                       </p>
@@ -4720,7 +4720,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
           </TabsContent>
 
           <TabsContent value="evaluation" className="space-y-6">
-            <EvaluationFormsTab />
+            <EvaluationFormsTab forms={evaluationForms} onFormsChange={setEvaluationForms} />
           </TabsContent>
 
           {/* <TabsContent value="training" className="space-y-6">

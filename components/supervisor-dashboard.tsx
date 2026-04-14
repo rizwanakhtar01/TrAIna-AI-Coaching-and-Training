@@ -176,6 +176,9 @@ interface SupervisorDashboardProps {
   onSwitchToAgent?: () => void;
 }
 
+// Agents whose team has a linked Quality Evaluation Form in Admin → Team Management
+const EVAL_ENABLED_AGENTS = new Set(["Sarah Mitchell", "John Davis"]);
+
 export function SupervisorDashboard({ onLogout, onSwitchToAgent }: SupervisorDashboardProps) {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [selectedAgent, setSelectedAgent] = useState<string | null>(null);
@@ -2643,6 +2646,7 @@ export function SupervisorDashboard({ onLogout, onSwitchToAgent }: SupervisorDas
             controlledFilterTime={agentDetailFilterTime}
             controlledCustomDate={agentDetailCustomDate}
             hideFilters={true}
+            evaluationEnabled={EVAL_ENABLED_AGENTS.has(agentInsight.agent)}
           />
 
           {/* Coaching Preparation */}

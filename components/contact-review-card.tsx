@@ -460,9 +460,10 @@ function EvaluationScoresPanel({ evaluation }: { evaluation: EvaluationResult })
 
 interface ContactReviewCardProps {
   review: ContactReview;
+  evaluationEnabled?: boolean;
 }
 
-function ContactReviewCard({ review }: ContactReviewCardProps) {
+function ContactReviewCard({ review, evaluationEnabled = true }: ContactReviewCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -584,7 +585,7 @@ function ContactReviewCard({ review }: ContactReviewCardProps) {
           </div>
         </div>
 
-        {review.evaluation && review.evaluation.sections.length > 0 && (
+        {evaluationEnabled && review.evaluation && review.evaluation.sections.length > 0 && (
           <EvaluationScoresPanel evaluation={review.evaluation} />
         )}
 
@@ -656,6 +657,7 @@ interface ContactReviewsListProps {
   controlledFilterTime?: "today" | "yesterday" | "last3days" | "last7days" | "custom";
   controlledCustomDate?: Date;
   hideFilters?: boolean;
+  evaluationEnabled?: boolean;
 }
 
 export function ContactReviewsList({ 
@@ -666,6 +668,7 @@ export function ContactReviewsList({
   controlledFilterTime,
   controlledCustomDate,
   hideFilters = false,
+  evaluationEnabled = true,
 }: ContactReviewsListProps) {
   const isControlled = controlledFilterTime !== undefined;
   
@@ -892,7 +895,7 @@ export function ContactReviewsList({
 
       <div className="space-y-4">
         {filteredReviews.map((review) => (
-          <ContactReviewCard key={review.id} review={review} />
+          <ContactReviewCard key={review.id} review={review} evaluationEnabled={evaluationEnabled} />
         ))}
 
         {filteredReviews.length === 0 && (
