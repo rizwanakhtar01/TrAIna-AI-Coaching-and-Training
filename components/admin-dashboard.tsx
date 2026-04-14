@@ -109,6 +109,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { EvaluationFormsTab } from "@/components/evaluation-forms";
 
 interface AdminDashboardProps {
   onLogout: () => void;
@@ -1985,12 +1986,13 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
           className="space-y-6"
         >
           <div className="flex items-center justify-between">
-            <TabsList className="grid w-full grid-cols-5 lg:w-[900px] bg-zinc-100">
+            <TabsList className="grid w-full grid-cols-6 lg:w-[1080px] bg-zinc-100">
               <TabsTrigger value="overview">System Overview</TabsTrigger>
               <TabsTrigger value="orchestrator">Overall LLM Agent</TabsTrigger>
               <TabsTrigger value="agents">AI Agent Management</TabsTrigger>
               <TabsTrigger value="users">User Management</TabsTrigger>
               <TabsTrigger value="teams">Team Management</TabsTrigger>
+              <TabsTrigger value="evaluation">Evaluation Forms</TabsTrigger>
             </TabsList>
 
             {activeTab === "agents" && (
@@ -4675,6 +4677,10 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
+          </TabsContent>
+
+          <TabsContent value="evaluation" className="space-y-6">
+            <EvaluationFormsTab />
           </TabsContent>
 
           {/* <TabsContent value="training" className="space-y-6">

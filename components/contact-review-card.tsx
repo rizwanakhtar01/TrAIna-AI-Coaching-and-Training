@@ -26,7 +26,12 @@ import {
   Play,
   Pause,
   Volume2,
+  ClipboardList,
+  TrendingDown,
+  TrendingUp,
+  Minus,
 } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -45,6 +50,14 @@ import { format, isToday, isYesterday, isSameDay, subDays } from "date-fns";
 
 const getToday = () => format(new Date(), "yyyy-MM-dd");
 const getYesterday = () => format(subDays(new Date(), 1), "yyyy-MM-dd");
+
+interface EvaluationScore {
+  criterionId: string;
+  criterionName: string;
+  score: number;
+  maxScore: number;
+  notes?: string;
+}
 
 interface ContactReview {
   id: string;
@@ -73,6 +86,7 @@ interface ContactReview {
     highlight?: "positive" | "negative" | "neutral";
     aiNote?: string;
   }[];
+  evaluationScores?: EvaluationScore[];
 }
 
 const sampleReviews: ContactReview[] = [
@@ -134,6 +148,12 @@ const sampleReviews: ContactReview[] = [
         timestamp: "14:35",
       },
     ],
+    evaluationScores: [
+      { criterionId: "c1", criterionName: "Empathy & Tone", score: 7, maxScore: 10, notes: "Empathetic opening but missed a key retention moment" },
+      { criterionId: "c2", criterionName: "Policy Compliance", score: 9, maxScore: 10, notes: "Refund timeline communicated correctly" },
+      { criterionId: "c3", criterionName: "First Contact Resolution", score: 8, maxScore: 10, notes: "Issue resolved in single interaction" },
+      { criterionId: "c4", criterionName: "Communication Clarity", score: 8, maxScore: 10, notes: "Clear and easy to follow throughout" },
+    ],
   },
   {
     id: "2",
@@ -188,6 +208,12 @@ const sampleReviews: ContactReview[] = [
         highlight: "positive",
         aiNote: "Good explanation and proactive solution",
       },
+    ],
+    evaluationScores: [
+      { criterionId: "c1", criterionName: "Empathy & Tone", score: 5, maxScore: 10, notes: "Did not acknowledge frustration before jumping to account lookup" },
+      { criterionId: "c2", criterionName: "Policy Compliance", score: 9, maxScore: 10, notes: "Refund timeline explained correctly and escalation initiated" },
+      { criterionId: "c3", criterionName: "First Contact Resolution", score: 7, maxScore: 10, notes: "Escalated correctly but final resolution pending" },
+      { criterionId: "c4", criterionName: "Communication Clarity", score: 8, maxScore: 10, notes: "Clear explanation of refund timeline" },
     ],
   },
   {
@@ -251,6 +277,88 @@ const sampleReviews: ContactReview[] = [
     ],
   },
 ];
+
+// ─── Evaluation Scores Panel ──────────────────────────────────────────────────
+
+function EvaluationScoresPanel({ scores }: { scores: EvaluationScore[] }) {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const weightedAvg =
+    scores.reduce((sum, s) => sum + (s.score / s.maxScore) * 100, 0) /
+    scores.length;
+
+  const getScoreBadgeClass = (pct: number) => {
+    if (pct >= 80) return "bg-green-100 text-green-800 border-green-200";
+    if (pct >= 60) return "bg-amber-100 text-amber-800 border-amber-200";
+    return "bg-red-100 text-red-800 border-red-200";
+  };
+
+  const getBarColor = (pct: number) => {
+    if (pct >= 80) return "[&>div]:bg-green-500";
+    if (pct >= 60) return "[&>div]:bg-amber-500";
+    return "[&>div]:bg-red-500";
+  };
+
+  const overallPct = Math.round(weightedAvg);
+
+  return (
+    <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+      <div className="border rounded-lg overflow-hidden">
+        <CollapsibleTrigger asChild>
+          <button className="w-full flex items-center justify-between p-3 bg-slate-50/80 hover:bg-slate-100/80 transition-colors text-left">
+            <div className="flex items-center gap-2">
+              <ClipboardList className="h-4 w-4 text-primary" />
+              <span className="text-sm font-medium">Quality Evaluation</span>
+              <Badge
+                className={`text-xs border ${getScoreBadgeClass(overallPct)}`}
+                variant="outline"
+              >
+                {overallPct}% overall
+              </Badge>
+              <span className="text-xs text-muted-foreground">· Evaluated by Amazon Connect AI</span>
+            </div>
+            <div className="flex items-center gap-1 text-muted-foreground">
+              <span className="text-xs">{isOpen ? "Hide" : "Show details"}</span>
+              {isOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+            </div>
+          </button>
+        </CollapsibleTrigger>
+        <CollapsibleContent>
+          <div className="p-4 space-y-3 border-t bg-white">
+            {scores.map((s) => {
+              const pct = Math.round((s.score / s.maxScore) * 100);
+              return (
+                <div key={s.criterionId} className="space-y-1">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium">{s.criterionName}</span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-muted-foreground">
+                        {s.score}/{s.maxScore}
+                      </span>
+                      <Badge
+                        variant="outline"
+                        className={`text-xs border ${getScoreBadgeClass(pct)}`}
+                      >
+                        {pct}%
+                      </Badge>
+                    </div>
+                  </div>
+                  <Progress
+                    value={pct}
+                    className={`h-1.5 ${getBarColor(pct)}`}
+                  />
+                  {s.notes && (
+                    <p className="text-xs text-muted-foreground">{s.notes}</p>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </CollapsibleContent>
+      </div>
+    </Collapsible>
+  );
+}
 
 interface ContactReviewCardProps {
   review: ContactReview;
@@ -377,6 +485,10 @@ function ContactReviewCard({ review }: ContactReviewCardProps) {
             </p>
           </div>
         </div>
+
+        {review.evaluationScores && review.evaluationScores.length > 0 && (
+          <EvaluationScoresPanel scores={review.evaluationScores} />
+        )}
 
         <Collapsible open={isExpanded} onOpenChange={setIsExpanded}>
           <CollapsibleTrigger asChild>

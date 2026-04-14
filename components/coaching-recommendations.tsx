@@ -50,6 +50,8 @@ interface AgentPlan {
   assignedDate: string
   dueDate: string
   status: "active" | "completed" | "overdue"
+  source?: "challenge-pattern" | "evaluation"
+  evaluationContext?: { criterionName: string; score: number; maxScore: number; contactCount: number }
   supervisorNote?: string
   sections: { id: string; title: string; type: string; completed: boolean }[]
   timeline: { event: string; date: string; type: "assigned" | "opened" | "completed" | "section" }[]
@@ -327,6 +329,64 @@ const agentPlansData: AgentPlan[] = [
       { event: "Plan assigned by Team Lead", date: "2 days ago", type: "assigned" },
       { event: "Opened coaching plan", date: "Yesterday", type: "opened" },
       { event: "Completed: Coaching objective", date: "Yesterday", type: "section" },
+    ],
+  },
+  {
+    id: "plan-5",
+    agentId: "5",
+    agentName: "Aisha Okonkwo",
+    agentAvatar: "AO",
+    patternName: "Billing Inquiries",
+    areaToImprove: "Empathy & Tone",
+    assignedBy: "Team Lead",
+    assignedDate: "Yesterday",
+    dueDate: "In 6 days",
+    status: "active",
+    source: "evaluation",
+    evaluationContext: { criterionName: "Empathy & Tone", score: 5, maxScore: 10, contactCount: 12 },
+    supervisorNote:
+      "Aisha — your evaluation scores flagged empathy as a consistent gap over the past 12 contacts. This plan will help you build the language and habits to connect better before diving into solutions.",
+    sections: [
+      { id: "s1", title: "Coaching objective", type: "objective", completed: false },
+      { id: "s2", title: "Talk tracks", type: "talkTracks", completed: false },
+      { id: "s3", title: "Policy & knowledge base", type: "policy", completed: false },
+      { id: "s4", title: "Practice scenario", type: "scenario", completed: false },
+      { id: "s5", title: "Best practices", type: "bestPractices", completed: false },
+    ],
+    timeline: [
+      { event: "Evaluation flagged low Empathy & Tone score (50%) across 12 contacts", date: "2 days ago", type: "assigned" },
+      { event: "Plan auto-generated from evaluation data", date: "Yesterday", type: "assigned" },
+      { event: "Plan assigned by Team Lead", date: "Yesterday", type: "assigned" },
+    ],
+  },
+  {
+    id: "plan-6",
+    agentId: "6",
+    agentName: "Carlos Mendes",
+    agentAvatar: "CM",
+    patternName: "Technical Support",
+    areaToImprove: "First Contact Resolution",
+    assignedBy: "Team Lead",
+    assignedDate: "4 days ago",
+    dueDate: "In 3 days",
+    status: "active",
+    source: "evaluation",
+    evaluationContext: { criterionName: "First Contact Resolution", score: 4, maxScore: 10, contactCount: 9 },
+    supervisorNote:
+      "Carlos — evaluation data shows customers are frequently contacting us again after your interactions. Let's focus on closing each call with a clear resolution or an escalation path so nothing falls through.",
+    sections: [
+      { id: "s1", title: "Coaching objective", type: "objective", completed: true },
+      { id: "s2", title: "Talk tracks", type: "talkTracks", completed: false },
+      { id: "s3", title: "Policy & knowledge base", type: "policy", completed: false },
+      { id: "s4", title: "Practice scenario", type: "scenario", completed: false },
+      { id: "s5", title: "Best practices", type: "bestPractices", completed: false },
+    ],
+    timeline: [
+      { event: "Evaluation flagged low FCR score (40%) across 9 contacts", date: "5 days ago", type: "assigned" },
+      { event: "Plan auto-generated from evaluation data", date: "4 days ago", type: "assigned" },
+      { event: "Plan assigned by Team Lead", date: "4 days ago", type: "assigned" },
+      { event: "Opened coaching plan", date: "3 days ago", type: "opened" },
+      { event: "Completed: Coaching objective", date: "3 days ago", type: "section" },
     ],
   },
 ]
@@ -849,6 +909,11 @@ export function CoachingProgressTracker() {
                         <div className="flex items-center gap-2 flex-wrap">
                           <span className="font-semibold">{plan.agentName}</span>
                           <StatusBadge status={plan.status} />
+                          {plan.source === "evaluation" && (
+                            <Badge className="bg-purple-100 text-purple-800 border-purple-200 text-xs">
+                              Evaluation
+                            </Badge>
+                          )}
                         </div>
                         <p className="text-sm text-muted-foreground">
                           1 plan · {plan.patternName}
@@ -1006,13 +1071,23 @@ export function AgentCoachingPlans({ onViewPlan }: AgentCoachingPlansProps) {
                 <CardContent className="p-5">
                   <div className="flex items-start justify-between gap-4">
                     <div className="space-y-1">
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 flex-wrap">
                         <h4 className="font-semibold">{plan.patternName}</h4>
                         <Badge className="bg-blue-100 text-blue-800 text-xs">Active</Badge>
+                        {plan.source === "evaluation" && (
+                          <Badge className="bg-purple-100 text-purple-800 border-purple-200 text-xs">
+                            Evaluation-triggered
+                          </Badge>
+                        )}
                       </div>
                       <p className="text-sm text-muted-foreground">
                         Area to improve: {plan.areaToImprove}
                       </p>
+                      {plan.source === "evaluation" && plan.evaluationContext && (
+                        <p className="text-xs text-purple-700 bg-purple-50 px-2 py-1 rounded inline-block">
+                          {plan.evaluationContext.criterionName}: {plan.evaluationContext.score}/{plan.evaluationContext.maxScore} across {plan.evaluationContext.contactCount} contacts
+                        </p>
+                      )}
                       <div className="flex gap-4 text-xs text-muted-foreground">
                         <span>Assigned {plan.assignedDate}</span>
                         <span>Due {plan.dueDate}</span>
@@ -1213,13 +1288,28 @@ export function AgentPlanDetail({ planId, onBack, readOnly = false }: AgentPlanD
         <CardContent className="p-6">
           <div className="flex items-start justify-between mb-4">
             <div className="space-y-1">
-              <h2 className="text-xl font-bold">{plan.patternName}</h2>
+              <div className="flex items-center gap-2 flex-wrap">
+                <h2 className="text-xl font-bold">{plan.patternName}</h2>
+                {plan.source === "evaluation" && (
+                  <Badge className="bg-purple-100 text-purple-800 border-purple-200 text-xs">
+                    Evaluation-triggered
+                  </Badge>
+                )}
+              </div>
               <p className="text-sm text-muted-foreground">
                 Area to improve: {plan.areaToImprove}
               </p>
             </div>
             <StatusBadge status={plan.status} />
           </div>
+          {plan.source === "evaluation" && plan.evaluationContext && (
+            <div className="mb-4 p-3 bg-purple-50 border border-purple-200 rounded-lg">
+              <p className="text-xs font-semibold text-purple-700 mb-1">Generated from evaluation data</p>
+              <p className="text-sm text-purple-900">
+                Criterion <strong>{plan.evaluationContext.criterionName}</strong> scored <strong>{plan.evaluationContext.score}/{plan.evaluationContext.maxScore}</strong> ({Math.round((plan.evaluationContext.score / plan.evaluationContext.maxScore) * 100)}%) across <strong>{plan.evaluationContext.contactCount} contacts</strong>. This plan was auto-generated to address this gap.
+              </p>
+            </div>
+          )}
           <div className="flex gap-6 text-sm text-muted-foreground mb-4">
             <span>
               Assigned by: <span className="font-medium text-foreground">{plan.assignedBy}</span>
