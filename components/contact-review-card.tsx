@@ -51,7 +51,7 @@ import { format, isToday, isYesterday, isSameDay, subDays } from "date-fns";
 const getToday = () => format(new Date(), "yyyy-MM-dd");
 const getYesterday = () => format(subDays(new Date(), 1), "yyyy-MM-dd");
 
-interface EvaluationQuestionResult {
+export interface EvaluationQuestionResult {
   questionId: string;
   questionText: string;
   scoringType: "numeric" | "pass-fail";
@@ -60,14 +60,14 @@ interface EvaluationQuestionResult {
   notes?: string;
 }
 
-interface EvaluationSectionResult {
+export interface EvaluationSectionResult {
   sectionId: string;
   sectionName: string;
   aiFeedback?: string;
   questions: EvaluationQuestionResult[];
 }
 
-interface EvaluationResult {
+export interface EvaluationResult {
   formName: string;
   evaluationDate: string;
   sections: EvaluationSectionResult[];
@@ -376,7 +376,7 @@ const sampleReviews: ContactReview[] = [
 
 // ─── Evaluation Scores Panel ──────────────────────────────────────────────────
 
-function EvaluationScoresPanel({ evaluation }: { evaluation: EvaluationResult }) {
+export function EvaluationScoresPanel({ evaluation }: { evaluation: EvaluationResult }) {
   const [isOpen, setIsOpen] = useState(false);
   const { formName, sections } = evaluation;
 

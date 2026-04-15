@@ -4,7 +4,8 @@ import { useState, useEffect } from "react";
 import { format, isToday, isYesterday, isSameDay, subDays } from "date-fns";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar as CalendarPicker } from "@/components/ui/calendar";
-import { ContactReviewsList } from "@/components/contact-review-card";
+import { ContactReviewsList, EvaluationScoresPanel } from "@/components/contact-review-card";
+import type { EvaluationResult } from "@/components/contact-review-card";
 import { useTeamEval } from "@/contexts/team-eval-context";
 import {
   AiRecommendationCard,
@@ -110,7 +111,8 @@ interface ContactReview {
     highlight?: "positive" | "negative" | "neutral";
     aiNote?: string;
   }[];
-  agentName: string; // Add agent mapping
+  agentName: string;
+  evaluations?: EvaluationResult[];
 }
 
 // Comprehensive data models for supervisor dashboard
@@ -629,6 +631,41 @@ export function SupervisorDashboard({ onLogout, onSwitchToAgent }: SupervisorDas
         },
       ],
       agentName: "Sarah Mitchell",
+      evaluations: [
+        {
+          formName: "Billing & Refunds Quality Scorecard",
+          evaluationDate: "Today, 14:35",
+          sections: [
+            {
+              sectionId: "sec_01",
+              sectionName: "Opening & Empathy",
+              aiFeedback: "You opened this call with real warmth and professionalism — that sets the stage for everything. Next time, use that empathetic connection as a natural moment to explore whether the customer might be open to staying before processing the cancellation. A brief retention conversation there can make all the difference.",
+              questions: [
+                { questionId: "q01", questionText: "Agent greeted the customer professionally and introduced themselves", scoringType: "pass-fail", score: 10, maxScore: 10 },
+                { questionId: "q02", questionText: "Agent acknowledged the customer's concern with empathy before moving to resolution", scoringType: "numeric", score: 7, maxScore: 10 },
+              ],
+            },
+            {
+              sectionId: "sec_02",
+              sectionName: "Policy & Resolution",
+              aiFeedback: "You nailed the policy side of this interaction — correct verification, accurate timeline, clear communication throughout. That's the standard to hold yourself to on every billing call. Keep building on this consistency.",
+              questions: [
+                { questionId: "q03", questionText: "Agent followed correct refund authorization and verification steps", scoringType: "pass-fail", score: 10, maxScore: 10 },
+                { questionId: "q04", questionText: "Agent communicated refund timeline clearly and accurately to the customer", scoringType: "numeric", score: 9, maxScore: 10 },
+              ],
+            },
+            {
+              sectionId: "sec_03",
+              sectionName: "Closing",
+              aiFeedback: "You closed this call exactly right — the customer left knowing what had been done and what to expect next. That kind of clarity at the end of a call is what turns a good interaction into a great one. Keep finishing strong.",
+              questions: [
+                { questionId: "q05", questionText: "Agent confirmed the issue was fully resolved before ending the contact", scoringType: "pass-fail", score: 10, maxScore: 10 },
+                { questionId: "q06", questionText: "Agent summarized the action taken and set clear next-step expectations", scoringType: "numeric", score: 8, maxScore: 10 },
+              ],
+            },
+          ],
+        },
+      ],
     },
     {
       id: "2",
@@ -684,6 +721,41 @@ export function SupervisorDashboard({ onLogout, onSwitchToAgent }: SupervisorDas
         },
       ],
       agentName: "John Davis",
+      evaluations: [
+        {
+          formName: "Billing & Refunds Quality Scorecard",
+          evaluationDate: "Today, 14:17",
+          sections: [
+            {
+              sectionId: "sec_01",
+              sectionName: "Opening & Empathy",
+              aiFeedback: "Here's a key moment to work on: next time a customer arrives frustrated, try pausing before jumping into account lookup and say something like 'I completely understand how stressful a delayed refund can be — let's get this sorted right now.' That small acknowledgment changes the whole tone of the call.",
+              questions: [
+                { questionId: "q01", questionText: "Agent greeted the customer professionally and introduced themselves", scoringType: "pass-fail", score: 10, maxScore: 10 },
+                { questionId: "q02", questionText: "Agent acknowledged the customer's concern with empathy before moving to resolution", scoringType: "numeric", score: 4, maxScore: 10 },
+              ],
+            },
+            {
+              sectionId: "sec_02",
+              sectionName: "Policy & Resolution",
+              aiFeedback: "You handled a difficult situation really well here — correct escalation steps, a clear timeline, and a proactive push to expedite the refund. That combination of process knowledge and quick thinking is exactly what great support looks like. Build on this.",
+              questions: [
+                { questionId: "q03", questionText: "Agent followed correct refund authorization and verification steps", scoringType: "pass-fail", score: 10, maxScore: 10 },
+                { questionId: "q04", questionText: "Agent communicated refund timeline clearly and accurately to the customer", scoringType: "numeric", score: 9, maxScore: 10 },
+              ],
+            },
+            {
+              sectionId: "sec_03",
+              sectionName: "Closing",
+              aiFeedback: "Before ending a call where the issue is still in progress, always anchor the customer with a clear next step — something like 'I'll send you a confirmation email and you can expect an update within 48 hours.' That reassurance is what the customer takes away from the call, so make it count.",
+              questions: [
+                { questionId: "q05", questionText: "Agent confirmed the issue was fully resolved before ending the contact", scoringType: "pass-fail", score: 0, maxScore: 10 },
+                { questionId: "q06", questionText: "Agent summarized the action taken and set clear next-step expectations", scoringType: "numeric", score: 7, maxScore: 10 },
+              ],
+            },
+          ],
+        },
+      ],
     },
     {
       id: "3",
@@ -1100,6 +1172,18 @@ export function SupervisorDashboard({ onLogout, onSwitchToAgent }: SupervisorDas
                 ))}
               </div>
             </div>
+
+            {/* Evaluation Forms */}
+            {review.evaluations && review.evaluations.length > 0 && (
+              <div className="space-y-2">
+                <h5 className="font-medium text-sm">Quality Evaluations</h5>
+                <div className="space-y-2">
+                  {review.evaluations.map((ev, idx) => (
+                    <EvaluationScoresPanel key={idx} evaluation={ev} />
+                  ))}
+                </div>
+              </div>
+            )}
           </CardContent>
         )}
       </Card>
