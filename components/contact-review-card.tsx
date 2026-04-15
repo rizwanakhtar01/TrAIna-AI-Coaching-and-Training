@@ -386,6 +386,11 @@ function EvaluationScoresPanel({ evaluation }: { evaluation: EvaluationResult })
     return Math.round(numQs.reduce((sum, q) => sum + (q.score / q.maxScore) * 100, 0) / numQs.length);
   };
 
+  const allQuestions = sections.flatMap((s) => s.questions);
+  const overallPct = Math.round(
+    allQuestions.reduce((sum, q) => sum + (q.score / q.maxScore) * 100, 0) / allQuestions.length
+  );
+
   return (
     <Collapsible open={isOpen} onOpenChange={setIsOpen}>
       <div className="border rounded-lg overflow-hidden">
@@ -394,6 +399,9 @@ function EvaluationScoresPanel({ evaluation }: { evaluation: EvaluationResult })
             <div className="flex items-center gap-2 flex-wrap">
               <ClipboardList className="h-4 w-4 text-primary flex-shrink-0" />
               <span className="text-sm font-medium">{formName}</span>
+              <Badge variant="outline" className="text-xs border border-border text-muted-foreground">
+                {overallPct}%
+              </Badge>
               <span className="text-xs text-muted-foreground">· Amazon Connect Evaluation</span>
             </div>
             <div className="flex items-center gap-1 text-muted-foreground flex-shrink-0 ml-2">
