@@ -382,7 +382,7 @@ function EvaluationScoresPanel({ evaluation }: { evaluation: EvaluationResult })
               <Badge className={`text-xs border ${getScoreBadgeClass(overallPct)}`} variant="outline">
                 {overallPct}% overall
               </Badge>
-              <span className="text-xs text-muted-foreground">· Evaluated by Amazon Connect AI · {evaluationDate}</span>
+              <span className="text-xs text-muted-foreground">· Evaluated by Amazon Connect AI</span>
             </div>
             <div className="flex items-center gap-1 text-muted-foreground flex-shrink-0 ml-2">
               <span className="text-xs">{isOpen ? "Hide" : "Show details"}</span>
@@ -410,7 +410,7 @@ function EvaluationScoresPanel({ evaluation }: { evaluation: EvaluationResult })
                       </div>
                       {sectionPct !== null && (
                         <Badge className={`text-xs border ${getScoreBadgeClass(sectionPct)}`} variant="outline">
-                          {sectionPct}% avg
+                          Evaluation Score: {sectionPct}%
                         </Badge>
                       )}
                     </div>
@@ -420,7 +420,7 @@ function EvaluationScoresPanel({ evaluation }: { evaluation: EvaluationResult })
                         const passed = q.score >= q.maxScore * 0.5;
                         const pct = Math.round((q.score / q.maxScore) * 100);
                         return (
-                          <div key={q.questionId} className="space-y-1">
+                          <div key={q.questionId} className="space-y-1.5">
                             <div className="flex items-start justify-between gap-3">
                               <span className="text-xs text-muted-foreground mt-0.5 w-4 flex-shrink-0">{qIdx + 1}.</span>
                               <div className="flex-1 min-w-0">
@@ -432,15 +432,18 @@ function EvaluationScoresPanel({ evaluation }: { evaluation: EvaluationResult })
                                         {passed ? "Pass" : "Fail"}
                                       </Badge>
                                     ) : (
-                                      <>
-                                        <span className="text-xs text-muted-foreground">{q.score}/{q.maxScore}</span>
-                                        <Badge variant="outline" className={`text-xs border ${getScoreBadgeClass(pct)}`}>{pct}%</Badge>
-                                      </>
+                                      <Badge variant="outline" className={`text-xs border ${getScoreBadgeClass(pct)}`}>
+                                        Avg evaluation score: {pct}%
+                                      </Badge>
                                     )}
                                   </div>
                                 </div>
                                 {!isPassFail && <Progress value={pct} className={`h-1 mt-1 ${getBarColor(pct)}`} />}
-                                {q.notes && <p className="text-xs text-muted-foreground mt-0.5 italic">{q.notes}</p>}
+                                {q.notes && (
+                                  <div className="text-xs text-accent bg-accent/10 p-2 rounded border-l-2 border-accent mt-1.5">
+                                    <strong>AI Note:</strong> {q.notes}
+                                  </div>
+                                )}
                               </div>
                             </div>
                           </div>
