@@ -424,6 +424,7 @@ function EvaluationScoresPanel({ evaluation }: { evaluation: EvaluationResult })
                     <div className="space-y-3 pl-2">
                       {section.questions.map((q, qIdx) => {
                         const pct = Math.round((q.score / q.maxScore) * 100);
+                        const evalAnswer = pct > 70 ? "Yes" : pct < 50 ? "No" : null;
                         return (
                           <div key={q.questionId} className="space-y-1.5">
                             <div className="flex items-start justify-between gap-3">
@@ -432,6 +433,11 @@ function EvaluationScoresPanel({ evaluation }: { evaluation: EvaluationResult })
                                 <div className="flex items-start justify-between gap-2">
                                   <p className="text-xs text-foreground leading-relaxed">{q.questionText}</p>
                                   <div className="flex items-center gap-1.5 flex-shrink-0">
+                                    {evalAnswer && (
+                                      <Badge variant="outline" className={`text-xs border ${evalAnswer === "Yes" ? "bg-green-50 text-green-700 border-green-200" : "bg-red-50 text-red-700 border-red-200"}`}>
+                                        {evalAnswer}
+                                      </Badge>
+                                    )}
                                     <Badge variant="outline" className="text-xs border border-border text-muted-foreground">
                                       {pct}%
                                     </Badge>
