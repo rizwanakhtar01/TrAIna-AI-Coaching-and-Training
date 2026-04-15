@@ -432,8 +432,8 @@ function EvaluationScoresPanel({ evaluation }: { evaluation: EvaluationResult })
                                 <div className="flex items-start justify-between gap-2">
                                   <p className="text-xs text-foreground leading-relaxed">{q.questionText}</p>
                                   <div className="flex items-center gap-1.5 flex-shrink-0">
-                                    <Badge variant="outline" className={`text-xs border ${getScoreBadgeClass(pct)}`}>
-                                      Avg evaluation score: {pct}%
+                                    <Badge variant="outline" className="text-xs border border-border text-muted-foreground">
+                                      {pct}%
                                     </Badge>
                                   </div>
                                 </div>
