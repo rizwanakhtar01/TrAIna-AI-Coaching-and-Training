@@ -100,7 +100,7 @@ interface ContactReview {
     highlight?: "positive" | "negative" | "neutral";
     aiNote?: string;
   }[];
-  evaluation?: EvaluationResult;
+  evaluations?: EvaluationResult[];
 }
 
 const sampleReviews: ContactReview[] = [
@@ -162,39 +162,65 @@ const sampleReviews: ContactReview[] = [
         timestamp: "14:35",
       },
     ],
-    evaluation: {
-      formName: "Billing & Refunds Quality Scorecard",
-      evaluationDate: "Today, 14:35",
-      sections: [
-        {
-          sectionId: "sec_01",
-          sectionName: "Opening & Empathy",
-          aiFeedback: "Agent delivered a warm, professional opening and acknowledged the customer's concern with empathy. There was a minor missed opportunity to reinforce retention messaging before processing the cancellation request.",
-          questions: [
-            { questionId: "q01", questionText: "Agent greeted the customer professionally and introduced themselves", scoringType: "pass-fail", score: 10, maxScore: 10 },
-            { questionId: "q02", questionText: "Agent acknowledged the customer's concern with empathy before moving to resolution", scoringType: "numeric", score: 7, maxScore: 10 },
-          ],
-        },
-        {
-          sectionId: "sec_02",
-          sectionName: "Policy & Resolution",
-          aiFeedback: "Refund authorization and verification steps were followed correctly throughout the interaction. The refund timeline was communicated clearly and accurately, demonstrating strong policy adherence.",
-          questions: [
-            { questionId: "q03", questionText: "Agent followed correct refund authorization and verification steps", scoringType: "pass-fail", score: 10, maxScore: 10 },
-            { questionId: "q04", questionText: "Agent communicated refund timeline clearly and accurately to the customer", scoringType: "numeric", score: 9, maxScore: 10 },
-          ],
-        },
-        {
-          sectionId: "sec_03",
-          sectionName: "Closing",
-          aiFeedback: "Strong closing with confirmed resolution and a clear next-step summary. The customer concluded the interaction with a full understanding of the refund timeline and what to expect next.",
-          questions: [
-            { questionId: "q05", questionText: "Agent confirmed the issue was fully resolved before ending the contact", scoringType: "pass-fail", score: 10, maxScore: 10 },
-            { questionId: "q06", questionText: "Agent summarized the action taken and set clear next-step expectations", scoringType: "numeric", score: 8, maxScore: 10 },
-          ],
-        },
-      ],
-    },
+    evaluations: [
+      {
+        formName: "Billing & Refunds Quality Scorecard",
+        evaluationDate: "Today, 14:35",
+        sections: [
+          {
+            sectionId: "sec_01",
+            sectionName: "Opening & Empathy",
+            aiFeedback: "Agent delivered a warm, professional opening and acknowledged the customer's concern with empathy. There was a minor missed opportunity to reinforce retention messaging before processing the cancellation request.",
+            questions: [
+              { questionId: "q01", questionText: "Agent greeted the customer professionally and introduced themselves", scoringType: "pass-fail", score: 10, maxScore: 10 },
+              { questionId: "q02", questionText: "Agent acknowledged the customer's concern with empathy before moving to resolution", scoringType: "numeric", score: 7, maxScore: 10 },
+            ],
+          },
+          {
+            sectionId: "sec_02",
+            sectionName: "Policy & Resolution",
+            aiFeedback: "Refund authorization and verification steps were followed correctly throughout the interaction. The refund timeline was communicated clearly and accurately, demonstrating strong policy adherence.",
+            questions: [
+              { questionId: "q03", questionText: "Agent followed correct refund authorization and verification steps", scoringType: "pass-fail", score: 10, maxScore: 10 },
+              { questionId: "q04", questionText: "Agent communicated refund timeline clearly and accurately to the customer", scoringType: "numeric", score: 9, maxScore: 10 },
+            ],
+          },
+          {
+            sectionId: "sec_03",
+            sectionName: "Closing",
+            aiFeedback: "Strong closing with confirmed resolution and a clear next-step summary. The customer concluded the interaction with a full understanding of the refund timeline and what to expect next.",
+            questions: [
+              { questionId: "q05", questionText: "Agent confirmed the issue was fully resolved before ending the contact", scoringType: "pass-fail", score: 10, maxScore: 10 },
+              { questionId: "q06", questionText: "Agent summarized the action taken and set clear next-step expectations", scoringType: "numeric", score: 8, maxScore: 10 },
+            ],
+          },
+        ],
+      },
+      {
+        formName: "Customer Experience & Communication Scorecard",
+        evaluationDate: "Today, 14:40",
+        sections: [
+          {
+            sectionId: "cx_01",
+            sectionName: "Tone & Professionalism",
+            aiFeedback: "Agent maintained a consistently calm and professional tone throughout the interaction. Language choices were appropriate and the agent avoided jargon that could confuse the customer.",
+            questions: [
+              { questionId: "cx_q01", questionText: "Agent used clear, jargon-free language throughout the interaction", scoringType: "numeric", score: 9, maxScore: 10 },
+              { questionId: "cx_q02", questionText: "Agent maintained a calm and professional tone even when the customer expressed frustration", scoringType: "numeric", score: 8, maxScore: 10 },
+            ],
+          },
+          {
+            sectionId: "cx_02",
+            sectionName: "First Contact Resolution",
+            aiFeedback: "The issue was fully resolved within this single contact with no indication of a follow-up requirement. The customer did not need to re-contact support, reflecting strong ownership of the case.",
+            questions: [
+              { questionId: "cx_q03", questionText: "Agent resolved the customer's issue without requiring a follow-up contact", scoringType: "pass-fail", score: 10, maxScore: 10 },
+              { questionId: "cx_q04", questionText: "Agent took full ownership of the issue without transferring unnecessarily", scoringType: "numeric", score: 9, maxScore: 10 },
+            ],
+          },
+        ],
+      },
+    ],
   },
   {
     id: "2",
@@ -250,39 +276,41 @@ const sampleReviews: ContactReview[] = [
         aiNote: "Good explanation and proactive solution",
       },
     ],
-    evaluation: {
-      formName: "Billing & Refunds Quality Scorecard",
-      evaluationDate: "Today, 14:17",
-      sections: [
-        {
-          sectionId: "sec_01",
-          sectionName: "Opening & Empathy",
-          aiFeedback: "Agent moved directly to account lookup without acknowledging the customer's frustration. A brief empathy statement — such as recognising how stressful a delayed refund can be — should come before any verification steps to set a better tone.",
-          questions: [
-            { questionId: "q01", questionText: "Agent greeted the customer professionally and introduced themselves", scoringType: "pass-fail", score: 10, maxScore: 10 },
-            { questionId: "q02", questionText: "Agent acknowledged the customer's concern with empathy before moving to resolution", scoringType: "numeric", score: 4, maxScore: 10 },
-          ],
-        },
-        {
-          sectionId: "sec_02",
-          sectionName: "Policy & Resolution",
-          aiFeedback: "Correct escalation process was initiated and the refund timeline was explained clearly. Agent showed good knowledge of policy and took a proactive approach by expediting the case despite the difficult situation.",
-          questions: [
-            { questionId: "q03", questionText: "Agent followed correct refund authorization and verification steps", scoringType: "pass-fail", score: 10, maxScore: 10 },
-            { questionId: "q04", questionText: "Agent communicated refund timeline clearly and accurately to the customer", scoringType: "numeric", score: 9, maxScore: 10 },
-          ],
-        },
-        {
-          sectionId: "sec_03",
-          sectionName: "Closing",
-          aiFeedback: "The contact ended while the issue was still pending escalation without a confirmed resolution. Agent should have set an explicit follow-up timeline and reassured the customer of the next steps before closing the interaction.",
-          questions: [
-            { questionId: "q05", questionText: "Agent confirmed the issue was fully resolved before ending the contact", scoringType: "pass-fail", score: 0, maxScore: 10 },
-            { questionId: "q06", questionText: "Agent summarized the action taken and set clear next-step expectations", scoringType: "numeric", score: 7, maxScore: 10 },
-          ],
-        },
-      ],
-    },
+    evaluations: [
+      {
+        formName: "Billing & Refunds Quality Scorecard",
+        evaluationDate: "Today, 14:17",
+        sections: [
+          {
+            sectionId: "sec_01",
+            sectionName: "Opening & Empathy",
+            aiFeedback: "Agent moved directly to account lookup without acknowledging the customer's frustration. A brief empathy statement — such as recognising how stressful a delayed refund can be — should come before any verification steps to set a better tone.",
+            questions: [
+              { questionId: "q01", questionText: "Agent greeted the customer professionally and introduced themselves", scoringType: "pass-fail", score: 10, maxScore: 10 },
+              { questionId: "q02", questionText: "Agent acknowledged the customer's concern with empathy before moving to resolution", scoringType: "numeric", score: 4, maxScore: 10 },
+            ],
+          },
+          {
+            sectionId: "sec_02",
+            sectionName: "Policy & Resolution",
+            aiFeedback: "Correct escalation process was initiated and the refund timeline was explained clearly. Agent showed good knowledge of policy and took a proactive approach by expediting the case despite the difficult situation.",
+            questions: [
+              { questionId: "q03", questionText: "Agent followed correct refund authorization and verification steps", scoringType: "pass-fail", score: 10, maxScore: 10 },
+              { questionId: "q04", questionText: "Agent communicated refund timeline clearly and accurately to the customer", scoringType: "numeric", score: 9, maxScore: 10 },
+            ],
+          },
+          {
+            sectionId: "sec_03",
+            sectionName: "Closing",
+            aiFeedback: "The contact ended while the issue was still pending escalation without a confirmed resolution. Agent should have set an explicit follow-up timeline and reassured the customer of the next steps before closing the interaction.",
+            questions: [
+              { questionId: "q05", questionText: "Agent confirmed the issue was fully resolved before ending the contact", scoringType: "pass-fail", score: 0, maxScore: 10 },
+              { questionId: "q06", questionText: "Agent summarized the action taken and set clear next-step expectations", scoringType: "numeric", score: 7, maxScore: 10 },
+            ],
+          },
+        ],
+      },
+    ],
   },
   {
     id: "3",
@@ -350,27 +378,7 @@ const sampleReviews: ContactReview[] = [
 
 function EvaluationScoresPanel({ evaluation }: { evaluation: EvaluationResult }) {
   const [isOpen, setIsOpen] = useState(false);
-  const { formName, evaluationDate, sections } = evaluation;
-
-  const allQuestions = sections.flatMap((s) => s.questions);
-  const numericQs = allQuestions.filter((q) => q.scoringType !== "pass-fail");
-  const overallPct = Math.round(
-    numericQs.length > 0
-      ? numericQs.reduce((sum, q) => sum + (q.score / q.maxScore) * 100, 0) / numericQs.length
-      : allQuestions.reduce((sum, q) => sum + (q.score / q.maxScore) * 100, 0) / allQuestions.length
-  );
-
-  const getScoreBadgeClass = (pct: number) => {
-    if (pct >= 80) return "bg-green-100 text-green-800 border-green-200";
-    if (pct >= 60) return "bg-amber-100 text-amber-800 border-amber-200";
-    return "bg-red-100 text-red-800 border-red-200";
-  };
-
-  const getBarColor = (pct: number) => {
-    if (pct >= 80) return "[&>div]:bg-green-500";
-    if (pct >= 60) return "[&>div]:bg-amber-500";
-    return "[&>div]:bg-red-500";
-  };
+  const { formName, sections } = evaluation;
 
   const getSectionAvgPct = (section: EvaluationSectionResult) => {
     const numQs = section.questions.filter((q) => q.scoringType !== "pass-fail");
@@ -385,11 +393,8 @@ function EvaluationScoresPanel({ evaluation }: { evaluation: EvaluationResult })
           <button className="w-full flex items-center justify-between p-3 bg-slate-50/80 hover:bg-slate-100/80 transition-colors text-left">
             <div className="flex items-center gap-2 flex-wrap">
               <ClipboardList className="h-4 w-4 text-primary flex-shrink-0" />
-              <span className="text-sm font-medium">Quality Evaluation</span>
-              <Badge className={`text-xs border ${getScoreBadgeClass(overallPct)}`} variant="outline">
-                {overallPct}% overall
-              </Badge>
-              <span className="text-xs text-muted-foreground">· Evaluated by Amazon Connect AI</span>
+              <span className="text-sm font-medium">{formName}</span>
+              <span className="text-xs text-muted-foreground">· Amazon Connect Evaluation</span>
             </div>
             <div className="flex items-center gap-1 text-muted-foreground flex-shrink-0 ml-2">
               <span className="text-xs">{isOpen ? "Hide" : "Show details"}</span>
@@ -399,11 +404,6 @@ function EvaluationScoresPanel({ evaluation }: { evaluation: EvaluationResult })
         </CollapsibleTrigger>
         <CollapsibleContent>
           <div className="border-t bg-white">
-            {/* Form header */}
-            <div className="px-4 py-2 border-b bg-slate-50/50 flex items-center gap-2">
-              <span className="text-xs text-muted-foreground font-medium">Form:</span>
-              <span className="text-xs text-foreground font-medium">{formName}</span>
-            </div>
             {/* Sections */}
             <div className="divide-y">
               {sections.map((section, sIdx) => {
@@ -585,9 +585,9 @@ function ContactReviewCard({ review, evaluationEnabled = true }: ContactReviewCa
           </div>
         </div>
 
-        {evaluationEnabled && review.evaluation && review.evaluation.sections.length > 0 && (
-          <EvaluationScoresPanel evaluation={review.evaluation} />
-        )}
+        {evaluationEnabled && review.evaluations && review.evaluations.map((ev, idx) => (
+          <EvaluationScoresPanel key={idx} evaluation={ev} />
+        ))}
 
         <Collapsible open={isExpanded} onOpenChange={setIsExpanded}>
           <CollapsibleTrigger asChild>
