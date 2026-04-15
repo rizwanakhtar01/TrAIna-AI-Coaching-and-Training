@@ -170,7 +170,7 @@ const sampleReviews: ContactReview[] = [
           {
             sectionId: "sec_01",
             sectionName: "Opening & Empathy",
-            aiFeedback: "Agent delivered a warm, professional opening and acknowledged the customer's concern with empathy. There was a minor missed opportunity to reinforce retention messaging before processing the cancellation request.",
+            aiFeedback: "You opened this call with real warmth and professionalism — that sets the stage for everything. Next time, use that empathetic connection as a natural moment to explore whether the customer might be open to staying before processing the cancellation. A brief retention conversation there can make all the difference.",
             questions: [
               { questionId: "q01", questionText: "Agent greeted the customer professionally and introduced themselves", scoringType: "pass-fail", score: 10, maxScore: 10 },
               { questionId: "q02", questionText: "Agent acknowledged the customer's concern with empathy before moving to resolution", scoringType: "numeric", score: 7, maxScore: 10 },
@@ -179,7 +179,7 @@ const sampleReviews: ContactReview[] = [
           {
             sectionId: "sec_02",
             sectionName: "Policy & Resolution",
-            aiFeedback: "Refund authorization and verification steps were followed correctly throughout the interaction. The refund timeline was communicated clearly and accurately, demonstrating strong policy adherence.",
+            aiFeedback: "You nailed the policy side of this interaction — correct verification, accurate timeline, clear communication throughout. That's the standard to hold yourself to on every billing call. Keep building on this consistency.",
             questions: [
               { questionId: "q03", questionText: "Agent followed correct refund authorization and verification steps", scoringType: "pass-fail", score: 10, maxScore: 10 },
               { questionId: "q04", questionText: "Agent communicated refund timeline clearly and accurately to the customer", scoringType: "numeric", score: 9, maxScore: 10 },
@@ -188,7 +188,7 @@ const sampleReviews: ContactReview[] = [
           {
             sectionId: "sec_03",
             sectionName: "Closing",
-            aiFeedback: "Strong closing with confirmed resolution and a clear next-step summary. The customer concluded the interaction with a full understanding of the refund timeline and what to expect next.",
+            aiFeedback: "You closed this call exactly right — the customer left knowing what had been done and what to expect next. That kind of clarity at the end of a call is what turns a good interaction into a great one. Keep finishing strong.",
             questions: [
               { questionId: "q05", questionText: "Agent confirmed the issue was fully resolved before ending the contact", scoringType: "pass-fail", score: 10, maxScore: 10 },
               { questionId: "q06", questionText: "Agent summarized the action taken and set clear next-step expectations", scoringType: "numeric", score: 8, maxScore: 10 },
@@ -203,7 +203,7 @@ const sampleReviews: ContactReview[] = [
           {
             sectionId: "cx_01",
             sectionName: "Tone & Professionalism",
-            aiFeedback: "Agent maintained a consistently calm and professional tone throughout the interaction. Language choices were appropriate and the agent avoided jargon that could confuse the customer.",
+            aiFeedback: "Your language was clear and easy to follow throughout — the customer never had to ask for clarification, and that's a real skill. Keep using plain, accessible language, especially on billing calls where jargon can add unnecessary stress.",
             questions: [
               { questionId: "cx_q01", questionText: "Agent used clear, jargon-free language throughout the interaction", scoringType: "numeric", score: 9, maxScore: 10 },
               { questionId: "cx_q02", questionText: "Agent maintained a calm and professional tone even when the customer expressed frustration", scoringType: "numeric", score: 8, maxScore: 10 },
@@ -212,7 +212,7 @@ const sampleReviews: ContactReview[] = [
           {
             sectionId: "cx_02",
             sectionName: "First Contact Resolution",
-            aiFeedback: "The issue was fully resolved within this single contact with no indication of a follow-up requirement. The customer did not need to re-contact support, reflecting strong ownership of the case.",
+            aiFeedback: "You took full ownership here and resolved everything in a single contact — that's something to feel proud of. First-contact resolution is one of the most meaningful things you can do for a customer. Keep that ownership mindset front and centre.",
             questions: [
               { questionId: "cx_q03", questionText: "Agent resolved the customer's issue without requiring a follow-up contact", scoringType: "pass-fail", score: 10, maxScore: 10 },
               { questionId: "cx_q04", questionText: "Agent took full ownership of the issue without transferring unnecessarily", scoringType: "numeric", score: 9, maxScore: 10 },
@@ -284,7 +284,7 @@ const sampleReviews: ContactReview[] = [
           {
             sectionId: "sec_01",
             sectionName: "Opening & Empathy",
-            aiFeedback: "Agent moved directly to account lookup without acknowledging the customer's frustration. A brief empathy statement — such as recognising how stressful a delayed refund can be — should come before any verification steps to set a better tone.",
+            aiFeedback: "Here's a key moment to work on: next time a customer arrives frustrated, try pausing before jumping into account lookup and say something like 'I completely understand how stressful a delayed refund can be — let's get this sorted right now.' That small acknowledgment changes the whole tone of the call.",
             questions: [
               { questionId: "q01", questionText: "Agent greeted the customer professionally and introduced themselves", scoringType: "pass-fail", score: 10, maxScore: 10 },
               { questionId: "q02", questionText: "Agent acknowledged the customer's concern with empathy before moving to resolution", scoringType: "numeric", score: 4, maxScore: 10 },
@@ -293,7 +293,7 @@ const sampleReviews: ContactReview[] = [
           {
             sectionId: "sec_02",
             sectionName: "Policy & Resolution",
-            aiFeedback: "Correct escalation process was initiated and the refund timeline was explained clearly. Agent showed good knowledge of policy and took a proactive approach by expediting the case despite the difficult situation.",
+            aiFeedback: "You handled a difficult situation really well here — correct escalation steps, a clear timeline, and a proactive push to expedite the refund. That combination of process knowledge and quick thinking is exactly what great support looks like. Build on this.",
             questions: [
               { questionId: "q03", questionText: "Agent followed correct refund authorization and verification steps", scoringType: "pass-fail", score: 10, maxScore: 10 },
               { questionId: "q04", questionText: "Agent communicated refund timeline clearly and accurately to the customer", scoringType: "numeric", score: 9, maxScore: 10 },
@@ -302,7 +302,7 @@ const sampleReviews: ContactReview[] = [
           {
             sectionId: "sec_03",
             sectionName: "Closing",
-            aiFeedback: "The contact ended while the issue was still pending escalation without a confirmed resolution. Agent should have set an explicit follow-up timeline and reassured the customer of the next steps before closing the interaction.",
+            aiFeedback: "Before ending a call where the issue is still in progress, always anchor the customer with a clear next step — something like 'I'll send you a confirmation email and you can expect an update within 48 hours.' That reassurance is what the customer takes away from the call, so make it count.",
             questions: [
               { questionId: "q05", questionText: "Agent confirmed the issue was fully resolved before ending the contact", scoringType: "pass-fail", score: 0, maxScore: 10 },
               { questionId: "q06", questionText: "Agent summarized the action taken and set clear next-step expectations", scoringType: "numeric", score: 7, maxScore: 10 },
@@ -426,23 +426,19 @@ function EvaluationScoresPanel({ evaluation }: { evaluation: EvaluationResult })
                         const pct = Math.round((q.score / q.maxScore) * 100);
                         const evalAnswer = pct > 70 ? "Yes" : pct < 50 ? "No" : null;
                         return (
-                          <div key={q.questionId} className="space-y-1.5">
+                          <div key={q.questionId} className="space-y-1">
                             <div className="flex items-start justify-between gap-3">
                               <span className="text-xs text-muted-foreground mt-0.5 w-4 flex-shrink-0">{qIdx + 1}.</span>
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-start justify-between gap-2">
                                   <p className="text-xs text-foreground leading-relaxed">{q.questionText}</p>
-                                  <div className="flex items-center gap-1.5 flex-shrink-0">
-                                    {evalAnswer && (
-                                      <Badge variant="outline" className={`text-xs border ${evalAnswer === "Yes" ? "bg-green-50 text-green-700 border-green-200" : "bg-red-50 text-red-700 border-red-200"}`}>
-                                        {evalAnswer}
-                                      </Badge>
-                                    )}
-                                    <Badge variant="outline" className="text-xs border border-border text-muted-foreground">
-                                      {pct}%
-                                    </Badge>
-                                  </div>
+                                  <Badge variant="outline" className="text-xs border border-border text-muted-foreground flex-shrink-0">
+                                    {pct}%
+                                  </Badge>
                                 </div>
+                                {evalAnswer && (
+                                  <p className="text-xs text-muted-foreground mt-0.5 pl-0">{evalAnswer}</p>
+                                )}
                               </div>
                             </div>
                           </div>
@@ -451,7 +447,7 @@ function EvaluationScoresPanel({ evaluation }: { evaluation: EvaluationResult })
                     </div>
                     {section.aiFeedback && (
                       <div className="text-xs text-accent bg-accent/10 p-2 rounded border-l-2 border-accent mt-3">
-                        <strong>AI Feedback:</strong> {section.aiFeedback}
+                        <strong>AI Coaching:</strong> {section.aiFeedback}
                       </div>
                     )}
                   </div>
