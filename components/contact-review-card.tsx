@@ -430,7 +430,6 @@ function EvaluationScoresPanel({ evaluation }: { evaluation: EvaluationResult })
                                     </Badge>
                                   </div>
                                 </div>
-                                <Progress value={pct} className={`h-1 mt-1 ${getBarColor(pct)}`} />
                                 {q.notes && (
                                   <div className="text-xs text-accent bg-accent/10 p-2 rounded border-l-2 border-accent mt-1.5">
                                     <strong>AI Note:</strong> {q.notes}
