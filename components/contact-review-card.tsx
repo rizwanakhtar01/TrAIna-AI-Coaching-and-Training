@@ -416,7 +416,7 @@ function EvaluationScoresPanel({ evaluation }: { evaluation: EvaluationResult })
                         <span className="text-sm font-semibold text-foreground">{section.sectionName}</span>
                       </div>
                       {sectionPct !== null && (
-                        <Badge className={`text-xs border ${getScoreBadgeClass(sectionPct)}`} variant="outline">
+                        <Badge variant="outline" className="text-xs border border-border text-muted-foreground">
                           Evaluation Score: {sectionPct}%
                         </Badge>
                       )}
