@@ -63,6 +63,7 @@ interface EvaluationQuestionResult {
 interface EvaluationSectionResult {
   sectionId: string;
   sectionName: string;
+  aiFeedback?: string;
   questions: EvaluationQuestionResult[];
 }
 
@@ -168,25 +169,28 @@ const sampleReviews: ContactReview[] = [
         {
           sectionId: "sec_01",
           sectionName: "Opening & Empathy",
+          aiFeedback: "Agent delivered a warm, professional opening and acknowledged the customer's concern with empathy. There was a minor missed opportunity to reinforce retention messaging before processing the cancellation request.",
           questions: [
-            { questionId: "q01", questionText: "Agent greeted the customer professionally and introduced themselves", scoringType: "pass-fail", score: 10, maxScore: 10, notes: "Professional and warm greeting" },
-            { questionId: "q02", questionText: "Agent acknowledged the customer's concern with empathy before moving to resolution", scoringType: "numeric", score: 7, maxScore: 10, notes: "Empathetic opening but missed a key retention moment" },
+            { questionId: "q01", questionText: "Agent greeted the customer professionally and introduced themselves", scoringType: "pass-fail", score: 10, maxScore: 10 },
+            { questionId: "q02", questionText: "Agent acknowledged the customer's concern with empathy before moving to resolution", scoringType: "numeric", score: 7, maxScore: 10 },
           ],
         },
         {
           sectionId: "sec_02",
           sectionName: "Policy & Resolution",
+          aiFeedback: "Refund authorization and verification steps were followed correctly throughout the interaction. The refund timeline was communicated clearly and accurately, demonstrating strong policy adherence.",
           questions: [
-            { questionId: "q03", questionText: "Agent followed correct refund authorization and verification steps", scoringType: "pass-fail", score: 10, maxScore: 10, notes: "Correct process followed" },
-            { questionId: "q04", questionText: "Agent communicated refund timeline clearly and accurately to the customer", scoringType: "numeric", score: 9, maxScore: 10, notes: "Refund timeline communicated correctly" },
+            { questionId: "q03", questionText: "Agent followed correct refund authorization and verification steps", scoringType: "pass-fail", score: 10, maxScore: 10 },
+            { questionId: "q04", questionText: "Agent communicated refund timeline clearly and accurately to the customer", scoringType: "numeric", score: 9, maxScore: 10 },
           ],
         },
         {
           sectionId: "sec_03",
           sectionName: "Closing",
+          aiFeedback: "Strong closing with confirmed resolution and a clear next-step summary. The customer concluded the interaction with a full understanding of the refund timeline and what to expect next.",
           questions: [
-            { questionId: "q05", questionText: "Agent confirmed the issue was fully resolved before ending the contact", scoringType: "pass-fail", score: 10, maxScore: 10, notes: "Customer confirmed resolution" },
-            { questionId: "q06", questionText: "Agent summarized the action taken and set clear next-step expectations", scoringType: "numeric", score: 8, maxScore: 10, notes: "Clear summary and timeline provided" },
+            { questionId: "q05", questionText: "Agent confirmed the issue was fully resolved before ending the contact", scoringType: "pass-fail", score: 10, maxScore: 10 },
+            { questionId: "q06", questionText: "Agent summarized the action taken and set clear next-step expectations", scoringType: "numeric", score: 8, maxScore: 10 },
           ],
         },
       ],
@@ -253,25 +257,28 @@ const sampleReviews: ContactReview[] = [
         {
           sectionId: "sec_01",
           sectionName: "Opening & Empathy",
+          aiFeedback: "Agent moved directly to account lookup without acknowledging the customer's frustration. A brief empathy statement — such as recognising how stressful a delayed refund can be — should come before any verification steps to set a better tone.",
           questions: [
-            { questionId: "q01", questionText: "Agent greeted the customer professionally and introduced themselves", scoringType: "pass-fail", score: 10, maxScore: 10, notes: "Basic greeting completed" },
-            { questionId: "q02", questionText: "Agent acknowledged the customer's concern with empathy before moving to resolution", scoringType: "numeric", score: 4, maxScore: 10, notes: "Jumped straight to account lookup without acknowledging frustration" },
+            { questionId: "q01", questionText: "Agent greeted the customer professionally and introduced themselves", scoringType: "pass-fail", score: 10, maxScore: 10 },
+            { questionId: "q02", questionText: "Agent acknowledged the customer's concern with empathy before moving to resolution", scoringType: "numeric", score: 4, maxScore: 10 },
           ],
         },
         {
           sectionId: "sec_02",
           sectionName: "Policy & Resolution",
+          aiFeedback: "Correct escalation process was initiated and the refund timeline was explained clearly. Agent showed good knowledge of policy and took a proactive approach by expediting the case despite the difficult situation.",
           questions: [
-            { questionId: "q03", questionText: "Agent followed correct refund authorization and verification steps", scoringType: "pass-fail", score: 10, maxScore: 10, notes: "Escalation initiated correctly" },
-            { questionId: "q04", questionText: "Agent communicated refund timeline clearly and accurately to the customer", scoringType: "numeric", score: 9, maxScore: 10, notes: "Refund timeline explained correctly and escalation initiated" },
+            { questionId: "q03", questionText: "Agent followed correct refund authorization and verification steps", scoringType: "pass-fail", score: 10, maxScore: 10 },
+            { questionId: "q04", questionText: "Agent communicated refund timeline clearly and accurately to the customer", scoringType: "numeric", score: 9, maxScore: 10 },
           ],
         },
         {
           sectionId: "sec_03",
           sectionName: "Closing",
+          aiFeedback: "The contact ended while the issue was still pending escalation without a confirmed resolution. Agent should have set an explicit follow-up timeline and reassured the customer of the next steps before closing the interaction.",
           questions: [
-            { questionId: "q05", questionText: "Agent confirmed the issue was fully resolved before ending the contact", scoringType: "pass-fail", score: 0, maxScore: 10, notes: "Contact ended while resolution still pending escalation" },
-            { questionId: "q06", questionText: "Agent summarized the action taken and set clear next-step expectations", scoringType: "numeric", score: 7, maxScore: 10, notes: "Escalation explained, but no clear timeline given for follow-up" },
+            { questionId: "q05", questionText: "Agent confirmed the issue was fully resolved before ending the contact", scoringType: "pass-fail", score: 0, maxScore: 10 },
+            { questionId: "q06", questionText: "Agent summarized the action taken and set clear next-step expectations", scoringType: "numeric", score: 7, maxScore: 10 },
           ],
         },
       ],
@@ -430,17 +437,17 @@ function EvaluationScoresPanel({ evaluation }: { evaluation: EvaluationResult })
                                     </Badge>
                                   </div>
                                 </div>
-                                {q.notes && (
-                                  <div className="text-xs text-accent bg-accent/10 p-2 rounded border-l-2 border-accent mt-1.5">
-                                    <strong>AI Note:</strong> {q.notes}
-                                  </div>
-                                )}
                               </div>
                             </div>
                           </div>
                         );
                       })}
                     </div>
+                    {section.aiFeedback && (
+                      <div className="text-xs text-accent bg-accent/10 p-2 rounded border-l-2 border-accent mt-3">
+                        <strong>AI Feedback:</strong> {section.aiFeedback}
+                      </div>
+                    )}
                   </div>
                 );
               })}
