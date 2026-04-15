@@ -416,8 +416,6 @@ function EvaluationScoresPanel({ evaluation }: { evaluation: EvaluationResult })
                     </div>
                     <div className="space-y-3 pl-2">
                       {section.questions.map((q, qIdx) => {
-                        const isPassFail = q.scoringType === "pass-fail";
-                        const passed = q.score >= q.maxScore * 0.5;
                         const pct = Math.round((q.score / q.maxScore) * 100);
                         return (
                           <div key={q.questionId} className="space-y-1.5">
@@ -427,20 +425,12 @@ function EvaluationScoresPanel({ evaluation }: { evaluation: EvaluationResult })
                                 <div className="flex items-start justify-between gap-2">
                                   <p className="text-xs text-foreground leading-relaxed">{q.questionText}</p>
                                   <div className="flex items-center gap-1.5 flex-shrink-0">
-                                    {isPassFail ? (
-                                      !passed && (
-                                        <Badge variant="outline" className="text-xs border bg-red-100 text-red-800 border-red-200">
-                                          Fail
-                                        </Badge>
-                                      )
-                                    ) : (
-                                      <Badge variant="outline" className={`text-xs border ${getScoreBadgeClass(pct)}`}>
-                                        Avg evaluation score: {pct}%
-                                      </Badge>
-                                    )}
+                                    <Badge variant="outline" className={`text-xs border ${getScoreBadgeClass(pct)}`}>
+                                      Avg evaluation score: {pct}%
+                                    </Badge>
                                   </div>
                                 </div>
-                                {!isPassFail && <Progress value={pct} className={`h-1 mt-1 ${getBarColor(pct)}`} />}
+                                <Progress value={pct} className={`h-1 mt-1 ${getBarColor(pct)}`} />
                                 {q.notes && (
                                   <div className="text-xs text-accent bg-accent/10 p-2 rounded border-l-2 border-accent mt-1.5">
                                     <strong>AI Note:</strong> {q.notes}
