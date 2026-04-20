@@ -1,5 +1,7 @@
 "use client";
 
+export const dynamic = "force-dynamic";
+
 import { AgentDesktopDemo } from "@/components/agent-desktop-demo";
 
 export default function DemoAgentDesktopPage() {

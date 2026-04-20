@@ -1,5 +1,7 @@
 "use client";
 
+export const dynamic = "force-dynamic";
+
 import { AiCoachingDashboard } from "@/components/ai-coaching-dashboard";
 
 export default function AgentDashboardPage() {

@@ -1,5 +1,7 @@
 "use client"
 
+export const dynamic = "force-dynamic";
+
 import { useState } from "react"
 import { LoginScreen } from "@/components/login-screen"
 import { AiCoachingDashboard } from "@/components/ai-coaching-dashboard"
