@@ -92,7 +92,7 @@ interface ContactReview {
   channel: "chat" | "phone" | "email";
   customerIssue: string;
   contactSummary: string;
-  queue: string;
+  contactId: string;
   customer: {
     name: string;
     email: string;
@@ -581,7 +581,7 @@ export function SupervisorDashboard({ onLogout, onSwitchToAgent }: SupervisorDas
       customerIssue: "Subscription cancellation request",
       contactSummary:
         "Customer requested subscription cancellation due to low usage. Refund processed successfully but missed retention opportunity.",
-      queue: "Billing & Subscriptions",
+      contactId: "1676ef98-066f-4caf-b18d-079c5c31f786",
       customer: {
         name: "Sarah Johnson",
         email: "sarah.johnson@email.com",
@@ -675,7 +675,7 @@ export function SupervisorDashboard({ onLogout, onSwitchToAgent }: SupervisorDas
       customerIssue: "Refund inquiry - 10 days overdue",
       contactSummary:
         "Customer frustrated about delayed refund. Issue escalated to expedite processing. Good recovery after initial misstep.",
-      queue: "Customer Support",
+      contactId: "2a84bc12-7f3e-4d91-a55c-1c6e80f3d924",
       customer: {
         name: "Michael Chen",
         email: "m.chen@company.com",
@@ -765,7 +765,7 @@ export function SupervisorDashboard({ onLogout, onSwitchToAgent }: SupervisorDas
       customerIssue: "Technical support - third contact attempt",
       contactSummary:
         "Repeat technical issue with login. Customer frustrated after multiple failed attempts. Finally escalated to technical team.",
-      queue: "Technical Support",
+      contactId: "3d5fe237-8c2a-4b67-9e41-0a7f92c16385",
       customer: {
         name: "Emma Rodriguez",
         email: "emma.rodriguez@startup.io",
@@ -825,7 +825,7 @@ export function SupervisorDashboard({ onLogout, onSwitchToAgent }: SupervisorDas
       customerIssue: "Product information inquiry",
       contactSummary:
         "Customer asking about advanced features and pricing options. Agent provided comprehensive information and guided toward upgrade.",
-      queue: "Sales Support",
+      contactId: "4b7a1c49-3d8f-4e02-b16d-5c8e20f4a637",
       customer: {
         name: "James Wilson",
         email: "james.w@example.com",
@@ -880,7 +880,7 @@ export function SupervisorDashboard({ onLogout, onSwitchToAgent }: SupervisorDas
       customerIssue: "Account setup assistance",
       contactSummary:
         "New customer needed help setting up their account and understanding the platform. Agent provided thorough walkthrough and follow-up resources.",
-      queue: "Customer Onboarding",
+      contactId: "5c8b2d50-4e9a-5f03-c27e-6d9f31a5b748",
       customer: {
         name: "Maria Garcia",
         email: "maria.garcia@startup.com",
@@ -933,7 +933,7 @@ export function SupervisorDashboard({ onLogout, onSwitchToAgent }: SupervisorDas
       customerIssue: "Billing discrepancy resolution",
       contactSummary:
         "Customer questioned unexpected charges on their account. Agent investigated, found system error, and processed refund with apology.",
-      queue: "Billing & Subscriptions",
+      contactId: "6d9c3e61-5fab-4104-d38f-7eaf42b6c859",
       customer: {
         name: "Robert Taylor",
         email: "robert.taylor@company.org",
@@ -1113,7 +1113,7 @@ export function SupervisorDashboard({ onLogout, onSwitchToAgent }: SupervisorDas
               </div>
               <div>
                 <h5 className="font-medium text-sm">Contact Details</h5>
-                <p className="text-sm">Queue: {review.queue}</p>
+                <p className="text-sm font-mono">Contact ID: {review.contactId}</p>
                 <p className="text-xs text-muted-foreground">
                   Duration: {review.duration}
                 </p>

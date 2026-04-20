@@ -21,7 +21,7 @@ import {
   Mail,
   Search,
   User,
-  MapPin,
+
   Calendar,
   Play,
   Pause,
@@ -80,7 +80,7 @@ interface ContactReview {
   channel: "chat" | "phone" | "email";
   customerIssue: string;
   contactSummary: string;
-  queue: string;
+  contactId: string;
   agentName?: string;
   customer: {
     name: string;
@@ -112,7 +112,7 @@ const sampleReviews: ContactReview[] = [
     customerIssue: "Subscription cancellation request",
     contactSummary:
       "Customer requested subscription cancellation due to low usage. Refund processed successfully but missed retention opportunity.",
-    queue: "Billing & Subscriptions",
+    contactId: "1676ef98-066f-4caf-b18d-079c5c31f786",
     agentName: "Sarah Mitchell",
     customer: {
       name: "Sarah Johnson",
@@ -230,7 +230,7 @@ const sampleReviews: ContactReview[] = [
     customerIssue: "Refund inquiry - 10 days overdue",
     contactSummary:
       "Customer frustrated about delayed refund. Issue escalated to expedite processing. Good recovery after initial misstep.",
-    queue: "Customer Support",
+    contactId: "2a84bc12-7f3e-4d91-a55c-1c6e80f3d924",
     agentName: "John Davis",
     customer: {
       name: "Michael Chen",
@@ -320,7 +320,7 @@ const sampleReviews: ContactReview[] = [
     customerIssue: "Technical support - third contact attempt",
     contactSummary:
       "Repeat technical issue with login. Customer frustrated after multiple failed attempts. Finally escalated to technical team.",
-    queue: "Technical Support",
+    contactId: "3d5fe237-8c2a-4b67-9e41-0a7f92c16385",
     agentName: "Lisa Kim",
     customer: {
       name: "Emma Rodriguez",
@@ -541,9 +541,8 @@ function ContactReviewCard({ review, evaluationEnabled = true }: ContactReviewCa
                 {review.channel}
               </Badge>
             </div>
-            <Badge variant="secondary" className="text-xs">
-              <MapPin className="h-3 w-3 mr-1" />
-              {review.queue}
+            <Badge variant="secondary" className="text-xs font-mono">
+              Contact ID: {review.contactId}
             </Badge>
           </div>
           <div className="flex items-center gap-2">
