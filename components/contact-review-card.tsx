@@ -31,7 +31,7 @@ import {
   TrendingUp,
   Minus,
 } from "lucide-react";
-import { Progress } from "@/components/ui/progress";
+
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -387,9 +387,9 @@ export function EvaluationScoresPanel({ evaluation }: { evaluation: EvaluationRe
   };
 
   const allQuestions = sections.flatMap((s) => s.questions);
-  const overallPct = Math.round(
-    allQuestions.reduce((sum, q) => sum + (q.score / q.maxScore) * 100, 0) / allQuestions.length
-  );
+  const overallPct = allQuestions.length > 0
+    ? Math.round(allQuestions.reduce((sum, q) => sum + (q.score / q.maxScore) * 100, 0) / allQuestions.length)
+    : 0;
 
   return (
     <Collapsible open={isOpen} onOpenChange={setIsOpen}>
