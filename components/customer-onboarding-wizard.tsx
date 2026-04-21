@@ -195,7 +195,7 @@ export function CustomerOnboardingWizard({
   // ── Success screen ──────────────────────────────────────────────────────────
   if (submitted) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-6">
+      <div className="fixed inset-0 z-50 bg-background overflow-y-auto flex items-center justify-center p-6">
         <div className="bg-card rounded-xl border border-border shadow-sm w-full max-w-md p-8 text-center space-y-6">
           <div className="flex justify-center">
             <div className="h-16 w-16 rounded-full bg-green-100 flex items-center justify-center">
@@ -292,7 +292,7 @@ export function CustomerOnboardingWizard({
 
   // ── Page shell ──────────────────────────────────────────────────────────────
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="fixed inset-0 z-50 bg-background overflow-y-auto flex flex-col">
 
       {/* Card — centered, wider */}
       <div className="flex-1 flex justify-center px-4 py-10 pb-12">
