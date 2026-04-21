@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { CustomerOnboardingWizard } from "@/components/customer-onboarding-wizard";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -219,23 +220,8 @@ export function SuperAdminDashboard({ onLogout }: SuperAdminDashboardProps) {
   const [customers, setCustomers] = useState<Customer[]>(mockCustomers);
   const [showCreateCustomer, setShowCreateCustomer] = useState(false);
   const [showCustomerProfile, setShowCustomerProfile] = useState<Customer | null>(null);
-  const [showSuccessDialog, setShowSuccessDialog] = useState(false);
   const [showEditCustomer, setShowEditCustomer] = useState<Customer | null>(null);
   const [showStatusConfirm, setShowStatusConfirm] = useState<Customer | null>(null);
-
-  const [newCustomer, setNewCustomer] = useState({
-    companyName: "",
-    primaryAdminEmail: "",
-    amazonConnectInstanceId: "",
-    llmApiKey: "",
-    numberOfAgents: "",
-    region: "",
-    licenseEndDate: "",
-    enabledModules: {
-      aiCoachingTier: "none" as "none" | "base" | "standard" | "advanced",
-      training: false,
-    },
-  });
 
   const totalAgents = customers.reduce((sum, c) => sum + c.agentsCount, 0);
   const totalTrainingModules = customers.reduce((sum, c) => sum + c.trainingModulesCount, 0);
@@ -244,19 +230,29 @@ export function SuperAdminDashboard({ onLogout }: SuperAdminDashboardProps) {
   const kbPercentage = Math.round((customersWithKB / customers.length) * 100);
   const trainingPercentage = Math.round((customersWithActiveTraining / customers.length) * 100);
 
-  const handleCreateCustomer = () => {
+  const handleCreateCustomer = (data: {
+    companyName: string;
+    primaryAdminEmail: string;
+    amazonConnectInstanceId: string;
+    llmApiKey: string;
+    numberOfAgents: string;
+    region: string;
+    licenseEndDate: string;
+    aiCoachingTier: "none" | "base" | "standard" | "advanced";
+    training: boolean;
+  }) => {
     const newId = (customers.length + 1).toString();
     const customer: Customer = {
       id: newId,
-      companyName: newCustomer.companyName,
-      amazonConnectId: newCustomer.amazonConnectInstanceId,
-      llmApiKey: newCustomer.llmApiKey,
+      companyName: data.companyName,
+      amazonConnectId: data.amazonConnectInstanceId,
+      llmApiKey: data.llmApiKey,
       status: "active",
-      primaryAdminEmail: newCustomer.primaryAdminEmail,
-      region: newCustomer.region,
-      numberOfAgents: parseInt(newCustomer.numberOfAgents) || 0,
-      licenseEndDate: newCustomer.licenseEndDate,
-      enabledModules: newCustomer.enabledModules,
+      primaryAdminEmail: data.primaryAdminEmail,
+      region: data.region,
+      numberOfAgents: parseInt(data.numberOfAgents) || 0,
+      licenseEndDate: data.licenseEndDate,
+      enabledModules: { aiCoachingTier: data.aiCoachingTier, training: data.training },
       onboarding: {
         adminCreated: false,
         knowledgeBaseUploaded: false,
@@ -264,22 +260,10 @@ export function SuperAdminDashboard({ onLogout }: SuperAdminDashboardProps) {
         agentsOnboarded: false,
         firstTrainingCompleted: false,
       },
-      agentsCount: parseInt(newCustomer.numberOfAgents) || 0,
+      agentsCount: parseInt(data.numberOfAgents) || 0,
       trainingModulesCount: 0,
     };
     setCustomers([...customers, customer]);
-    setNewCustomer({
-      companyName: "",
-      primaryAdminEmail: "",
-      amazonConnectInstanceId: "",
-      llmApiKey: "",
-      numberOfAgents: "",
-      region: "",
-      licenseEndDate: "",
-      enabledModules: { aiCoachingTier: "none" as "none" | "base" | "standard" | "advanced", training: false },
-    });
-    setShowCreateCustomer(false);
-    setShowSuccessDialog(true);
   };
 
   const handleConfirmStatusChange = () => {
@@ -692,210 +676,14 @@ export function SuperAdminDashboard({ onLogout }: SuperAdminDashboardProps) {
         </div>
       </main>
 
-      <Dialog open={showCreateCustomer} onOpenChange={setShowCreateCustomer}>
-        <DialogContent className="sm:max-w-xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Create New Customer</DialogTitle>
-            <DialogDescription>Add a new tenant organization to the platform</DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="companyName">Business Name</Label>
-              <Input
-                id="companyName"
-                value={newCustomer.companyName}
-                onChange={(e) => setNewCustomer({ ...newCustomer, companyName: e.target.value })}
-                placeholder="Enter business name"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="adminEmail">Email Address</Label>
-              <Input
-                id="adminEmail"
-                type="email"
-                value={newCustomer.primaryAdminEmail}
-                onChange={(e) => setNewCustomer({ ...newCustomer, primaryAdminEmail: e.target.value })}
-                placeholder="admin@company.com"
-              />
-              <p className="text-xs text-muted-foreground">An email will be sent with Admin Portal Credentials</p>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="connectInstanceId">Amazon Connect Instance ID</Label>
-              <Input
-                id="connectInstanceId"
-                value={newCustomer.amazonConnectInstanceId}
-                onChange={(e) => setNewCustomer({ ...newCustomer, amazonConnectInstanceId: e.target.value })}
-                placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="llmApiKey">LLM API Key</Label>
-              <Input
-                id="llmApiKey"
-                type="password"
-                value={newCustomer.llmApiKey}
-                onChange={(e) => setNewCustomer({ ...newCustomer, llmApiKey: e.target.value })}
-                placeholder="sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="numberOfAgents">No. of Agents</Label>
-                <Input
-                  id="numberOfAgents"
-                  type="number"
-                  value={newCustomer.numberOfAgents}
-                  onChange={(e) => setNewCustomer({ ...newCustomer, numberOfAgents: e.target.value })}
-                  placeholder="e.g., 50"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="region">Region (Amazon Connect)</Label>
-                <Select
-                  value={newCustomer.region}
-                  onValueChange={(value) => setNewCustomer({ ...newCustomer, region: value })}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select region" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="us-east-1">US East (N. Virginia)</SelectItem>
-                    <SelectItem value="us-west-2">US West (Oregon)</SelectItem>
-                    <SelectItem value="eu-west-2">Europe (London)</SelectItem>
-                    <SelectItem value="eu-central-1">Europe (Frankfurt)</SelectItem>
-                    <SelectItem value="ap-southeast-1">Asia Pacific (Singapore)</SelectItem>
-                    <SelectItem value="ap-southeast-2">Asia Pacific (Sydney)</SelectItem>
-                    <SelectItem value="ap-northeast-1">Asia Pacific (Tokyo)</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="licenseEndDate">License End Date</Label>
-              <Input
-                id="licenseEndDate"
-                type="date"
-                value={newCustomer.licenseEndDate}
-                onChange={(e) => setNewCustomer({ ...newCustomer, licenseEndDate: e.target.value })}
-              />
-            </div>
-            <div className="space-y-3">
-              <Label>AI Coaching (select one)</Label>
-              <div className="space-y-3 border rounded-lg p-3">
-                <label className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${newCustomer.enabledModules.aiCoachingTier === "base" ? "border-primary bg-primary/5" : "border-gray-200 hover:bg-gray-50"}`}>
-                  <input
-                    type="radio"
-                    name="aiCoachingTier"
-                    value="base"
-                    checked={newCustomer.enabledModules.aiCoachingTier === "base"}
-                    onChange={() => setNewCustomer({ ...newCustomer, enabledModules: { ...newCustomer.enabledModules, aiCoachingTier: "base" } })}
-                    className="mt-1"
-                  />
-                  <div className="flex-1">
-                    <p className="font-medium">Base</p>
-                    <ul className="text-xs text-muted-foreground mt-1 space-y-0.5">
-                      <li>• Consolidated AI-generated feedback per agent</li>
-                      <li>• Behavioral and communication quality assessment based on defined evaluation criteria</li>
-                      <li>• High-level coaching insights without message-level breakdown</li>
-                    </ul>
-                  </div>
-                </label>
-                <label className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${newCustomer.enabledModules.aiCoachingTier === "standard" ? "border-primary bg-primary/5" : "border-gray-200 hover:bg-gray-50"}`}>
-                  <input
-                    type="radio"
-                    name="aiCoachingTier"
-                    value="standard"
-                    checked={newCustomer.enabledModules.aiCoachingTier === "standard"}
-                    onChange={() => setNewCustomer({ ...newCustomer, enabledModules: { ...newCustomer.enabledModules, aiCoachingTier: "standard" } })}
-                    className="mt-1"
-                  />
-                  <div className="flex-1">
-                    <p className="font-medium">Standard</p>
-                    <ul className="text-xs text-muted-foreground mt-1 space-y-0.5">
-                      <li>• Consolidated AI-generated feedback per agent</li>
-                      <li>• Message-by-message coaching on agent responses</li>
-                      <li>• Behavioral, tone, and communication quality evaluation for every interaction</li>
-                    </ul>
-                  </div>
-                </label>
-                <label className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${newCustomer.enabledModules.aiCoachingTier === "advanced" ? "border-primary bg-primary/5" : "border-gray-200 hover:bg-gray-50"}`}>
-                  <input
-                    type="radio"
-                    name="aiCoachingTier"
-                    value="advanced"
-                    checked={newCustomer.enabledModules.aiCoachingTier === "advanced"}
-                    onChange={() => setNewCustomer({ ...newCustomer, enabledModules: { ...newCustomer.enabledModules, aiCoachingTier: "advanced" } })}
-                    className="mt-1"
-                  />
-                  <div className="flex-1">
-                    <p className="font-medium">Advanced</p>
-                    <ul className="text-xs text-muted-foreground mt-1 space-y-0.5">
-                      <li>• Consolidated daily feedback covering agent behavior and performance</li>
-                      <li>• Message-level coaching to improve clarity, tone, and empathy</li>
-                      <li>• Validation of agent responses against uploaded knowledge base to flag incorrect information</li>
-                    </ul>
-                  </div>
-                </label>
-              </div>
-            </div>
-            <div className="space-y-3">
-              <Label>AI Training</Label>
-              <div className={`border rounded-lg p-3 ${newCustomer.enabledModules.aiCoachingTier === "none" ? "opacity-50" : ""}`}>
-                <label className={`flex items-center gap-3 ${newCustomer.enabledModules.aiCoachingTier === "none" ? "cursor-not-allowed" : "cursor-pointer"}`}>
-                  <input
-                    type="checkbox"
-                    checked={newCustomer.enabledModules.training}
-                    onChange={() => {
-                      if (newCustomer.enabledModules.aiCoachingTier !== "none") {
-                        setNewCustomer({ ...newCustomer, enabledModules: { ...newCustomer.enabledModules, training: !newCustomer.enabledModules.training } });
-                      }
-                    }}
-                    disabled={newCustomer.enabledModules.aiCoachingTier === "none"}
-                    className="h-4 w-4 rounded border-gray-300"
-                  />
-                  <div>
-                    <p className="font-medium text-sm">AI based Agent Training</p>
-                    <p className="text-xs text-muted-foreground">Interactive training modules and assessments</p>
-                    {newCustomer.enabledModules.aiCoachingTier === "none" && (
-                      <p className="text-xs text-amber-600 mt-1">Select an AI Coaching tier to enable this option</p>
-                    )}
-                  </div>
-                </label>
-              </div>
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowCreateCustomer(false)}>
-              Cancel
-            </Button>
-            <Button
-              onClick={handleCreateCustomer}
-              disabled={!newCustomer.companyName || !newCustomer.primaryAdminEmail || !newCustomer.region || !newCustomer.amazonConnectInstanceId}
-            >
-              Create Customer
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <CheckCircle className="h-5 w-5 text-green-500" />
-              Customer Created Successfully
-            </DialogTitle>
-            <DialogDescription>
-              The new customer has been added to the platform. They will receive an invitation email to set up their account.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button onClick={() => setShowSuccessDialog(false)}>
-              Done
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {showCreateCustomer && (
+        <CustomerOnboardingWizard
+          onClose={() => setShowCreateCustomer(false)}
+          onCreate={(data) => {
+            handleCreateCustomer(data);
+          }}
+        />
+      )}
 
       <Dialog open={!!showStatusConfirm} onOpenChange={() => setShowStatusConfirm(null)}>
         <DialogContent className="sm:max-w-md">
