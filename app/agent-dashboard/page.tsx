@@ -1,13 +1,7 @@
-"use client";
-
 export const dynamic = "force-dynamic";
 
-import { AiCoachingDashboard } from "@/components/ai-coaching-dashboard";
+import { AgentDashboardClient } from "@/components/pages/agent-dashboard-client";
 
 export default function AgentDashboardPage() {
-  const handleLogout = () => {
-    window.close();
-  };
-
-  return <AiCoachingDashboard onLogout={handleLogout} />;
+  return <AgentDashboardClient />;
 }

@@ -294,14 +294,15 @@ export function CustomerOnboardingWizard({
   return (
     <div className="min-h-screen bg-background flex flex-col">
 
-      {/* Step indicator — centered at top */}
-      <div className="pt-8 pb-6 px-6">
-        <StepIndicator />
-      </div>
+      {/* Card — centered, wider */}
+      <div className="flex-1 flex justify-center px-4 py-10 pb-12">
+        <div className="bg-card rounded-xl border border-border shadow-sm w-full max-w-3xl">
 
-      {/* Card — centered, fixed max-width */}
-      <div className="flex-1 flex justify-center px-4 pb-12">
-        <div className="bg-card rounded-xl border border-border shadow-sm w-full max-w-lg">
+          {/* Step indicator — inside the card at the top */}
+          <div className="px-8 py-6 border-b border-border">
+            <StepIndicator />
+          </div>
+
           <div className="p-8 space-y-6">
 
             {/* ── Step 1: Business details ───────────────────────────────── */}
