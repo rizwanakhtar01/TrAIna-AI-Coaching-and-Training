@@ -622,6 +622,9 @@ export function CustomerOnboardingWizard({
                               set("thresholdValue", parseInt(e.target.value))
                             }
                             className="w-full h-2 rounded-full appearance-none cursor-pointer accent-primary"
+                            style={{
+                              background: `linear-gradient(to right, hsl(var(--primary)) ${((form.thresholdValue - 30) / 60) * 100}%, hsl(var(--border)) ${((form.thresholdValue - 30) / 60) * 100}%)`,
+                            }}
                           />
                           <div className="flex justify-between text-xs text-muted-foreground">
                             <span>More coaching (30%)</span>
