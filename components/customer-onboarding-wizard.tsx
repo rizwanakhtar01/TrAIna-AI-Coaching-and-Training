@@ -12,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { CheckCircle, Info } from "lucide-react";
+import { ArrowLeft, CheckCircle, Info } from "lucide-react";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -161,12 +161,30 @@ export function CustomerOnboardingWizard({
   const [step, setStep] = useState(1);
   const [form, setForm] = useState<WizardFormData>(DEFAULT_FORM);
   const [submitted, setSubmitted] = useState(false);
+  const [showBackConfirm, setShowBackConfirm] = useState(false);
 
   const set = <K extends keyof WizardFormData>(field: K, value: WizardFormData[K]) =>
     setForm((prev) => ({ ...prev, [field]: value }));
 
   const regionLabel =
     REGIONS.find((r) => r.value === form.region)?.label ?? form.region;
+
+  const hasChanges = () =>
+    form.companyName !== DEFAULT_FORM.companyName ||
+    form.primaryAdminEmail !== DEFAULT_FORM.primaryAdminEmail ||
+    form.licenseEndDate !== DEFAULT_FORM.licenseEndDate ||
+    form.amazonConnectInstanceId !== DEFAULT_FORM.amazonConnectInstanceId ||
+    form.numberOfAgents !== DEFAULT_FORM.numberOfAgents ||
+    form.region !== DEFAULT_FORM.region ||
+    form.llmApiKey !== DEFAULT_FORM.llmApiKey ||
+    form.aiCoachingTier !== DEFAULT_FORM.aiCoachingTier ||
+    form.training !== DEFAULT_FORM.training ||
+    form.evalCoachingEnabled !== DEFAULT_FORM.evalCoachingEnabled;
+
+  const handleTopBack = () => {
+    if (hasChanges()) setShowBackConfirm(true);
+    else onClose();
+  };
 
   const canProceed = () => {
     if (step === 1) return !!form.companyName && !!form.primaryAdminEmail;
@@ -181,8 +199,12 @@ export function CustomerOnboardingWizard({
   };
 
   const handleBack = () => {
-    if (step === 1) onClose();
-    else setStep((s) => s - 1);
+    if (step === 1) {
+      if (hasChanges()) setShowBackConfirm(true);
+      else onClose();
+    } else {
+      setStep((s) => s - 1);
+    }
   };
 
   const handleNext = () => setStep((s) => s + 1);
@@ -298,7 +320,19 @@ export function CustomerOnboardingWizard({
       <div className="flex-1 flex justify-center px-4 py-10 pb-12">
         <div className="bg-card rounded-xl border border-border shadow-sm w-full max-w-3xl">
 
-          {/* Step indicator — inside the card at the top */}
+          {/* Card header — back button + title */}
+          <div className="flex items-center px-8 py-5 border-b border-border">
+            <button
+              onClick={handleTopBack}
+              className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mr-4 flex-shrink-0"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Back
+            </button>
+            <h1 className="flex-1 text-center text-xl font-bold pr-16">Create Customer</h1>
+          </div>
+
+          {/* Step indicator — inside the card */}
           <div className="px-8 py-6 border-b border-border">
             <StepIndicator />
           </div>
@@ -732,6 +766,36 @@ export function CustomerOnboardingWizard({
           </div>
         </div>
       </div>
+
+      {/* Confirmation dialog — shown when leaving with unsaved data */}
+      {showBackConfirm && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40">
+          <div className="bg-card rounded-xl border border-border shadow-xl w-full max-w-sm mx-4 p-6 space-y-4">
+            <h3 className="text-base font-semibold">Leave without saving?</h3>
+            <p className="text-sm text-muted-foreground">
+              You have unsaved changes. If you go back now, all the information
+              you&apos;ve entered will be lost.
+            </p>
+            <div className="flex gap-3 justify-end pt-1">
+              <Button
+                variant="outline"
+                onClick={() => setShowBackConfirm(false)}
+              >
+                Keep editing
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={() => {
+                  setShowBackConfirm(false);
+                  onClose();
+                }}
+              >
+                Leave
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
