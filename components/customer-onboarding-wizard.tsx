@@ -271,16 +271,16 @@ export function CustomerOnboardingWizard({
 
   // ── Step indicator ──────────────────────────────────────────────────────────
   const StepIndicator = () => (
-    <div className="flex items-center justify-center">
+    <div className="flex items-start w-full">
       {STEPS.map((s, idx) => {
         const isActive = s.number === step;
         const isDone = s.number < step;
         return (
-          <div key={s.number} className="flex items-center">
-            {/* Circle + label */}
-            <div className="flex items-center gap-2">
+          <div key={s.number} className="flex items-start flex-1 min-w-0">
+            {/* Circle + label stacked */}
+            <div className="flex flex-col items-center flex-shrink-0">
               <div
-                className={`h-8 w-8 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 transition-all ${
+                className={`h-8 w-8 rounded-full flex items-center justify-center text-sm font-bold transition-all ${
                   isActive
                     ? "bg-primary text-white"
                     : isDone
@@ -288,12 +288,16 @@ export function CustomerOnboardingWizard({
                     : "bg-transparent border-2 border-muted-foreground/30 text-muted-foreground"
                 }`}
               >
-                {s.number}
+                {isDone ? (
+                  <CheckCircle className="h-4 w-4" />
+                ) : (
+                  s.number
+                )}
               </div>
               <span
-                className={`text-sm whitespace-nowrap transition-all ${
+                className={`text-xs text-center mt-1.5 leading-tight max-w-[72px] transition-all ${
                   isActive
-                    ? "font-bold text-foreground"
+                    ? "font-semibold text-primary"
                     : isDone
                     ? "text-foreground/70"
                     : "text-muted-foreground"
@@ -302,9 +306,13 @@ export function CustomerOnboardingWizard({
                 {s.label}
               </span>
             </div>
-            {/* Connector */}
+            {/* Connector line — sits at circle mid-height */}
             {idx < STEPS.length - 1 && (
-              <div className="w-8 h-px bg-border mx-4 flex-shrink-0" />
+              <div
+                className={`flex-1 h-px mt-4 mx-2 transition-all ${
+                  isDone ? "bg-primary/40" : "bg-border"
+                }`}
+              />
             )}
           </div>
         );
