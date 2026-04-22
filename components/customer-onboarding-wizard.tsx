@@ -12,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ArrowLeft, CheckCircle, Info } from "lucide-react";
+import { ArrowLeft, BookOpen, CheckCircle, Info } from "lucide-react";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -243,6 +243,10 @@ export function CustomerOnboardingWizard({
             <div className="flex justify-between">
               <span className="text-muted-foreground">AI Coaching tier</span>
               <span className="font-medium capitalize">{form.aiCoachingTier}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">AI Training</span>
+              <span className="font-medium">{form.training ? "Enabled" : "Disabled"}</span>
             </div>
             {form.evalCoachingEnabled && (
               <>
@@ -508,6 +512,27 @@ export function CustomerOnboardingWizard({
                       </RadioCard>
                     </div>
                   </div>
+
+                  {/* AI Training toggle */}
+                  <div className="flex items-center justify-between p-4 border rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <BookOpen
+                        className={`h-5 w-5 flex-shrink-0 ${
+                          form.training ? "text-primary" : "text-muted-foreground"
+                        }`}
+                      />
+                      <div>
+                        <p className="font-medium text-sm">AI based Agent Training</p>
+                        <p className="text-xs text-muted-foreground mt-0.5">
+                          Interactive training modules and assessments
+                        </p>
+                      </div>
+                    </div>
+                    <Switch
+                      checked={form.training}
+                      onCheckedChange={(v) => set("training", v)}
+                    />
+                  </div>
                 </div>
               </>
             )}
@@ -703,6 +728,21 @@ export function CustomerOnboardingWizard({
                           <span className="capitalize font-medium">
                             {form.aiCoachingTier}
                           </span>
+                        }
+                      />
+                      <ReviewRow
+                        label="AI Training"
+                        value={
+                          <Badge
+                            variant="outline"
+                            className={`text-xs ${
+                              form.training
+                                ? "bg-blue-50 text-blue-700 border-blue-200"
+                                : "bg-muted text-muted-foreground"
+                            }`}
+                          >
+                            {form.training ? "Enabled" : "Disabled"}
+                          </Badge>
                         }
                       />
                     </div>
