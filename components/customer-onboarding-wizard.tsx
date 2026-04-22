@@ -479,7 +479,10 @@ export function CustomerOnboardingWizard({
                     <div className="space-y-2">
                       <RadioCard
                         selected={form.aiCoachingTier === "base"}
-                        onClick={() => set("aiCoachingTier", "base")}
+                        onClick={() => {
+                          set("aiCoachingTier", "base");
+                          set("training", false);
+                        }}
                         title="Base"
                       >
                         <ul className="text-xs text-muted-foreground mt-1 space-y-0.5">
@@ -490,7 +493,10 @@ export function CustomerOnboardingWizard({
                       </RadioCard>
                       <RadioCard
                         selected={form.aiCoachingTier === "standard"}
-                        onClick={() => set("aiCoachingTier", "standard")}
+                        onClick={() => {
+                          set("aiCoachingTier", "standard");
+                          set("training", false);
+                        }}
                         title="Standard"
                       >
                         <ul className="text-xs text-muted-foreground mt-1 space-y-0.5">
@@ -514,7 +520,11 @@ export function CustomerOnboardingWizard({
                   </div>
 
                   {/* AI Training toggle */}
-                  <div className="flex items-center justify-between p-4 border rounded-lg">
+                  <div
+                    className={`flex items-center justify-between p-4 border rounded-lg transition-opacity ${
+                      form.aiCoachingTier !== "advanced" ? "opacity-50" : ""
+                    }`}
+                  >
                     <div className="flex items-center gap-3">
                       <BookOpen
                         className={`h-5 w-5 flex-shrink-0 ${
@@ -524,13 +534,16 @@ export function CustomerOnboardingWizard({
                       <div>
                         <p className="font-medium text-sm">AI based Agent Training</p>
                         <p className="text-xs text-muted-foreground mt-0.5">
-                          Interactive training modules and assessments
+                          {form.aiCoachingTier !== "advanced"
+                            ? "Requires Advanced tier to enable"
+                            : "Interactive training modules and assessments"}
                         </p>
                       </div>
                     </div>
                     <Switch
                       checked={form.training}
                       onCheckedChange={(v) => set("training", v)}
+                      disabled={form.aiCoachingTier !== "advanced"}
                     />
                   </div>
                 </div>
