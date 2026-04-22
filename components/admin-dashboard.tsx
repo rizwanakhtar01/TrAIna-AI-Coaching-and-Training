@@ -109,7 +109,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { EvaluationFormsTab, EvaluationForm, initialEvaluationForms } from "@/components/evaluation-forms";
+import {
+  EvaluationFormsTab,
+  EvaluationForm,
+  initialEvaluationForms,
+} from "@/components/evaluation-forms";
 import { getTeamEvalFormId } from "@/lib/team-eval-config";
 import { useTeamEval } from "@/contexts/team-eval-context";
 import { Switch } from "@/components/ui/switch";
@@ -258,7 +262,11 @@ interface AnalysisArea {
 }
 
 export function AdminDashboard({ onLogout }: AdminDashboardProps) {
-  const { upsertTeamEvalSetting, removeTeamEvalSetting, isEvaluationEnabledForTeam } = useTeamEval();
+  const {
+    upsertTeamEvalSetting,
+    removeTeamEvalSetting,
+    isEvaluationEnabledForTeam,
+  } = useTeamEval();
   const [activeTab, setActiveTab] = useState("overview");
   const [isCreateWizardOpen, setIsCreateWizardOpen] = useState(false);
   const [wizardStep, setWizardStep] = useState(1);
@@ -572,9 +580,13 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
   const [createTeamAgentSearch, setCreateTeamAgentSearch] = useState("");
   const [newTeamKBIds, setNewTeamKBIds] = useState<string[]>([]);
   const [newTeamAreaIds, setNewTeamAreaIds] = useState<string[]>([]);
-  const [newTeamEvaluationEnabled, setNewTeamEvaluationEnabled] = useState<boolean>(false);
-  const [newTeamEvaluationFormId, setNewTeamEvaluationFormId] = useState<string>("none");
-  const [evaluationForms, setEvaluationForms] = useState<EvaluationForm[]>(initialEvaluationForms);
+  const [newTeamEvaluationEnabled, setNewTeamEvaluationEnabled] =
+    useState<boolean>(false);
+  const [newTeamEvaluationFormId, setNewTeamEvaluationFormId] =
+    useState<string>("none");
+  const [evaluationForms, setEvaluationForms] = useState<EvaluationForm[]>(
+    initialEvaluationForms,
+  );
   const [teamToDelete, setTeamToDelete] = useState<Team | null>(null);
 
   // Sample routing analytics data (in a real app, this would come from API)
@@ -922,8 +934,10 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
     setTeams((prev) =>
       prev.map((t) => ({
         ...t,
-        analysisAreaIds: (t.analysisAreaIds || []).filter((id) => id !== deletedId),
-      }))
+        analysisAreaIds: (t.analysisAreaIds || []).filter(
+          (id) => id !== deletedId,
+        ),
+      })),
     );
     setAreaToDelete(null);
   };
@@ -1329,9 +1343,10 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
       .filter(Boolean);
 
     if (editingTeam) {
-      const resolvedFormId = newTeamEvaluationEnabled && newTeamEvaluationFormId !== "none"
-        ? newTeamEvaluationFormId
-        : undefined;
+      const resolvedFormId =
+        newTeamEvaluationEnabled && newTeamEvaluationFormId !== "none"
+          ? newTeamEvaluationFormId
+          : undefined;
       setTeams((prev) =>
         prev.map((t) =>
           t.id === editingTeam.id
@@ -1361,15 +1376,18 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
         agentIds: newTeamAgentIds,
         knowledgeBaseIds: newTeamKBIds,
         analysisAreaIds: newTeamAreaIds,
-        evaluationFormId: newTeamEvaluationEnabled && newTeamEvaluationFormId !== "none"
-          ? newTeamEvaluationFormId
-          : undefined,
+        evaluationFormId:
+          newTeamEvaluationEnabled && newTeamEvaluationFormId !== "none"
+            ? newTeamEvaluationFormId
+            : undefined,
       };
       setTeams((prev) => [...prev, newTeam]);
       upsertTeamEvalSetting(
         newTeam.id,
         newTeamEvaluationEnabled,
-        newTeamEvaluationEnabled && newTeamEvaluationFormId !== "none" ? newTeamEvaluationFormId : null,
+        newTeamEvaluationEnabled && newTeamEvaluationFormId !== "none"
+          ? newTeamEvaluationFormId
+          : null,
         resolvedAgentNames,
       );
     }
@@ -3225,19 +3243,27 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                     <div className="space-y-2 text-sm text-muted-foreground">
                       <p>
                         Are you sure you want to remove{" "}
-                        <strong className="text-foreground">{areaToDelete?.title}</strong>?
+                        <strong className="text-foreground">
+                          {areaToDelete?.title}
+                        </strong>
+                        ?
                       </p>
                       {(() => {
                         const assignedCount = teams.filter((t) =>
-                          (t.analysisAreaIds || []).includes(areaToDelete?.id ?? "")
+                          (t.analysisAreaIds || []).includes(
+                            areaToDelete?.id ?? "",
+                          ),
                         ).length;
                         return assignedCount > 0 ? (
                           <p className="text-amber-700 font-medium">
-                            This area is assigned to {assignedCount} team{assignedCount !== 1 ? "s" : ""}. Deleting it will remove it from all of them. This cannot be undone.
+                            This area is assigned to {assignedCount} team
+                            {assignedCount !== 1 ? "s" : ""}. Deleting it will
+                            remove it from all of them. This cannot be undone.
                           </p>
                         ) : (
                           <p>
-                            This area will no longer be used when TrAIna evaluates agent contacts.
+                            This area will no longer be used when TrAIna
+                            evaluates agent contacts.
                           </p>
                         );
                       })()}
@@ -4406,7 +4432,9 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                             Evaluation On
                           </Badge>
                         ) : (
-                          <span className="text-xs text-muted-foreground">—</span>
+                          <span className="text-xs text-muted-foreground">
+                            —
+                          </span>
                         )}
                       </TableCell>
                       <TableCell className="text-right">
@@ -4576,10 +4604,12 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                   <div className="space-y-2">
                     <div className="flex items-center gap-2">
                       <Label>Analysis Areas</Label>
-                      <span className="text-xs text-muted-foreground font-normal">(optional)</span>
+                      {/* <span className="text-xs text-muted-foreground font-normal">(optional)</span> */}
                     </div>
                     <p className="text-xs text-muted-foreground">
-                      Select the performance dimensions TrAIna will evaluate for this team's contacts
+                      If no analysis areas are selected, all contacts will be
+                      analyzed using generic areas. It’s highly recommended to
+                      select analysis areas.
                     </p>
                     {analysisAreas.length > 0 ? (
                       <div className="border rounded-lg max-h-[180px] overflow-y-auto">
@@ -4591,7 +4621,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                               setNewTeamAreaIds((prev) =>
                                 prev.includes(area.id)
                                   ? prev.filter((id) => id !== area.id)
-                                  : [...prev, area.id]
+                                  : [...prev, area.id],
                               )
                             }
                           >
@@ -4601,15 +4631,19 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                                 setNewTeamAreaIds((prev) =>
                                   prev.includes(area.id)
                                     ? prev.filter((id) => id !== area.id)
-                                    : [...prev, area.id]
+                                    : [...prev, area.id],
                                 )
                               }
                               className="mt-0.5"
                             />
                             <div className="flex-1 min-w-0">
-                              <p className="font-medium text-sm">{area.title}</p>
+                              <p className="font-medium text-sm">
+                                {area.title}
+                              </p>
                               {area.definition && (
-                                <p className="text-xs text-muted-foreground line-clamp-1 mt-0.5">{area.definition}</p>
+                                <p className="text-xs text-muted-foreground line-clamp-1 mt-0.5">
+                                  {area.definition}
+                                </p>
                               )}
                             </div>
                           </div>
@@ -4619,12 +4653,15 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                       <div className="border rounded-lg p-4 text-center text-muted-foreground">
                         <Target className="h-6 w-6 mx-auto mb-1 opacity-50" />
                         <p className="text-sm">No analysis areas defined yet</p>
-                        <p className="text-xs">Create analysis areas in the LLM Agent section first</p>
+                        <p className="text-xs">
+                          Create analysis areas in the LLM Agent section first
+                        </p>
                       </div>
                     )}
                     {newTeamAreaIds.length > 0 && (
                       <p className="text-xs text-muted-foreground">
-                        {newTeamAreaIds.length} area{newTeamAreaIds.length !== 1 ? "s" : ""} selected
+                        {newTeamAreaIds.length} area
+                        {newTeamAreaIds.length !== 1 ? "s" : ""} selected
                       </p>
                     )}
                   </div>
@@ -4689,9 +4726,12 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                   <div className="space-y-3 rounded-lg border border-border p-3">
                     <div className="flex items-center justify-between">
                       <div className="space-y-0.5">
-                        <Label className="text-sm font-medium">Use Amazon Connect Evaluations</Label>
+                        <Label className="text-sm font-medium">
+                          Use Amazon Connect Evaluations
+                        </Label>
                         <p className="text-xs text-muted-foreground">
-                          Automatically score contacts for this team using a quality scorecard
+                          Automatically score contacts for this team using a
+                          quality scorecard
                         </p>
                       </div>
                       <div onClick={(e) => e.stopPropagation()}>
@@ -4703,16 +4743,26 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                     </div>
                     {newTeamEvaluationEnabled && (
                       <div className="space-y-2 border-t border-border pt-3">
-                        <Label className="text-xs text-muted-foreground font-medium">Quality Evaluation Form</Label>
+                        <Label className="text-xs text-muted-foreground font-medium">
+                          Quality Evaluation Form
+                        </Label>
                         <Select
                           value={newTeamEvaluationFormId}
                           onValueChange={setNewTeamEvaluationFormId}
                         >
-                          <SelectTrigger className={newTeamEvaluationFormId === "none" ? "border-amber-400" : ""}>
+                          <SelectTrigger
+                            className={
+                              newTeamEvaluationFormId === "none"
+                                ? "border-amber-400"
+                                : ""
+                            }
+                          >
                             <SelectValue placeholder="Select a scorecard…" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="none">No form selected</SelectItem>
+                            <SelectItem value="none">
+                              No form selected
+                            </SelectItem>
                             {evaluationForms.map((form) => (
                               <SelectItem key={form.id} value={form.id}>
                                 {form.name}
@@ -4722,7 +4772,8 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                         </Select>
                         {newTeamEvaluationFormId === "none" ? (
                           <p className="text-xs text-amber-600">
-                            A scorecard is required to save with evaluations enabled
+                            A scorecard is required to save with evaluations
+                            enabled
                           </p>
                         ) : (
                           <p className="text-xs text-primary">
@@ -4778,7 +4829,10 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
           </TabsContent>
 
           <TabsContent value="evaluation" className="space-y-6">
-            <EvaluationFormsTab forms={evaluationForms} onFormsChange={setEvaluationForms} />
+            <EvaluationFormsTab
+              forms={evaluationForms}
+              onFormsChange={setEvaluationForms}
+            />
           </TabsContent>
 
           {/* <TabsContent value="training" className="space-y-6">
