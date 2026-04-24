@@ -40,21 +40,21 @@ interface CustomerOnboardingWizardProps {
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 const STEPS = [
-  { number: 1, label: "Business details"    },
-  { number: 2, label: "Connect setup"       },
-  { number: 3, label: "AI configuration"   },
+  { number: 1, label: "Business details" },
+  { number: 2, label: "Connect setup" },
+  { number: 3, label: "AI configuration" },
   { number: 4, label: "Evaluation coaching" },
-  { number: 5, label: "Review & create"    },
+  { number: 5, label: "Review & create" },
 ];
 
 const REGIONS = [
-  { value: "us-east-1",      label: "US East (N. Virginia)"    },
-  { value: "us-west-2",      label: "US West (Oregon)"         },
-  { value: "eu-west-2",      label: "Europe (London)"          },
-  { value: "eu-central-1",   label: "Europe (Frankfurt)"       },
+  { value: "us-east-1", label: "US East (N. Virginia)" },
+  { value: "us-west-2", label: "US West (Oregon)" },
+  { value: "eu-west-2", label: "Europe (London)" },
+  { value: "eu-central-1", label: "Europe (Frankfurt)" },
   { value: "ap-southeast-1", label: "Asia Pacific (Singapore)" },
-  { value: "ap-southeast-2", label: "Asia Pacific (Sydney)"    },
-  { value: "ap-northeast-1", label: "Asia Pacific (Tokyo)"     },
+  { value: "ap-southeast-2", label: "Asia Pacific (Sydney)" },
+  { value: "ap-northeast-1", label: "Asia Pacific (Tokyo)" },
 ];
 
 const DEFAULT_FORM: WizardFormData = {
@@ -146,8 +146,12 @@ function ReviewRow({
 }) {
   return (
     <div className="flex items-center justify-between px-4 py-3 gap-4">
-      <span className="text-sm text-muted-foreground flex-shrink-0">{label}</span>
-      <span className={`text-sm text-right ${mono ? "font-mono" : ""}`}>{value}</span>
+      <span className="text-sm text-muted-foreground flex-shrink-0">
+        {label}
+      </span>
+      <span className={`text-sm text-right ${mono ? "font-mono" : ""}`}>
+        {value}
+      </span>
     </div>
   );
 }
@@ -163,8 +167,10 @@ export function CustomerOnboardingWizard({
   const [submitted, setSubmitted] = useState(false);
   const [showBackConfirm, setShowBackConfirm] = useState(false);
 
-  const set = <K extends keyof WizardFormData>(field: K, value: WizardFormData[K]) =>
-    setForm((prev) => ({ ...prev, [field]: value }));
+  const set = <K extends keyof WizardFormData>(
+    field: K,
+    value: WizardFormData[K],
+  ) => setForm((prev) => ({ ...prev, [field]: value }));
 
   const regionLabel =
     REGIONS.find((r) => r.value === form.region)?.label ?? form.region;
@@ -190,9 +196,7 @@ export function CustomerOnboardingWizard({
     if (step === 1) return !!form.companyName && !!form.primaryAdminEmail;
     if (step === 2)
       return (
-        !!form.amazonConnectInstanceId &&
-        !!form.numberOfAgents &&
-        !!form.region
+        !!form.amazonConnectInstanceId && !!form.numberOfAgents && !!form.region
       );
     if (step === 3) return form.aiCoachingTier !== "none";
     return true;
@@ -227,8 +231,10 @@ export function CustomerOnboardingWizard({
           <div className="space-y-2">
             <h2 className="text-2xl font-bold">Customer created</h2>
             <p className="text-sm text-muted-foreground">
-              <span className="font-medium text-foreground">{form.companyName}</span> has been
-              added to the platform.
+              <span className="font-medium text-foreground">
+                {form.companyName}
+              </span>{" "}
+              has been added to the platform.
             </p>
           </div>
           <div className="bg-muted/40 border rounded-lg p-4 text-left space-y-2 text-sm">
@@ -242,11 +248,15 @@ export function CustomerOnboardingWizard({
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">AI Coaching tier</span>
-              <span className="font-medium capitalize">{form.aiCoachingTier}</span>
+              <span className="font-medium capitalize">
+                {form.aiCoachingTier}
+              </span>
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">AI Training</span>
-              <span className="font-medium">{form.training ? "Enabled" : "Disabled"}</span>
+              <span className="font-medium">
+                {form.training ? "Enabled" : "Disabled"}
+              </span>
             </div>
             {form.evalCoachingEnabled && (
               <>
@@ -263,7 +273,8 @@ export function CustomerOnboardingWizard({
             )}
           </div>
           <p className="text-xs text-muted-foreground">
-            An invitation email will be sent to {form.primaryAdminEmail} to set up their account.
+            An invitation email will be sent to {form.primaryAdminEmail} to set
+            up their account.
           </p>
           <Button className="w-full" onClick={onClose}>
             Done
@@ -288,23 +299,19 @@ export function CustomerOnboardingWizard({
                   isActive
                     ? "bg-primary text-white"
                     : isDone
-                    ? "bg-primary/20 text-primary border-2 border-primary"
-                    : "bg-transparent border-2 border-muted-foreground/30 text-muted-foreground"
+                      ? "bg-primary/20 text-primary border-2 border-primary"
+                      : "bg-transparent border-2 border-muted-foreground/30 text-muted-foreground"
                 }`}
               >
-                {isDone ? (
-                  <CheckCircle className="h-4 w-4" />
-                ) : (
-                  s.number
-                )}
+                {isDone ? <CheckCircle className="h-4 w-4" /> : s.number}
               </div>
               <span
                 className={`text-xs text-center mt-1.5 leading-tight max-w-[72px] transition-all ${
                   isActive
                     ? "font-semibold text-primary"
                     : isDone
-                    ? "text-foreground/70"
-                    : "text-muted-foreground"
+                      ? "text-foreground/70"
+                      : "text-muted-foreground"
                 }`}
               >
                 {s.label}
@@ -327,11 +334,9 @@ export function CustomerOnboardingWizard({
   // ── Page shell ──────────────────────────────────────────────────────────────
   return (
     <div className="fixed inset-0 z-50 bg-background overflow-y-auto flex flex-col">
-
       {/* Card — centered, wider */}
       <div className="flex-1 flex justify-center px-4 py-10 pb-12">
         <div className="bg-card rounded-xl border border-border shadow-sm w-full max-w-3xl">
-
           {/* Card header — back button + title */}
           <div className="flex items-center px-8 py-5 border-b border-border">
             <button
@@ -341,7 +346,9 @@ export function CustomerOnboardingWizard({
               <ArrowLeft className="h-4 w-4" />
               Back
             </button>
-            <h1 className="flex-1 text-center text-xl font-bold pr-16">Create Customer</h1>
+            <h1 className="flex-1 text-center text-xl font-bold pr-16">
+              Create Customer
+            </h1>
           </div>
 
           {/* Step indicator — inside the card */}
@@ -350,7 +357,6 @@ export function CustomerOnboardingWizard({
           </div>
 
           <div className="p-8 space-y-6">
-
             {/* ── Step 1: Business details ───────────────────────────────── */}
             {step === 1 && (
               <>
@@ -386,7 +392,9 @@ export function CustomerOnboardingWizard({
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <FieldLabel htmlFor="licenseEndDate">License End Date</FieldLabel>
+                    <FieldLabel htmlFor="licenseEndDate">
+                      License End Date
+                    </FieldLabel>
                     <Input
                       id="licenseEndDate"
                       type="date"
@@ -423,7 +431,9 @@ export function CustomerOnboardingWizard({
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <FieldLabel htmlFor="numberOfAgents">No. of Agents</FieldLabel>
+                    <FieldLabel htmlFor="numberOfAgents">
+                      No. of Agents
+                    </FieldLabel>
                     <Input
                       id="numberOfAgents"
                       type="number"
@@ -433,7 +443,9 @@ export function CustomerOnboardingWizard({
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <FieldLabel htmlFor="region">Region (Amazon Connect)</FieldLabel>
+                    <FieldLabel htmlFor="region">
+                      Region (Amazon Connect)
+                    </FieldLabel>
                     <Select
                       value={form.region}
                       onValueChange={(v) => set("region", v)}
@@ -486,8 +498,12 @@ export function CustomerOnboardingWizard({
                         title="Base"
                       >
                         <ul className="text-xs text-muted-foreground mt-1 space-y-0.5">
-                          <li>• Consolidated AI-generated feedback per agent</li>
-                          <li>• Behavioral and communication quality assessment</li>
+                          <li>
+                            • Consolidated AI-generated feedback per agent
+                          </li>
+                          <li>
+                            • Behavioral and communication quality assessment
+                          </li>
                           <li>• High-level coaching insights</li>
                         </ul>
                       </RadioCard>
@@ -500,9 +516,16 @@ export function CustomerOnboardingWizard({
                         title="Standard"
                       >
                         <ul className="text-xs text-muted-foreground mt-1 space-y-0.5">
-                          <li>• Consolidated AI-generated feedback per agent</li>
-                          <li>• Message-by-message coaching on agent responses</li>
-                          <li>• Behavioral, tone, and communication quality evaluation</li>
+                          <li>
+                            • Consolidated AI-generated feedback per agent
+                          </li>
+                          <li>
+                            • Message-by-message coaching on agent responses
+                          </li>
+                          <li>
+                            • Behavioral, tone, and communication quality
+                            evaluation
+                          </li>
                         </ul>
                       </RadioCard>
                       <RadioCard
@@ -511,9 +534,16 @@ export function CustomerOnboardingWizard({
                         title="Advanced"
                       >
                         <ul className="text-xs text-muted-foreground mt-1 space-y-0.5">
-                          <li>• Consolidated daily feedback on agent behavior</li>
-                          <li>• Message-level coaching for clarity, tone, and empathy</li>
-                          <li>• Knowledge base validation against uploaded content</li>
+                          <li>
+                            • Consolidated daily feedback on agent behavior
+                          </li>
+                          <li>
+                            • Message-level coaching for clarity, tone, and
+                            empathy
+                          </li>
+                          <li>
+                            • Knowledge base validation against uploaded content
+                          </li>
                         </ul>
                       </RadioCard>
                     </div>
@@ -528,11 +558,15 @@ export function CustomerOnboardingWizard({
                     <div className="flex items-center gap-3">
                       <BookOpen
                         className={`h-5 w-5 flex-shrink-0 ${
-                          form.training ? "text-primary" : "text-muted-foreground"
+                          form.training
+                            ? "text-primary"
+                            : "text-muted-foreground"
                         }`}
                       />
                       <div>
-                        <p className="font-medium text-sm">AI based Agent Training</p>
+                        <p className="font-medium text-sm">
+                          AI based Agent Training
+                        </p>
                         <p className="text-xs text-muted-foreground mt-0.5">
                           {form.aiCoachingTier !== "advanced"
                             ? "Requires Advanced tier to enable"
@@ -556,14 +590,17 @@ export function CustomerOnboardingWizard({
                 <div>
                   <h2 className="text-xl font-bold">Evaluation coaching</h2>
                   <p className="text-sm text-muted-foreground mt-1">
-                    Automatically trigger coaching from Amazon Connect evaluation results
+                    Automatically trigger coaching from Amazon Connect
+                    evaluation results
                   </p>
                 </div>
                 <div className="space-y-5">
                   {/* Toggle */}
                   <div className="flex items-center justify-between p-4 border rounded-lg">
                     <div>
-                      <p className="font-medium text-sm">Enable evaluation coaching</p>
+                      <p className="font-medium text-sm">
+                        Enable evaluation coaching
+                      </p>
                       <p className="text-xs text-muted-foreground mt-0.5">
                         {form.evalCoachingEnabled
                           ? "Coaching plans will be generated from evaluation scores"
@@ -588,16 +625,22 @@ export function CustomerOnboardingWizard({
                             title="Always"
                           >
                             <p className="text-xs text-muted-foreground mt-0.5">
-                              Generate a coaching plan after every evaluation, regardless of score.
+                              Generate a coaching plan after every evaluation,
+                              regardless of score.
                             </p>
                           </RadioCard>
                           <RadioCard
-                            selected={form.coachingTrigger === "below_threshold"}
-                            onClick={() => set("coachingTrigger", "below_threshold")}
+                            selected={
+                              form.coachingTrigger === "below_threshold"
+                            }
+                            onClick={() =>
+                              set("coachingTrigger", "below_threshold")
+                            }
                             title="Below threshold"
                           >
                             <p className="text-xs text-muted-foreground mt-0.5">
-                              Only coach when a section score falls below the configured value.
+                              Only coach when a section score falls below the
+                              configured value.
                             </p>
                           </RadioCard>
                         </div>
@@ -626,10 +669,10 @@ export function CustomerOnboardingWizard({
                               background: `linear-gradient(to right, hsl(var(--primary)) ${((form.thresholdValue - 30) / 60) * 100}%, hsl(var(--border)) ${((form.thresholdValue - 30) / 60) * 100}%)`,
                             }}
                           />
-                          <div className="flex justify-between text-xs text-muted-foreground">
+                          {/* <div className="flex justify-between text-xs text-muted-foreground">
                             <span>More coaching (30%)</span>
                             <span>Less coaching (90%)</span>
-                          </div>
+                          </div> */}
                         </div>
                       )}
 
@@ -639,11 +682,14 @@ export function CustomerOnboardingWizard({
                         <div className="space-y-2">
                           <RadioCard
                             selected={form.ingestionFrequency === "real_time"}
-                            onClick={() => set("ingestionFrequency", "real_time")}
+                            onClick={() =>
+                              set("ingestionFrequency", "real_time")
+                            }
                             title="Real-time"
                           >
                             <p className="text-xs text-muted-foreground mt-0.5">
-                              Evaluations are processed immediately as completed in Amazon Connect.
+                              Evaluations are processed immediately as completed
+                              in Amazon Connect.
                             </p>
                           </RadioCard>
                           <RadioCard
@@ -652,7 +698,8 @@ export function CustomerOnboardingWizard({
                             title="Daily"
                           >
                             <p className="text-xs text-muted-foreground mt-0.5">
-                              Evaluations are batched and processed once per day during off-peak hours.
+                              Evaluations are batched and processed once per day
+                              during off-peak hours.
                             </p>
                           </RadioCard>
                           <RadioCard
@@ -661,7 +708,8 @@ export function CustomerOnboardingWizard({
                             title="Manual only"
                           >
                             <p className="text-xs text-muted-foreground mt-0.5">
-                              Evaluations are only ingested when an admin triggers a manual sync.
+                              Evaluations are only ingested when an admin
+                              triggers a manual sync.
                             </p>
                           </RadioCard>
                         </div>
@@ -671,8 +719,8 @@ export function CustomerOnboardingWizard({
                       <div className="flex gap-3 p-4 bg-blue-50 border border-blue-200 rounded-lg text-sm text-blue-800">
                         <Info className="h-4 w-4 flex-shrink-0 mt-0.5 text-blue-500" />
                         <p>
-                          TrAIna will automatically read the evaluation form structure from the data.
-                          No manual mapping needed.
+                          TrAIna will automatically read the evaluation form
+                          structure from the data. No manual mapping needed.
                         </p>
                       </div>
                     </div>
@@ -699,8 +747,14 @@ export function CustomerOnboardingWizard({
                       </span>
                     </div>
                     <div className="divide-y">
-                      <ReviewRow label="Business Name" value={form.companyName} />
-                      <ReviewRow label="Email Address" value={form.primaryAdminEmail} />
+                      <ReviewRow
+                        label="Business Name"
+                        value={form.companyName}
+                      />
+                      <ReviewRow
+                        label="Email Address"
+                        value={form.primaryAdminEmail}
+                      />
                       <ReviewRow
                         label="License End Date"
                         value={form.licenseEndDate || "Not set"}
@@ -721,7 +775,10 @@ export function CustomerOnboardingWizard({
                         value={form.amazonConnectInstanceId}
                         mono
                       />
-                      <ReviewRow label="No. of Agents" value={form.numberOfAgents} />
+                      <ReviewRow
+                        label="No. of Agents"
+                        value={form.numberOfAgents}
+                      />
                       <ReviewRow label="Region" value={regionLabel} />
                     </div>
                   </div>
@@ -798,14 +855,15 @@ export function CustomerOnboardingWizard({
                             form.ingestionFrequency === "real_time"
                               ? "Real-time"
                               : form.ingestionFrequency === "daily"
-                              ? "Daily"
-                              : "Manual only"
+                                ? "Daily"
+                                : "Manual only"
                           }
                         />
                       </div>
                     ) : (
                       <div className="px-4 py-3 text-sm text-muted-foreground">
-                        Not enabled — can be configured later from the admin panel.
+                        Not enabled — can be configured later from the admin
+                        panel.
                       </div>
                     )}
                   </div>
@@ -826,7 +884,6 @@ export function CustomerOnboardingWizard({
                 <Button onClick={handleSubmit}>Create customer</Button>
               )}
             </div>
-
           </div>
         </div>
       </div>
