@@ -29,7 +29,7 @@ export interface WizardFormData {
   evalCoachingEnabled: boolean;
   coachingTrigger: "always" | "below_threshold";
   thresholdValue: number;
-  ingestionFrequency: "real_time" | "daily" | "manual";
+  ingestionFrequency: "real_time" | "daily";
 }
 
 interface CustomerOnboardingWizardProps {
@@ -655,24 +655,33 @@ export function CustomerOnboardingWizard({
                               {form.thresholdValue}%
                             </span>
                           </div>
-                          <input
-                            type="range"
-                            min={30}
-                            max={90}
-                            step={5}
-                            value={form.thresholdValue}
-                            onChange={(e) =>
-                              set("thresholdValue", parseInt(e.target.value))
-                            }
-                            className="w-full h-2 rounded-full appearance-none cursor-pointer accent-primary"
-                            style={{
-                              background: `linear-gradient(to right, hsl(var(--primary)) ${((form.thresholdValue - 30) / 60) * 100}%, hsl(var(--border)) ${((form.thresholdValue - 30) / 60) * 100}%)`,
-                            }}
-                          />
-                          {/* <div className="flex justify-between text-xs text-muted-foreground">
+                          <div className="relative flex items-center h-5">
+                            {/* Track background */}
+                            <div className="absolute inset-x-0 h-2 rounded-full bg-border overflow-hidden">
+                              <div
+                                className="h-full bg-primary rounded-full"
+                                style={{
+                                  width: `${((form.thresholdValue - 30) / 60) * 100}%`,
+                                }}
+                              />
+                            </div>
+                            {/* Range input — transparent, sits on top for interaction */}
+                            <input
+                              type="range"
+                              min={30}
+                              max={90}
+                              step={5}
+                              value={form.thresholdValue}
+                              onChange={(e) =>
+                                set("thresholdValue", parseInt(e.target.value))
+                              }
+                              className="relative w-full appearance-none bg-transparent cursor-pointer accent-primary"
+                            />
+                          </div>
+                          <div className="flex justify-between text-xs text-muted-foreground">
                             <span>More coaching (30%)</span>
                             <span>Less coaching (90%)</span>
-                          </div> */}
+                          </div>
                         </div>
                       )}
 
@@ -702,7 +711,7 @@ export function CustomerOnboardingWizard({
                               during off-peak hours.
                             </p>
                           </RadioCard>
-                          <RadioCard
+                          {/* <RadioCard
                             selected={form.ingestionFrequency === "manual"}
                             onClick={() => set("ingestionFrequency", "manual")}
                             title="Manual only"
@@ -711,18 +720,18 @@ export function CustomerOnboardingWizard({
                               Evaluations are only ingested when an admin
                               triggers a manual sync.
                             </p>
-                          </RadioCard>
+                          </RadioCard> */}
                         </div>
                       </div>
 
                       {/* Info callout */}
-                      <div className="flex gap-3 p-4 bg-blue-50 border border-blue-200 rounded-lg text-sm text-blue-800">
+                      {/* <div className="flex gap-3 p-4 bg-blue-50 border border-blue-200 rounded-lg text-sm text-blue-800">
                         <Info className="h-4 w-4 flex-shrink-0 mt-0.5 text-blue-500" />
                         <p>
                           TrAIna will automatically read the evaluation form
                           structure from the data. No manual mapping needed.
                         </p>
-                      </div>
+                      </div> */}
                     </div>
                   )}
                 </div>
