@@ -29,7 +29,6 @@ export interface WizardFormData {
   evalCoachingEnabled: boolean;
   coachingTrigger: "always" | "below_threshold";
   thresholdValue: number;
-  ingestionFrequency: "real_time" | "daily";
 }
 
 interface CustomerOnboardingWizardProps {
@@ -70,7 +69,6 @@ const DEFAULT_FORM: WizardFormData = {
   evalCoachingEnabled: false,
   coachingTrigger: "always",
   thresholdValue: 70,
-  ingestionFrequency: "daily",
 };
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
@@ -685,44 +683,6 @@ export function CustomerOnboardingWizard({
                         </div>
                       )}
 
-                      {/* Ingestion frequency */}
-                      <div className="space-y-2">
-                        <FieldLabel>Ingestion frequency</FieldLabel>
-                        <div className="space-y-2">
-                          <RadioCard
-                            selected={form.ingestionFrequency === "real_time"}
-                            onClick={() =>
-                              set("ingestionFrequency", "real_time")
-                            }
-                            title="Real-time"
-                          >
-                            <p className="text-xs text-muted-foreground mt-0.5">
-                              Evaluations are processed immediately as completed
-                              in Amazon Connect.
-                            </p>
-                          </RadioCard>
-                          <RadioCard
-                            selected={form.ingestionFrequency === "daily"}
-                            onClick={() => set("ingestionFrequency", "daily")}
-                            title="Daily"
-                          >
-                            <p className="text-xs text-muted-foreground mt-0.5">
-                              Evaluations are batched and processed once per day
-                              during off-peak hours.
-                            </p>
-                          </RadioCard>
-                          {/* <RadioCard
-                            selected={form.ingestionFrequency === "manual"}
-                            onClick={() => set("ingestionFrequency", "manual")}
-                            title="Manual only"
-                          >
-                            <p className="text-xs text-muted-foreground mt-0.5">
-                              Evaluations are only ingested when an admin
-                              triggers a manual sync.
-                            </p>
-                          </RadioCard> */}
-                        </div>
-                      </div>
 
                       {/* Info callout */}
                       {/* <div className="flex gap-3 p-4 bg-blue-50 border border-blue-200 rounded-lg text-sm text-blue-800">
@@ -856,16 +816,6 @@ export function CustomerOnboardingWizard({
                             form.coachingTrigger === "always"
                               ? "Always"
                               : `Below threshold (${form.thresholdValue}%)`
-                          }
-                        />
-                        <ReviewRow
-                          label="Ingestion frequency"
-                          value={
-                            form.ingestionFrequency === "real_time"
-                              ? "Real-time"
-                              : form.ingestionFrequency === "daily"
-                                ? "Daily"
-                                : "Manual only"
                           }
                         />
                       </div>
