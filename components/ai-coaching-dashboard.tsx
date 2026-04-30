@@ -380,7 +380,7 @@ export function AiCoachingDashboard({ onLogout, onSwitchToSupervisor }: AiCoachi
 
           {/* Contact Reviews */}
           <TabsContent value="reviews" className="space-y-6">
-            <ContactReviewsList />
+            <ContactReviewsList evaluationEnabled={false} />
           </TabsContent>
 
           {/* Challenge Patterns */}
