@@ -648,7 +648,8 @@ export function SupervisorDashboard({ onLogout, onSwitchToAgent }: SupervisorDas
             {
               sectionId: "sec_02",
               sectionName: "Policy & Resolution",
-              aiFeedback: "You nailed the policy side of this interaction — correct verification, accurate timeline, clear communication throughout. That's the standard to hold yourself to on every billing call. Keep building on this consistency.",
+              aiDeviation: true,
+              aiFeedback: "The evaluation scored this section highly, but the transcript tells a different story. The agent told the customer to expect the refund in '2–3 business days' — however, the actual policy for this account tier is 5–7 business days. This is a factual inaccuracy that may have set a wrong expectation. The evaluator may not have caught this in the review. This section warrants a closer look before the score is accepted.",
               questions: [
                 { questionId: "q03", questionText: "Agent followed correct refund authorization and verification steps", scoringType: "pass-fail", score: 10, maxScore: 10 },
                 { questionId: "q04", questionText: "Agent communicated refund timeline clearly and accurately to the customer", scoringType: "numeric", score: 9, maxScore: 10 },

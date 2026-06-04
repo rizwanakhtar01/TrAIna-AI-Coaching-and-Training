@@ -63,6 +63,7 @@ export interface EvaluationSectionResult {
   sectionId: string;
   sectionName: string;
   aiFeedback?: string;
+  aiDeviation?: boolean;
   questions: EvaluationQuestionResult[];
 }
 
@@ -193,8 +194,9 @@ const sampleReviews: ContactReview[] = [
           {
             sectionId: "sec_02",
             sectionName: "Policy & Resolution",
+            aiDeviation: true,
             aiFeedback:
-              "You nailed the policy side of this interaction — correct verification, accurate timeline, clear communication throughout. That's the standard to hold yourself to on every billing call. Keep building on this consistency.",
+              "The evaluation scored this section highly, but the transcript tells a different story. The agent told the customer to expect the refund in '2–3 business days' — however, the actual policy for this account tier is 5–7 business days. This is a factual inaccuracy that may have set a wrong expectation. The evaluator may not have caught this in the review. This section warrants a closer look before the score is accepted.",
             questions: [
               {
                 questionId: "q03",
@@ -616,9 +618,26 @@ export function EvaluationScoresPanel({
                       })}
                     </div>
                     {section.aiFeedback && (
-                      <div className="text-xs text-accent bg-accent/10 p-2 rounded border-l-2 border-accent mt-3">
-                        <strong>AI Coaching:</strong> {section.aiFeedback}
-                      </div>
+                      section.aiDeviation ? (
+                        <div className="mt-3 rounded border border-amber-300 bg-amber-50 overflow-hidden">
+                          <div className="flex items-center gap-2 px-3 py-2 bg-amber-100 border-b border-amber-300">
+                            <AlertTriangle className="h-3.5 w-3.5 text-amber-600 flex-shrink-0" />
+                            <span className="text-xs font-semibold text-amber-800">
+                              AI Analysis Contradicts Evaluation Score
+                            </span>
+                            <Badge className="ml-auto text-[10px] px-1.5 py-0 bg-amber-500 text-white border-0 hover:bg-amber-500">
+                              Deviation Detected
+                            </Badge>
+                          </div>
+                          <p className="text-xs text-amber-900 px-3 py-2.5 leading-relaxed">
+                            {section.aiFeedback}
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="text-xs text-accent bg-accent/10 p-2 rounded border-l-2 border-accent mt-3">
+                          <strong>AI Coaching:</strong> {section.aiFeedback}
+                        </div>
+                      )
                     )}
                   </div>
                 );
