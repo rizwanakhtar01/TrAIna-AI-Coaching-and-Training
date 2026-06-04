@@ -171,7 +171,7 @@ const sampleReviews: ContactReview[] = [
             sectionId: "sec_01",
             sectionName: "Opening & Empathy",
             aiFeedback:
-              "You opened this call with real warmth and professionalism — that sets the stage for everything. Next time, use that empathetic connection as a natural moment to explore whether the customer might be open to staying before processing the cancellation. A brief retention conversation there can make all the difference.",
+              "Agent opened this call with real warmth and professionalism — that set the stage for everything. The agent could use that empathetic connection as a natural moment to explore whether the customer might be open to staying before processing the cancellation. A brief retention conversation there can make all the difference.",
             questions: [
               {
                 questionId: "q01",
@@ -220,7 +220,7 @@ const sampleReviews: ContactReview[] = [
             sectionId: "sec_03",
             sectionName: "Closing",
             aiFeedback:
-              "You closed this call exactly right — the customer left knowing what had been done and what to expect next. That kind of clarity at the end of a call is what turns a good interaction into a great one. Keep finishing strong.",
+              "Agent closed this call exactly right — the customer left knowing what had been done and what to expect next. That kind of clarity at the end of a call is what turns a good interaction into a great one. The agent should keep finishing strong.",
             questions: [
               {
                 questionId: "q05",
@@ -250,7 +250,7 @@ const sampleReviews: ContactReview[] = [
             sectionId: "cx_01",
             sectionName: "Tone & Professionalism",
             aiFeedback:
-              "Your language was clear and easy to follow throughout — the customer never had to ask for clarification, and that's a real skill. Keep using plain, accessible language, especially on billing calls where jargon can add unnecessary stress.",
+              "Agent's language was clear and easy to follow throughout — the customer never had to ask for clarification, and that's a real skill. The agent should keep using plain, accessible language, especially on billing calls where jargon can add unnecessary stress.",
             questions: [
               {
                 questionId: "cx_q01",
@@ -274,7 +274,7 @@ const sampleReviews: ContactReview[] = [
             sectionId: "cx_02",
             sectionName: "First Contact Resolution",
             aiFeedback:
-              "You took full ownership here and resolved everything in a single contact — that's something to feel proud of. First-contact resolution is one of the most meaningful things you can do for a customer. Keep that ownership mindset front and centre.",
+              "Agent took full ownership here and resolved everything in a single contact — an excellent result. First-contact resolution is one of the most meaningful outcomes an agent can deliver. The agent should keep that ownership mindset front and centre.",
             questions: [
               {
                 questionId: "cx_q03",
@@ -361,7 +361,7 @@ const sampleReviews: ContactReview[] = [
             sectionId: "sec_01",
             sectionName: "Opening & Empathy",
             aiFeedback:
-              "Here's a key moment to work on: next time a customer arrives frustrated, try pausing before jumping into account lookup and say something like 'I completely understand how stressful a delayed refund can be — let's get this sorted right now.' That small acknowledgment changes the whole tone of the call.",
+              "A key area to work on: when a customer arrives frustrated, the agent should pause before jumping into account lookup and acknowledge the emotion first — something like 'I completely understand how stressful a delayed refund can be — let's get this sorted right now.' That small acknowledgment changes the whole tone of the call.",
             questions: [
               {
                 questionId: "q01",
@@ -385,7 +385,7 @@ const sampleReviews: ContactReview[] = [
             sectionId: "sec_02",
             sectionName: "Policy & Resolution",
             aiFeedback:
-              "You handled a difficult situation really well here — correct escalation steps, a clear timeline, and a proactive push to expedite the refund. That combination of process knowledge and quick thinking is exactly what great support looks like. Build on this.",
+              "Agent handled a difficult situation really well here — correct escalation steps, a clear timeline, and a proactive push to expedite the refund. That combination of process knowledge and quick thinking is exactly what great support looks like. The agent should build on this.",
             questions: [
               {
                 questionId: "q03",
@@ -409,7 +409,7 @@ const sampleReviews: ContactReview[] = [
             sectionId: "sec_03",
             sectionName: "Closing",
             aiFeedback:
-              "Before ending a call where the issue is still in progress, always anchor the customer with a clear next step — something like 'I'll send you a confirmation email and you can expect an update within 48 hours.' That reassurance is what the customer takes away from the call, so make it count.",
+              "Before ending a call where the issue is still in progress, the agent should always anchor the customer with a clear next step — something like 'I'll send you a confirmation email and you can expect an update within 48 hours.' That reassurance is what the customer takes away from the call, so it should be made to count.",
             questions: [
               {
                 questionId: "q05",

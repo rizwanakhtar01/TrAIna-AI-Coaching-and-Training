@@ -639,7 +639,7 @@ export function SupervisorDashboard({ onLogout, onSwitchToAgent }: SupervisorDas
             {
               sectionId: "sec_01",
               sectionName: "Opening & Empathy",
-              aiFeedback: "You opened this call with real warmth and professionalism — that sets the stage for everything. Next time, use that empathetic connection as a natural moment to explore whether the customer might be open to staying before processing the cancellation. A brief retention conversation there can make all the difference.",
+              aiFeedback: "Agent opened this call with real warmth and professionalism — that set the stage for everything. The agent could use that empathetic connection as a natural moment to explore whether the customer might be open to staying before processing the cancellation. A brief retention conversation there can make all the difference.",
               questions: [
                 { questionId: "q01", questionText: "Agent greeted the customer professionally and introduced themselves", scoringType: "pass-fail", score: 10, maxScore: 10 },
                 { questionId: "q02", questionText: "Agent acknowledged the customer's concern with empathy before moving to resolution", scoringType: "numeric", score: 7, maxScore: 10 },
@@ -658,7 +658,7 @@ export function SupervisorDashboard({ onLogout, onSwitchToAgent }: SupervisorDas
             {
               sectionId: "sec_03",
               sectionName: "Closing",
-              aiFeedback: "You closed this call exactly right — the customer left knowing what had been done and what to expect next. That kind of clarity at the end of a call is what turns a good interaction into a great one. Keep finishing strong.",
+              aiFeedback: "Agent closed this call exactly right — the customer left knowing what had been done and what to expect next. That kind of clarity at the end of a call is what turns a good interaction into a great one. The agent should keep finishing strong.",
               questions: [
                 { questionId: "q05", questionText: "Agent confirmed the issue was fully resolved before ending the contact", scoringType: "pass-fail", score: 10, maxScore: 10 },
                 { questionId: "q06", questionText: "Agent summarized the action taken and set clear next-step expectations", scoringType: "numeric", score: 8, maxScore: 10 },
@@ -730,7 +730,7 @@ export function SupervisorDashboard({ onLogout, onSwitchToAgent }: SupervisorDas
             {
               sectionId: "sec_01",
               sectionName: "Opening & Empathy",
-              aiFeedback: "Here's a key moment to work on: next time a customer arrives frustrated, try pausing before jumping into account lookup and say something like 'I completely understand how stressful a delayed refund can be — let's get this sorted right now.' That small acknowledgment changes the whole tone of the call.",
+              aiFeedback: "A key area to work on: when a customer arrives frustrated, the agent should pause before jumping into account lookup and acknowledge the emotion first — something like 'I completely understand how stressful a delayed refund can be — let's get this sorted right now.' That small acknowledgment changes the whole tone of the call.",
               questions: [
                 { questionId: "q01", questionText: "Agent greeted the customer professionally and introduced themselves", scoringType: "pass-fail", score: 10, maxScore: 10 },
                 { questionId: "q02", questionText: "Agent acknowledged the customer's concern with empathy before moving to resolution", scoringType: "numeric", score: 4, maxScore: 10 },
@@ -739,7 +739,7 @@ export function SupervisorDashboard({ onLogout, onSwitchToAgent }: SupervisorDas
             {
               sectionId: "sec_02",
               sectionName: "Policy & Resolution",
-              aiFeedback: "You handled a difficult situation really well here — correct escalation steps, a clear timeline, and a proactive push to expedite the refund. That combination of process knowledge and quick thinking is exactly what great support looks like. Build on this.",
+              aiFeedback: "Agent handled a difficult situation really well here — correct escalation steps, a clear timeline, and a proactive push to expedite the refund. That combination of process knowledge and quick thinking is exactly what great support looks like. The agent should build on this.",
               questions: [
                 { questionId: "q03", questionText: "Agent followed correct refund authorization and verification steps", scoringType: "pass-fail", score: 10, maxScore: 10 },
                 { questionId: "q04", questionText: "Agent communicated refund timeline clearly and accurately to the customer", scoringType: "numeric", score: 9, maxScore: 10 },
@@ -748,7 +748,7 @@ export function SupervisorDashboard({ onLogout, onSwitchToAgent }: SupervisorDas
             {
               sectionId: "sec_03",
               sectionName: "Closing",
-              aiFeedback: "Before ending a call where the issue is still in progress, always anchor the customer with a clear next step — something like 'I'll send you a confirmation email and you can expect an update within 48 hours.' That reassurance is what the customer takes away from the call, so make it count.",
+              aiFeedback: "Before ending a call where the issue is still in progress, the agent should always anchor the customer with a clear next step — something like 'I'll send you a confirmation email and you can expect an update within 48 hours.' That reassurance is what the customer takes away from the call, so it should be made to count.",
               questions: [
                 { questionId: "q05", questionText: "Agent confirmed the issue was fully resolved before ending the contact", scoringType: "pass-fail", score: 0, maxScore: 10 },
                 { questionId: "q06", questionText: "Agent summarized the action taken and set clear next-step expectations", scoringType: "numeric", score: 7, maxScore: 10 },
