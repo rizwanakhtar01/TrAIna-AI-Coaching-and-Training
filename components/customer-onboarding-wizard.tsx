@@ -42,7 +42,7 @@ export interface WizardFormData {
   thresholdValue: number;
   bedrockAccountId: string;
   bedrockRegion: string;
-  bedrockModel: "claude-sonnet" | "claude-haiku";
+  bedrockModel: "claude-sonnet" | "claude-haiku" | "nova-pro";
   iamRoleArn: string;
 }
 
@@ -743,6 +743,15 @@ export function CustomerOnboardingWizard({
                               Faster and more cost-efficient
                             </p>
                           </RadioCard>
+                          <RadioCard
+                            selected={form.bedrockModel === "nova-pro"}
+                            onClick={() => set("bedrockModel", "nova-pro")}
+                            title="Amazon Nova Pro"
+                          >
+                            <p className="text-xs text-muted-foreground mt-1.5">
+                              AWS-native multimodal model — strong reasoning and low latency
+                            </p>
+                          </RadioCard>
                         </div>
                       </div>
 
@@ -1125,7 +1134,9 @@ export function CustomerOnboardingWizard({
                             value={
                               form.bedrockModel === "claude-sonnet"
                                 ? "Claude Sonnet"
-                                : "Claude Haiku"
+                                : form.bedrockModel === "claude-haiku"
+                                  ? "Claude Haiku"
+                                  : "Amazon Nova Pro"
                             }
                           />
                         </>
