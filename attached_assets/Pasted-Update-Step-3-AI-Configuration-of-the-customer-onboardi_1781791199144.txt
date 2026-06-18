@@ -1,0 +1,21 @@
+Update Step 3 (AI Configuration) of the customer onboarding wizard to support two LLM providers: Gemini (existing) and Amazon Bedrock (new).
+Provider selection: Two selectable cards at the top of Step 3, side by side. Only one selected at a time (blue border highlight). Gemini is the default.
+
+Gemini card: Title "Gemini", subtitle "Managed by Omningage", badge "Default", description "No additional setup required." When selected, show existing fields: API Key input and AI Coaching Tier radio cards (Base / Standard / Advanced).
+Bedrock card: Title "Amazon Bedrock", subtitle "Runs in your AWS account", description "Requires IAM role configuration." When selected, show:
+
+AWS Account ID — text input, validates 12 digits
+AWS Region — dropdown (us-east-1, us-west-2, eu-central-1, eu-west-1, ap-southeast-2, ap-northeast-1)
+Foundation Model — radio cards: "Claude Sonnet" (tagged Recommended, default) and "Claude Haiku"
+AI Coaching Tier — same Base/Standard/Advanced radio cards as Gemini path
+External ID — read-only field with Copy button, auto-generated UUID on mount
+Collapsible "View IAM role setup instructions" section containing numbered steps and a copyable trust policy JSON code block (dark background, monospace). The JSON should dynamically insert the generated External ID value.
+IAM Role ARN — text input, validates arn:aws:iam::\d{12}:role/.+
+Test Connection button — on click shows loading state, then mock success/failure message. Next button is disabled until Test Connection succeeds (only for Bedrock path).
+
+
+
+Switching providers preserves filled values in state so switching back restores inputs.
+Step 5 (Review & create) summary should conditionally show provider-specific fields: just provider + tier for Gemini, or provider + Account ID + Region + Model + Tier + Role ARN + "Verified ✓" for Bedrock.
+Design tokens: Primary blue #1A56DB, light blue background #F0F6FF, white cards, 8px border-radius, Lato font. IAM setup section gets a 4px left blue accent border.
+Out of scope: No backend integration, no changes to Steps 1, 2, or 4.
