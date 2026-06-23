@@ -18,10 +18,14 @@ import {
   Eye,
   BarChart3,
   Star,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 
 export function AgentDesktopDemo() {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [winsOpen, setWinsOpen] = useState(false);
+  const [challengingOpen, setChallengingOpen] = useState(false);
 
   const yesterdayPerformance = {
     struggledAreas: [
@@ -170,13 +174,57 @@ export function AgentDesktopDemo() {
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="space-y-3">
+                      {/* AI Coaching Tip — pinned at top */}
+                      <div className="bg-gradient-to-r from-primary/10 to-secondary/10 p-3 rounded-lg border border-primary/20">
+                        <div className="flex items-start gap-2">
+                          <Sparkles className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+                          <div className="text-xs">
+                            <p className="font-semibold text-primary mb-1">
+                              AI Coaching Tip
+                            </p>
+                            <p className="text-gray-700">
+                              {yesterdayPerformance.aiTip}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Focus Areas for Today */}
                       <div className="flex items-start gap-2">
-                        <Star className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
+                        <MessageCircle className="h-4 w-4 text-purple-600 mt-0.5 flex-shrink-0" />
                         <div className="text-sm">
                           <p className="font-medium text-gray-900 mb-1">
-                            What You're Doing Well
+                            Focus Areas for Today
                           </p>
                           <ul className="space-y-1 text-gray-700">
+                            {yesterdayPerformance.focusAreas.map((area, idx) => (
+                              <li key={idx} className="text-xs">
+                                • {area}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
+
+                      {/* What You’re Doing Well — collapsible, collapsed by default */}
+                      <div className="border rounded-md overflow-hidden">
+                        <button
+                          type="button"
+                          onClick={() => setWinsOpen((v) => !v)}
+                          className="w-full flex items-center justify-between px-3 py-2 bg-gray-50 hover:bg-gray-100 transition-colors text-left"
+                        >
+                          <span className="font-medium text-gray-900 text-xs flex items-center gap-2">
+                            <Star className="h-3.5 w-3.5 text-green-600 flex-shrink-0" />
+                            What You’re Doing Well
+                          </span>
+                          {winsOpen ? (
+                            <ChevronUp className="h-3.5 w-3.5 text-gray-400 flex-shrink-0" />
+                          ) : (
+                            <ChevronDown className="h-3.5 w-3.5 text-gray-400 flex-shrink-0" />
+                          )}
+                        </button>
+                        {winsOpen && (
+                          <ul className="space-y-1 text-gray-700 px-3 py-2">
                             {yesterdayPerformance.struggledAreas.map(
                               (area, idx) => (
                                 <li key={idx} className="text-xs">
@@ -185,16 +233,28 @@ export function AgentDesktopDemo() {
                               )
                             )}
                           </ul>
-                        </div>
+                        )}
                       </div>
 
-                      <div className="flex items-start gap-2">
-                        <BarChart3 className="h-4 w-4 text-amber-600 mt-0.5 flex-shrink-0" />
-                        <div className="text-sm">
-                          <p className="font-medium text-gray-900 mb-1">
+                      {/* Areas to Improve — collapsible, collapsed by default */}
+                      <div className="border rounded-md overflow-hidden">
+                        <button
+                          type="button"
+                          onClick={() => setChallengingOpen((v) => !v)}
+                          className="w-full flex items-center justify-between px-3 py-2 bg-gray-50 hover:bg-gray-100 transition-colors text-left"
+                        >
+                          <span className="font-medium text-gray-900 text-xs flex items-center gap-2">
+                            <BarChart3 className="h-3.5 w-3.5 text-amber-600 flex-shrink-0" />
                             Areas to Improve
-                          </p>
-                          <ul className="space-y-1 text-gray-700">
+                          </span>
+                          {challengingOpen ? (
+                            <ChevronUp className="h-3.5 w-3.5 text-gray-400 flex-shrink-0" />
+                          ) : (
+                            <ChevronDown className="h-3.5 w-3.5 text-gray-400 flex-shrink-0" />
+                          )}
+                        </button>
+                        {challengingOpen && (
+                          <ul className="space-y-1 text-gray-700 px-3 py-2">
                             {yesterdayPerformance.challengingAreas.map(
                               (area, idx) => (
                                 <li key={idx} className="text-xs">
@@ -203,9 +263,10 @@ export function AgentDesktopDemo() {
                               )
                             )}
                           </ul>
-                        </div>
+                        )}
                       </div>
 
+                      {/* Example Contacts */}
                       <div className="flex items-start gap-2">
                         <Eye className="h-4 w-4 text-blue-600 mt-0.5 flex-shrink-0" />
                         <div className="text-sm">
@@ -227,36 +288,6 @@ export function AgentDesktopDemo() {
                                 </div>
                               )
                             )}
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="flex items-start gap-2">
-                        <MessageCircle className="h-4 w-4 text-purple-600 mt-0.5 flex-shrink-0" />
-                        <div className="text-sm">
-                          <p className="font-medium text-gray-900 mb-1">
-                            Focus Areas for Today
-                          </p>
-                          <ul className="space-y-1 text-gray-700">
-                            {yesterdayPerformance.focusAreas.map((area, idx) => (
-                              <li key={idx} className="text-xs">
-                                • {area}
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      </div>
-
-                      <div className="bg-gradient-to-r from-primary/10 to-secondary/10 p-3 rounded-lg border border-primary/20">
-                        <div className="flex items-start gap-2">
-                          <Sparkles className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
-                          <div className="text-xs">
-                            <p className="font-semibold text-primary mb-1">
-                              AI Coaching Tip
-                            </p>
-                            <p className="text-gray-700">
-                              {yesterdayPerformance.aiTip}
-                            </p>
                           </div>
                         </div>
                       </div>

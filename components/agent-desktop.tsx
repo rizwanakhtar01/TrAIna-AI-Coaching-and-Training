@@ -28,6 +28,8 @@ import {
   RefreshCw,
   CheckCircle,
   KeyRound,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 
 interface AgentDesktopProps {
@@ -45,6 +47,8 @@ function FloatingCoachingWidget({
   onSeeDetails,
 }: FloatingWidgetProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [winsOpen, setWinsOpen] = useState(false);
+  const [challengingOpen, setChallengingOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -788,51 +792,22 @@ function FloatingCoachingWidget({
                 )
               ) : (
                 <>
-                  {/* Areas where agent struggled */}
-                  <div className="space-y-2">
-                    <h4 className="font-semibold text-gray-800 text-sm flex items-center gap-2">
-                      <BarChart3 className="h-4 w-4 text-red-500" />
-                      Yesterday’s Wins
+                  {/* Pro Tip for Today — pinned at top */}
+                  <div className="p-3 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-md border border-blue-200">
+                    <h4 className="font-semibold text-gray-800 text-sm mb-2 flex items-center gap-2">
+                      <MessageCircle className="h-4 w-4 text-blue-600" />
+                      Pro Tip for Today
                     </h4>
-                    <ul className="space-y-1">
-                      {yesterdayPerformance.struggledAreas.map(
-                        (area, index) => (
-                          <li
-                            key={index}
-                            className="text-sm text-gray-600 pl-4 border-l-2 border-red-200"
-                          >
-                            • {area}
-                          </li>
-                        ),
-                      )}
-                    </ul>
+                    <p className="text-sm text-gray-700 italic">
+                      {yesterdayPerformance.aiTip}
+                    </p>
                   </div>
 
-                  {/* Challenging Areas */}
-                  <div className="space-y-2">
-                    <h4 className="font-semibold text-gray-800 text-sm flex items-center gap-2">
-                      <BarChart3 className="h-4 w-4 text-red-500" />
-                      Challenging Areas
-                    </h4>
-                    <ul className="space-y-1">
-                      {yesterdayPerformance.challengingAreas.map(
-                        (area, index) => (
-                          <li
-                            key={index}
-                            className="text-sm text-gray-600 pl-4 border-l-2 border-red-200"
-                          >
-                            • {area}
-                          </li>
-                        ),
-                      )}
-                    </ul>
-                  </div>
-
-                  {/* Areas to focus on today */}
+                  {/* Today's Focus Areas */}
                   <div className="space-y-2">
                     <h4 className="font-semibold text-gray-800 text-sm flex items-center gap-2">
                       <Star className="h-4 w-4 text-blue-500" />
-                      Today's Focus Areas
+                      Today’s Focus Areas
                     </h4>
                     <ul className="space-y-1">
                       {yesterdayPerformance.focusAreas.map((area, index) => (
@@ -846,15 +821,70 @@ function FloatingCoachingWidget({
                     </ul>
                   </div>
 
-                  {/* AI Tip */}
-                  <div className="p-3 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-md border border-blue-200">
-                    <h4 className="font-semibold text-gray-800 text-sm mb-2 flex items-center gap-2">
-                      <MessageCircle className="h-4 w-4 text-blue-600" />
-                      Pro Tip for Today
-                    </h4>
-                    <p className="text-sm text-gray-700 italic">
-                      {yesterdayPerformance.aiTip}
-                    </p>
+                  {/* Yesterday’s Wins — collapsible, collapsed by default */}
+                  <div className="border rounded-md overflow-hidden">
+                    <button
+                      type="button"
+                      onClick={() => setWinsOpen((v) => !v)}
+                      className="w-full flex items-center justify-between px-3 py-2.5 bg-gray-50 hover:bg-gray-100 transition-colors text-left"
+                    >
+                      <span className="font-semibold text-gray-800 text-sm flex items-center gap-2">
+                        <Star className="h-4 w-4 text-green-500" />
+                        Yesterday’s Wins
+                      </span>
+                      {winsOpen ? (
+                        <ChevronUp className="h-4 w-4 text-gray-400 flex-shrink-0" />
+                      ) : (
+                        <ChevronDown className="h-4 w-4 text-gray-400 flex-shrink-0" />
+                      )}
+                    </button>
+                    {winsOpen && (
+                      <ul className="space-y-1 px-3 py-2.5">
+                        {yesterdayPerformance.struggledAreas.map(
+                          (area, index) => (
+                            <li
+                              key={index}
+                              className="text-sm text-gray-600 pl-4 border-l-2 border-green-200"
+                            >
+                              • {area}
+                            </li>
+                          ),
+                        )}
+                      </ul>
+                    )}
+                  </div>
+
+                  {/* Challenging Areas — collapsible, collapsed by default */}
+                  <div className="border rounded-md overflow-hidden">
+                    <button
+                      type="button"
+                      onClick={() => setChallengingOpen((v) => !v)}
+                      className="w-full flex items-center justify-between px-3 py-2.5 bg-gray-50 hover:bg-gray-100 transition-colors text-left"
+                    >
+                      <span className="font-semibold text-gray-800 text-sm flex items-center gap-2">
+                        <BarChart3 className="h-4 w-4 text-amber-500" />
+                        Challenging Areas
+                      </span>
+                      {challengingOpen ? (
+                        <ChevronUp className="h-4 w-4 text-gray-400 flex-shrink-0" />
+                      ) : (
+                        <ChevronDown className="h-4 w-4 text-gray-400 flex-shrink-0" />
+                      )}
+                    </button>
+                    {challengingOpen && (
+                      <ul className="space-y-1 px-3 py-2.5">
+                        {yesterdayPerformance.challengingAreas.map(
+                          (area, index) => (
+                            <li
+                              key={index}
+                              className="text-sm text-gray-600 pl-4 border-l-2 border-amber-200"
+                            >
+                              • {area}
+                            </li>
+                          ),
+                        )}
+                      </ul>
+                    )}
                   </div>
 
                   {/* Acknowledge Button */}
