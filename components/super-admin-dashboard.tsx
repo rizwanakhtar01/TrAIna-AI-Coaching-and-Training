@@ -62,6 +62,8 @@ interface Customer {
   companyName: string;
   amazonConnectId: string;
   llmApiKey: string;
+  llmProvider: "gemini" | "bedrock";
+  bedrockModel: "claude-sonnet" | "claude-haiku" | "nova-pro";
   status: "active" | "inactive";
   primaryAdminEmail: string;
   region: string;
@@ -88,6 +90,8 @@ const mockCustomers: Customer[] = [
     companyName: "Acme Corp",
     amazonConnectId: "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
     llmApiKey: "sk-acme-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+    llmProvider: "gemini",
+    bedrockModel: "claude-sonnet",
     status: "active",
     primaryAdminEmail: "admin@acmecorp.com",
     region: "us-east-1",
@@ -112,6 +116,8 @@ const mockCustomers: Customer[] = [
     companyName: "Nova Support",
     amazonConnectId: "b2c3d4e5-f6a7-8901-bcde-f23456789012",
     llmApiKey: "sk-nova-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+    llmProvider: "gemini",
+    bedrockModel: "claude-sonnet",
     status: "active",
     primaryAdminEmail: "admin@novasupport.io",
     region: "eu-west-2",
@@ -136,6 +142,8 @@ const mockCustomers: Customer[] = [
     companyName: "ZenRetail",
     amazonConnectId: "c3d4e5f6-a7b8-9012-cdef-345678901234",
     llmApiKey: "sk-zen-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+    llmProvider: "gemini",
+    bedrockModel: "claude-sonnet",
     status: "inactive",
     primaryAdminEmail: "admin@zenretail.com",
     region: "ap-southeast-1",
@@ -160,6 +168,8 @@ const mockCustomers: Customer[] = [
     companyName: "TechFlow Solutions",
     amazonConnectId: "d4e5f6a7-b8c9-0123-defa-456789012345",
     llmApiKey: "sk-tech-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+    llmProvider: "gemini",
+    bedrockModel: "claude-sonnet",
     status: "active",
     primaryAdminEmail: "admin@techflow.com",
     region: "us-west-2",
@@ -184,6 +194,8 @@ const mockCustomers: Customer[] = [
     companyName: "Global Services Inc",
     amazonConnectId: "e5f6a7b8-c9d0-1234-efab-567890123456",
     llmApiKey: "sk-global-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+    llmProvider: "gemini",
+    bedrockModel: "claude-sonnet",
     status: "active",
     primaryAdminEmail: "admin@globalservices.com",
     region: "eu-central-1",
@@ -746,16 +758,87 @@ export function SuperAdminDashboard({ onLogout }: SuperAdminDashboardProps) {
                   placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
                 />
               </div>
+              {/* LLM Provider */}
               <div className="space-y-2">
-                <Label htmlFor="editLlmApiKey">LLM API Key</Label>
-                <Input
-                  id="editLlmApiKey"
-                  type="password"
-                  value={showEditCustomer.llmApiKey}
-                  onChange={(e) => setShowEditCustomer({ ...showEditCustomer, llmApiKey: e.target.value })}
-                  placeholder="sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-                />
+                <Label>LLM Provider</Label>
+                <div className="grid grid-cols-2 gap-2">
+                  <label className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${showEditCustomer.llmProvider === "gemini" ? "border-primary bg-primary/5" : "border-gray-200 hover:bg-gray-50"}`}>
+                    <input
+                      type="radio"
+                      name="editLlmProvider"
+                      value="gemini"
+                      checked={showEditCustomer.llmProvider === "gemini"}
+                      onChange={() => setShowEditCustomer({ ...showEditCustomer, llmProvider: "gemini" })}
+                      className="h-4 w-4"
+                    />
+                    <div>
+                      <p className="font-medium text-sm">Google Gemini</p>
+                      <p className="text-xs text-muted-foreground">OmniTrAIna hosted</p>
+                    </div>
+                  </label>
+                  <label className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${showEditCustomer.llmProvider === "bedrock" ? "border-primary bg-primary/5" : "border-gray-200 hover:bg-gray-50"}`}>
+                    <input
+                      type="radio"
+                      name="editLlmProvider"
+                      value="bedrock"
+                      checked={showEditCustomer.llmProvider === "bedrock"}
+                      onChange={() => setShowEditCustomer({ ...showEditCustomer, llmProvider: "bedrock" })}
+                      className="h-4 w-4"
+                    />
+                    <div>
+                      <p className="font-medium text-sm">Amazon Bedrock</p>
+                      <p className="text-xs text-muted-foreground">Customer’s AWS account</p>
+                    </div>
+                  </label>
+                </div>
               </div>
+              {/* Gemini: API Key */}
+              {showEditCustomer.llmProvider === "gemini" && (
+                <div className="space-y-2">
+                  <Label htmlFor="editLlmApiKey">LLM API Key</Label>
+                  <Input
+                    id="editLlmApiKey"
+                    type="password"
+                    value={showEditCustomer.llmApiKey}
+                    onChange={(e) => setShowEditCustomer({ ...showEditCustomer, llmApiKey: e.target.value })}
+                    placeholder="sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+                  />
+                </div>
+              )}
+              {/* Bedrock: Foundation Model */}
+              {showEditCustomer.llmProvider === "bedrock" && (
+                <div className="space-y-2">
+                  <Label>Foundation Model</Label>
+                  <div className="space-y-2">
+                    {[
+                      { value: "claude-sonnet", label: "Claude Sonnet 4.6", note: "Best balance of quality and speed", recommended: true },
+                      { value: "claude-haiku",  label: "Claude Haiku 4.5",  note: "Faster and more cost-efficient" },
+                      { value: "nova-pro",       label: "Amazon Nova Pro",   note: "AWS-native multimodal model" },
+                    ].map(({ value, label, note, recommended }) => (
+                      <label
+                        key={value}
+                        className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${showEditCustomer.bedrockModel === value ? "border-primary bg-primary/5" : "border-gray-200 hover:bg-gray-50"}`}
+                      >
+                        <input
+                          type="radio"
+                          name="editBedrockModel"
+                          value={value}
+                          checked={showEditCustomer.bedrockModel === value}
+                          onChange={() => setShowEditCustomer({ ...showEditCustomer, bedrockModel: value as "claude-sonnet" | "claude-haiku" | "nova-pro" })}
+                          className="mt-0.5 h-4 w-4"
+                        />
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <p className="font-medium text-sm">{label}</p>
+                            {recommended && <span className="text-[10px] px-1.5 py-0 bg-emerald-100 text-emerald-700 rounded-full font-medium">Recommended</span>}
+                          </div>
+                          <p className="text-xs text-muted-foreground">{note}</p>
+                        </div>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              )}
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="editNumberOfAgents">No. of Agents</Label>

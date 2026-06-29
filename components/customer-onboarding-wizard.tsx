@@ -153,9 +153,7 @@ function RadioCard({
             selected ? "border-[#1A56DB]" : "border-muted-foreground/40"
           }`}
         >
-          {selected && (
-            <div className="h-2 w-2 rounded-full bg-[#1A56DB]" />
-          )}
+          {selected && <div className="h-2 w-2 rounded-full bg-[#1A56DB]" />}
         </div>
         <span className="font-medium text-sm">{title}</span>
       </div>
@@ -212,14 +210,14 @@ export function CustomerOnboardingWizard({
       (c) => {
         const r = (Math.random() * 16) | 0;
         return (c === "x" ? r : (r & 0x3) | 0x8).toString(16);
-      }
+      },
     );
     setExternalId(uuid);
   }, []);
 
   const set = <K extends keyof WizardFormData>(
     field: K,
-    value: WizardFormData[K]
+    value: WizardFormData[K],
   ) => setForm((prev) => ({ ...prev, [field]: value }));
 
   const regionLabel =
@@ -248,7 +246,7 @@ export function CustomerOnboardingWizard({
 
   const isBedrockAccountIdValid = /^\d{12}$/.test(form.bedrockAccountId);
   const isIamRoleArnValid = /^arn:aws:iam::\d{12}:role\/.+$/.test(
-    form.iamRoleArn
+    form.iamRoleArn,
   );
 
   const canProceed = () => {
@@ -288,9 +286,7 @@ export function CustomerOnboardingWizard({
     setTimeout(() => {
       // Mock: succeed if all fields look valid
       const ok =
-        isBedrockAccountIdValid &&
-        !!form.bedrockRegion &&
-        isIamRoleArnValid;
+        isBedrockAccountIdValid && !!form.bedrockRegion && isIamRoleArnValid;
       setBedrockTestStatus(ok ? "success" : "failure");
     }, 1800);
   };
@@ -320,7 +316,7 @@ export function CustomerOnboardingWizard({
       ],
     },
     null,
-    2
+    2,
   );
 
   // ── Success screen ──────────────────────────────────────────────────────────
@@ -489,9 +485,7 @@ export function CustomerOnboardingWizard({
                       id="adminEmail"
                       type="email"
                       value={form.primaryAdminEmail}
-                      onChange={(e) =>
-                        set("primaryAdminEmail", e.target.value)
-                      }
+                      onChange={(e) => set("primaryAdminEmail", e.target.value)}
                       placeholder="admin@company.com"
                     />
                   </div>
@@ -602,9 +596,7 @@ export function CustomerOnboardingWizard({
                             Default
                           </Badge>
                         </div>
-                        <p className="text-xs text-muted-foreground">
-                          Managed by Omningage
-                        </p>
+
                         <p className="text-xs text-muted-foreground mt-2">
                           No additional setup required.
                         </p>
@@ -628,9 +620,6 @@ export function CustomerOnboardingWizard({
                         <p className="text-xs text-muted-foreground">
                           Runs in your AWS account
                         </p>
-                        <p className="text-xs text-muted-foreground mt-2">
-                          Requires IAM role configuration.
-                        </p>
                       </button>
                     </div>
                   </div>
@@ -651,9 +640,7 @@ export function CustomerOnboardingWizard({
 
                       <div className="space-y-3">
                         <FieldLabel>AI Coaching Tier</FieldLabel>
-                        <div className="space-y-2">
-                          {renderTierCards()}
-                        </div>
+                        <div className="space-y-2">{renderTierCards()}</div>
                       </div>
 
                       {renderTrainingToggle()}
@@ -696,7 +683,8 @@ export function CustomerOnboardingWizard({
                             title="Amazon Nova Pro"
                           >
                             <p className="text-xs text-muted-foreground mt-1.5">
-                              AWS-native multimodal model — strong reasoning and low latency
+                              AWS-native multimodal model — strong reasoning and
+                              low latency
                             </p>
                           </RadioCard>
                         </div>
@@ -705,9 +693,7 @@ export function CustomerOnboardingWizard({
                       {/* AI Coaching Tier */}
                       <div className="space-y-3">
                         <FieldLabel>AI Coaching Tier</FieldLabel>
-                        <div className="space-y-2">
-                          {renderTierCards()}
-                        </div>
+                        <div className="space-y-2">{renderTierCards()}</div>
                       </div>
 
                       {renderTrainingToggle()}
@@ -801,10 +787,7 @@ export function CustomerOnboardingWizard({
                               step={5}
                               value={form.thresholdValue}
                               onChange={(e) =>
-                                set(
-                                  "thresholdValue",
-                                  parseInt(e.target.value)
-                                )
+                                set("thresholdValue", parseInt(e.target.value))
                               }
                               className="relative w-full appearance-none bg-transparent cursor-pointer accent-primary"
                             />
@@ -939,8 +922,6 @@ export function CustomerOnboardingWizard({
                           </Badge>
                         }
                       />
-
-
                     </div>
                   </div>
 
