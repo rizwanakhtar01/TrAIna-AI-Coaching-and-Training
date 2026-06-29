@@ -663,59 +663,6 @@ export function CustomerOnboardingWizard({
                   {/* ── Bedrock fields ────────────────────────────────────── */}
                   {form.llmProvider === "bedrock" && (
                     <div className="space-y-5">
-                      {/* AWS Account ID */}
-                      <div className="space-y-1.5">
-                        <FieldLabel htmlFor="bedrockAccountId">
-                          AWS Account ID
-                        </FieldLabel>
-                        <Input
-                          id="bedrockAccountId"
-                          value={form.bedrockAccountId}
-                          onChange={(e) => {
-                            set("bedrockAccountId", e.target.value);
-                            setBedrockTestStatus("idle");
-                          }}
-                          placeholder="123456789012"
-                          className={`font-mono ${
-                            form.bedrockAccountId &&
-                            !isBedrockAccountIdValid
-                              ? "border-destructive"
-                              : ""
-                          }`}
-                          maxLength={12}
-                        />
-                        {form.bedrockAccountId && !isBedrockAccountIdValid && (
-                          <p className="text-xs text-destructive">
-                            Must be exactly 12 digits
-                          </p>
-                        )}
-                      </div>
-
-                      {/* AWS Region */}
-                      <div className="space-y-1.5">
-                        <FieldLabel htmlFor="bedrockRegion">
-                          AWS Region
-                        </FieldLabel>
-                        <Select
-                          value={form.bedrockRegion}
-                          onValueChange={(v) => {
-                            set("bedrockRegion", v);
-                            setBedrockTestStatus("idle");
-                          }}
-                        >
-                          <SelectTrigger id="bedrockRegion">
-                            <SelectValue placeholder="Select region" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {BEDROCK_REGIONS.map((r) => (
-                              <SelectItem key={r.value} value={r.value}>
-                                {r.label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-
                       {/* Foundation Model */}
                       <div className="space-y-3">
                         <FieldLabel>Foundation Model</FieldLabel>
@@ -723,7 +670,7 @@ export function CustomerOnboardingWizard({
                           <RadioCard
                             selected={form.bedrockModel === "claude-sonnet"}
                             onClick={() => set("bedrockModel", "claude-sonnet")}
-                            title="Claude Sonnet"
+                            title="Claude Sonnet 4.6"
                           >
                             <div className="flex items-center gap-2 mt-1.5">
                               <Badge className="text-[10px] px-1.5 py-0 bg-emerald-100 text-emerald-700 border-0 hover:bg-emerald-100">
@@ -737,7 +684,7 @@ export function CustomerOnboardingWizard({
                           <RadioCard
                             selected={form.bedrockModel === "claude-haiku"}
                             onClick={() => set("bedrockModel", "claude-haiku")}
-                            title="Claude Haiku"
+                            title="Claude Haiku 4.5"
                           >
                             <p className="text-xs text-muted-foreground mt-1.5">
                               Faster and more cost-efficient
@@ -764,170 +711,6 @@ export function CustomerOnboardingWizard({
                       </div>
 
                       {renderTrainingToggle()}
-
-                      {/* External ID */}
-                      <div className="space-y-1.5">
-                        <FieldLabel
-                          htmlFor="externalId"
-                          description="Provide this value when configuring your IAM trust policy"
-                        >
-                          External ID
-                        </FieldLabel>
-                        <div className="flex gap-2">
-                          <Input
-                            id="externalId"
-                            value={externalId}
-                            readOnly
-                            className="font-mono text-xs bg-muted/40 flex-1"
-                          />
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="icon"
-                            className="flex-shrink-0"
-                            onClick={() =>
-                              copyText(externalId, setCopiedExternalId)
-                            }
-                          >
-                            {copiedExternalId ? (
-                              <Check className="h-4 w-4 text-green-600" />
-                            ) : (
-                              <Copy className="h-4 w-4" />
-                            )}
-                          </Button>
-                        </div>
-                      </div>
-
-                      {/* Collapsible IAM instructions */}
-                      <div
-                        className="rounded-lg border overflow-hidden"
-                        style={{ borderLeft: "4px solid #1A56DB" }}
-                      >
-                        <button
-                          type="button"
-                          onClick={() => setIamOpen((v) => !v)}
-                          className="w-full flex items-center justify-between px-4 py-3 text-sm font-medium hover:bg-muted/30 transition-colors text-left"
-                        >
-                          <span>View IAM role setup instructions</span>
-                          {iamOpen ? (
-                            <ChevronDown className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-                          ) : (
-                            <ChevronRight className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-                          )}
-                        </button>
-
-                        {iamOpen && (
-                          <div className="px-4 pb-4 space-y-4 border-t">
-                            <ol className="text-sm text-muted-foreground space-y-2 mt-3 list-none">
-                              {[
-                                "Open the AWS IAM console and navigate to Roles → Create role.",
-                                'Choose "Another AWS account" as the trusted entity, and enter Omningage\'s AWS Account ID: 711387140677.',
-                                "Add a condition key sts:ExternalId and paste the External ID shown above.",
-                                "Attach the managed policy AmazonBedrockFullAccess.",
-                                "Name the role and create it, then copy the Role ARN and paste it in the field below.",
-                              ].map((step, i) => (
-                                <li key={i} className="flex gap-3">
-                                  <span className="flex-shrink-0 h-5 w-5 rounded-full bg-[#F0F6FF] text-[#1A56DB] text-xs font-semibold flex items-center justify-center">
-                                    {i + 1}
-                                  </span>
-                                  <span>{step}</span>
-                                </li>
-                              ))}
-                            </ol>
-
-                            {/* Trust policy JSON */}
-                            <div className="space-y-1.5">
-                              <div className="flex items-center justify-between">
-                                <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                                  Trust policy
-                                </span>
-                                <button
-                                  type="button"
-                                  onClick={() =>
-                                    copyText(trustPolicyJson, setCopiedPolicy)
-                                  }
-                                  className="flex items-center gap-1.5 text-xs text-[#1A56DB] hover:text-[#1A56DB]/80 transition-colors"
-                                >
-                                  {copiedPolicy ? (
-                                    <Check className="h-3 w-3" />
-                                  ) : (
-                                    <Copy className="h-3 w-3" />
-                                  )}
-                                  {copiedPolicy ? "Copied" : "Copy"}
-                                </button>
-                              </div>
-                              <pre className="bg-zinc-900 text-zinc-100 rounded-lg p-4 text-xs font-mono overflow-x-auto leading-relaxed">
-                                {trustPolicyJson}
-                              </pre>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-
-                      {/* IAM Role ARN */}
-                      <div className="space-y-1.5">
-                        <FieldLabel htmlFor="iamRoleArn">
-                          IAM Role ARN
-                        </FieldLabel>
-                        <Input
-                          id="iamRoleArn"
-                          value={form.iamRoleArn}
-                          onChange={(e) => {
-                            set("iamRoleArn", e.target.value);
-                            setBedrockTestStatus("idle");
-                          }}
-                          placeholder="arn:aws:iam::123456789012:role/OmninageBedrockRole"
-                          className={`font-mono text-xs ${
-                            form.iamRoleArn && !isIamRoleArnValid
-                              ? "border-destructive"
-                              : ""
-                          }`}
-                        />
-                        {form.iamRoleArn && !isIamRoleArnValid && (
-                          <p className="text-xs text-destructive">
-                            Must match arn:aws:iam::&lt;12 digits&gt;:role/&lt;name&gt;
-                          </p>
-                        )}
-                      </div>
-
-                      {/* Test Connection */}
-                      <div className="space-y-3">
-                        <Button
-                          type="button"
-                          variant="outline"
-                          onClick={handleTestConnection}
-                          disabled={
-                            bedrockTestStatus === "loading" ||
-                            !isBedrockAccountIdValid ||
-                            !form.bedrockRegion ||
-                            !isIamRoleArnValid
-                          }
-                          className="w-full"
-                        >
-                          {bedrockTestStatus === "loading" ? (
-                            <>
-                              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                              Testing connection…
-                            </>
-                          ) : (
-                            "Test Connection"
-                          )}
-                        </Button>
-
-                        {bedrockTestStatus === "success" && (
-                          <div className="flex items-center gap-2 p-3 rounded-lg bg-green-50 border border-green-200 text-sm text-green-800">
-                            <CheckCircle className="h-4 w-4 flex-shrink-0 text-green-600" />
-                            Connection successful — IAM role verified.
-                          </div>
-                        )}
-                        {bedrockTestStatus === "failure" && (
-                          <div className="flex items-center gap-2 p-3 rounded-lg bg-red-50 border border-red-200 text-sm text-red-800">
-                            <AlertCircle className="h-4 w-4 flex-shrink-0 text-red-600" />
-                            Connection failed — check the IAM role and try
-                            again.
-                          </div>
-                        )}
-                      </div>
                     </div>
                   )}
                 </div>
@@ -1121,21 +904,12 @@ export function CustomerOnboardingWizard({
                       ) : (
                         <>
                           <ReviewRow
-                            label="AWS Account ID"
-                            value={form.bedrockAccountId}
-                            mono
-                          />
-                          <ReviewRow
-                            label="AWS Region"
-                            value={bedrockRegionLabel}
-                          />
-                          <ReviewRow
                             label="Foundation Model"
                             value={
                               form.bedrockModel === "claude-sonnet"
-                                ? "Claude Sonnet"
+                                ? "Claude Sonnet 4.6"
                                 : form.bedrockModel === "claude-haiku"
-                                  ? "Claude Haiku"
+                                  ? "Claude Haiku 4.5"
                                   : "Amazon Nova Pro"
                             }
                           />
@@ -1166,27 +940,7 @@ export function CustomerOnboardingWizard({
                         }
                       />
 
-                      {form.llmProvider === "bedrock" && (
-                        <>
-                          <ReviewRow
-                            label="IAM Role ARN"
-                            value={
-                              <span className="font-mono text-xs break-all">
-                                {form.iamRoleArn || "—"}
-                              </span>
-                            }
-                          />
-                          <ReviewRow
-                            label="Connection"
-                            value={
-                              <span className="flex items-center gap-1.5 text-green-700 font-medium">
-                                <CheckCircle className="h-3.5 w-3.5 text-green-600" />
-                                Verified
-                              </span>
-                            }
-                          />
-                        </>
-                      )}
+
                     </div>
                   </div>
 
