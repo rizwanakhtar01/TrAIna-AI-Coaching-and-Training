@@ -944,26 +944,6 @@ function FloatingCoachingWidget({
                     )}
                   </div>
 
-                  {/* Acknowledge Button */}
-                  {/* <Button
-                    onClick={() => setIsAcknowledged(true)}
-                    disabled={isAcknowledged}
-                    className={`w-full ${
-                      isAcknowledged 
-                        ? "bg-green-600 hover:bg-green-600 cursor-default" 
-                        : "bg-amber-500 hover:bg-amber-600"
-                    } text-white`}
-                  >
-                    {isAcknowledged ? (
-                      <>
-                        <CheckCircle className="h-4 w-4 mr-2" />
-                        Acknowledged
-                      </>
-                    ) : (
-                      "Acknowledge"
-                    )}
-                  </Button> */}
-
                   {/* CTA Button */}
                   <Button
                     onClick={() => window.open("/agent-dashboard", "_blank")}
