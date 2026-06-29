@@ -56,9 +56,11 @@ function FloatingCoachingWidget({
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
-  
+
   const [showForgotPassword, setShowForgotPassword] = useState(false);
-  const [forgotPasswordStep, setForgotPasswordStep] = useState<"email" | "code" | "success">("email");
+  const [forgotPasswordStep, setForgotPasswordStep] = useState<
+    "email" | "code" | "success"
+  >("email");
   const [resetEmail, setResetEmail] = useState("");
   const [verificationCode, setVerificationCode] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -67,7 +69,7 @@ function FloatingCoachingWidget({
   const [forgotPasswordLoading, setForgotPasswordLoading] = useState(false);
   const [resendCountdown, setResendCountdown] = useState(0);
   const [codeSentMessage, setCodeSentMessage] = useState(true);
-  
+
   const [isFirstTimeLogin, setIsFirstTimeLogin] = useState(false);
   const [showSetupPassword, setShowSetupPassword] = useState(false);
   const [setupNewPassword, setSetupNewPassword] = useState("");
@@ -85,7 +87,10 @@ function FloatingCoachingWidget({
 
   useEffect(() => {
     if (resendCountdown > 0) {
-      const timer = setTimeout(() => setResendCountdown(resendCountdown - 1), 1000);
+      const timer = setTimeout(
+        () => setResendCountdown(resendCountdown - 1),
+        1000,
+      );
       return () => clearTimeout(timer);
     }
   }, [resendCountdown]);
@@ -339,7 +344,9 @@ function FloatingCoachingWidget({
                       className="h-7 w-7 p-0"
                       title="Refresh feedback"
                     >
-                      <RefreshCw className={`h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`} />
+                      <RefreshCw
+                        className={`h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`}
+                      />
                     </Button>
                   )}
                   <Button
@@ -374,13 +381,20 @@ function FloatingCoachingWidget({
                             Reset Your Password
                           </h3>
                           <p className="text-sm text-gray-600">
-                            Enter your email and we'll send you a verification code
+                            Enter your email and we'll send you a verification
+                            code
                           </p>
                         </div>
 
-                        <form onSubmit={handleSendVerificationCode} className="space-y-4 px-6">
+                        <form
+                          onSubmit={handleSendVerificationCode}
+                          className="space-y-4 px-6"
+                        >
                           <div className="space-y-2">
-                            <Label htmlFor="resetEmail" className="text-sm font-medium">
+                            <Label
+                              htmlFor="resetEmail"
+                              className="text-sm font-medium"
+                            >
                               Email Address
                             </Label>
                             <div className="relative">
@@ -400,7 +414,9 @@ function FloatingCoachingWidget({
 
                           {forgotPasswordError && (
                             <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
-                              <p className="text-sm text-red-600">{forgotPasswordError}</p>
+                              <p className="text-sm text-red-600">
+                                {forgotPasswordError}
+                              </p>
                             </div>
                           )}
 
@@ -441,7 +457,8 @@ function FloatingCoachingWidget({
                             Enter Verification Code
                           </h3>
                           <p className="text-sm text-gray-600">
-                            We sent a code to <span className="font-medium">{resetEmail}</span>
+                            We sent a code to{" "}
+                            <span className="font-medium">{resetEmail}</span>
                           </p>
                         </div>
 
@@ -452,9 +469,15 @@ function FloatingCoachingWidget({
                           </p>
                         </div>
 
-                        <form onSubmit={handleVerifyAndResetPassword} className="space-y-4 px-6">
+                        <form
+                          onSubmit={handleVerifyAndResetPassword}
+                          className="space-y-4 px-6"
+                        >
                           <div className="space-y-2">
-                            <Label htmlFor="verificationCode" className="text-sm font-medium">
+                            <Label
+                              htmlFor="verificationCode"
+                              className="text-sm font-medium"
+                            >
                               Verification Code
                             </Label>
                             <Input
@@ -462,7 +485,11 @@ function FloatingCoachingWidget({
                               type="text"
                               placeholder="Enter 6-digit code"
                               value={verificationCode}
-                              onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                              onChange={(e) =>
+                                setVerificationCode(
+                                  e.target.value.replace(/\D/g, "").slice(0, 6),
+                                )
+                              }
                               className="rounded-lg border-gray-300 text-center text-lg tracking-widest"
                               maxLength={6}
                               required
@@ -471,7 +498,10 @@ function FloatingCoachingWidget({
                           </div>
 
                           <div className="space-y-2">
-                            <Label htmlFor="newPassword" className="text-sm font-medium">
+                            <Label
+                              htmlFor="newPassword"
+                              className="text-sm font-medium"
+                            >
                               New Password
                             </Label>
                             <div className="relative">
@@ -490,7 +520,10 @@ function FloatingCoachingWidget({
                           </div>
 
                           <div className="space-y-2">
-                            <Label htmlFor="confirmPassword" className="text-sm font-medium">
+                            <Label
+                              htmlFor="confirmPassword"
+                              className="text-sm font-medium"
+                            >
                               Confirm Password
                             </Label>
                             <div className="relative">
@@ -500,7 +533,9 @@ function FloatingCoachingWidget({
                                 type="password"
                                 placeholder="Confirm your password"
                                 value={confirmPassword}
-                                onChange={(e) => setConfirmPassword(e.target.value)}
+                                onChange={(e) =>
+                                  setConfirmPassword(e.target.value)
+                                }
                                 className="pl-10 rounded-lg border-gray-300"
                                 required
                                 disabled={forgotPasswordLoading}
@@ -510,7 +545,9 @@ function FloatingCoachingWidget({
 
                           {forgotPasswordError && (
                             <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
-                              <p className="text-sm text-red-600">{forgotPasswordError}</p>
+                              <p className="text-sm text-red-600">
+                                {forgotPasswordError}
+                              </p>
                             </div>
                           )}
 
@@ -569,7 +606,8 @@ function FloatingCoachingWidget({
                           Password Reset Successful
                         </h3>
                         <p className="text-sm text-gray-600">
-                          Your password has been updated. You can now sign in with your new password.
+                          Your password has been updated. You can now sign in
+                          with your new password.
                         </p>
                         <Button
                           className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-lg"
@@ -596,13 +634,20 @@ function FloatingCoachingWidget({
 
                     <div className="mx-6 p-3 bg-blue-50 border border-blue-200 rounded-lg">
                       <p className="text-sm text-blue-700">
-                        Logged in as <span className="font-medium">{email}</span>
+                        Logged in as{" "}
+                        <span className="font-medium">{email}</span>
                       </p>
                     </div>
 
-                    <form onSubmit={handleSetupPassword} className="space-y-4 px-6">
+                    <form
+                      onSubmit={handleSetupPassword}
+                      className="space-y-4 px-6"
+                    >
                       <div className="space-y-2">
-                        <Label htmlFor="setupNewPassword" className="text-sm font-medium">
+                        <Label
+                          htmlFor="setupNewPassword"
+                          className="text-sm font-medium"
+                        >
                           New Password
                         </Label>
                         <div className="relative">
@@ -612,7 +657,9 @@ function FloatingCoachingWidget({
                             type="password"
                             placeholder="At least 8 characters"
                             value={setupNewPassword}
-                            onChange={(e) => setSetupNewPassword(e.target.value)}
+                            onChange={(e) =>
+                              setSetupNewPassword(e.target.value)
+                            }
                             className="pl-10 rounded-lg border-gray-300"
                             required
                             disabled={setupPasswordLoading}
@@ -621,7 +668,10 @@ function FloatingCoachingWidget({
                       </div>
 
                       <div className="space-y-2">
-                        <Label htmlFor="setupConfirmPassword" className="text-sm font-medium">
+                        <Label
+                          htmlFor="setupConfirmPassword"
+                          className="text-sm font-medium"
+                        >
                           Confirm Password
                         </Label>
                         <div className="relative">
@@ -631,7 +681,9 @@ function FloatingCoachingWidget({
                             type="password"
                             placeholder="Confirm your password"
                             value={setupConfirmPassword}
-                            onChange={(e) => setSetupConfirmPassword(e.target.value)}
+                            onChange={(e) =>
+                              setSetupConfirmPassword(e.target.value)
+                            }
                             className="pl-10 rounded-lg border-gray-300"
                             required
                             disabled={setupPasswordLoading}
@@ -641,7 +693,9 @@ function FloatingCoachingWidget({
 
                       {setupPasswordError && (
                         <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
-                          <p className="text-sm text-red-600">{setupPasswordError}</p>
+                          <p className="text-sm text-red-600">
+                            {setupPasswordError}
+                          </p>
                         </div>
                       )}
 
@@ -671,66 +725,69 @@ function FloatingCoachingWidget({
                     </form>
                   </div>
                 ) : (
-                <div className="space-y-4 py-4">
-                  <div className="text-center space-y-2 mb-6">
-                    <div className="mx-auto w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                      <Lock className="h-6 w-6 text-blue-600" />
-                    </div>
-                    <h3 className="font-semibold text-gray-900 text-lg">
-                      Sign in to TrAIna
-                    </h3>
-                    <p className="text-sm text-gray-600">
-                      Access your personalized coaching insights
-                    </p>
-                  </div>
-
-                  <form onSubmit={handleLogin} className="space-y-4 px-6">
-                    <div className="space-y-2">
-                      <Label htmlFor="email" className="text-sm font-medium">
-                        Email / Username
-                      </Label>
-                      <div className="relative">
-                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                        <Input
-                          id="email"
-                          type="text"
-                          placeholder="coach@omnihive.com"
-                          value={email}
-                          onChange={(e) => setEmail(e.target.value)}
-                          className="pl-10 rounded-lg border-gray-300"
-                          required
-                          disabled={isLoading}
-                        />
+                  <div className="space-y-4 py-4">
+                    <div className="text-center space-y-2 mb-6">
+                      <div className="mx-auto w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                        <Lock className="h-6 w-6 text-blue-600" />
                       </div>
+                      <h3 className="font-semibold text-gray-900 text-lg">
+                        Sign in to TrAIna
+                      </h3>
+                      <p className="text-sm text-gray-600">
+                        Access your personalized coaching insights
+                      </p>
                     </div>
 
-                    <div className="space-y-2">
-                      <Label htmlFor="password" className="text-sm font-medium">
-                        Password
-                      </Label>
-                      <div className="relative">
-                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                        <Input
-                          id="password"
-                          type="password"
-                          placeholder="Enter your password"
-                          value={password}
-                          onChange={(e) => setPassword(e.target.value)}
-                          className="pl-10 rounded-lg border-gray-300"
-                          required
-                          disabled={isLoading}
-                        />
+                    <form onSubmit={handleLogin} className="space-y-4 px-6">
+                      <div className="space-y-2">
+                        <Label htmlFor="email" className="text-sm font-medium">
+                          Email / Username
+                        </Label>
+                        <div className="relative">
+                          <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                          <Input
+                            id="email"
+                            type="text"
+                            placeholder="coach@omnihive.com"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            className="pl-10 rounded-lg border-gray-300"
+                            required
+                            disabled={isLoading}
+                          />
+                        </div>
                       </div>
-                    </div>
 
-                    {error && (
-                      <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
-                        <p className="text-sm text-red-600">{error}</p>
+                      <div className="space-y-2">
+                        <Label
+                          htmlFor="password"
+                          className="text-sm font-medium"
+                        >
+                          Password
+                        </Label>
+                        <div className="relative">
+                          <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                          <Input
+                            id="password"
+                            type="password"
+                            placeholder="Enter your password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            className="pl-10 rounded-lg border-gray-300"
+                            required
+                            disabled={isLoading}
+                          />
+                        </div>
                       </div>
-                    )}
 
-                    <div className="flex items-center justify-between">
-                      {/* <div className="flex items-center space-x-2">
+                      {error && (
+                        <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+                          <p className="text-sm text-red-600">{error}</p>
+                        </div>
+                      )}
+
+                      <div className="flex items-center justify-between">
+                        {/* <div className="flex items-center space-x-2">
                         <Checkbox
                           id="remember"
                           checked={rememberMe}
@@ -746,49 +803,49 @@ function FloatingCoachingWidget({
                           Remember me
                         </Label>
                       </div> */}
-                      <button
-                        type="button"
-                        className="text-sm text-blue-600 hover:text-blue-700 font-medium"
-                        disabled={isLoading}
-                        onClick={handleForgotPasswordOpen}
-                      >
-                        Forgot Password?
-                      </button>
-                    </div>
+                        <button
+                          type="button"
+                          className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                          disabled={isLoading}
+                          onClick={handleForgotPasswordOpen}
+                        >
+                          Forgot Password?
+                        </button>
+                      </div>
 
-                    <div className="flex items-center space-x-2">
-                      <Checkbox
-                        id="firstTimeLogin"
-                        checked={isFirstTimeLogin}
-                        onCheckedChange={(checked) =>
-                          setIsFirstTimeLogin(checked as boolean)
-                        }
-                        disabled={isLoading}
-                      />
-                      <Label
-                        htmlFor="firstTimeLogin"
-                        className="text-sm text-gray-600 cursor-pointer"
-                      >
-                        First time login (setup new password)
-                      </Label>
-                    </div>
+                      <div className="flex items-center space-x-2">
+                        <Checkbox
+                          id="firstTimeLogin"
+                          checked={isFirstTimeLogin}
+                          onCheckedChange={(checked) =>
+                            setIsFirstTimeLogin(checked as boolean)
+                          }
+                          disabled={isLoading}
+                        />
+                        <Label
+                          htmlFor="firstTimeLogin"
+                          className="text-sm text-gray-600 cursor-pointer"
+                        >
+                          First time login (setup new password)
+                        </Label>
+                      </div>
 
-                    <Button
-                      type="submit"
-                      className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-lg"
-                      disabled={isLoading}
-                    >
-                      {isLoading ? (
-                        <>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          Logging in...
-                        </>
-                      ) : (
-                        "Login"
-                      )}
-                    </Button>
-                  </form>
-                </div>
+                      <Button
+                        type="submit"
+                        className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-lg"
+                        disabled={isLoading}
+                      >
+                        {isLoading ? (
+                          <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            Logging in...
+                          </>
+                        ) : (
+                          "Login"
+                        )}
+                      </Button>
+                    </form>
+                  </div>
                 )
               ) : (
                 <>
@@ -888,7 +945,7 @@ function FloatingCoachingWidget({
                   </div>
 
                   {/* Acknowledge Button */}
-                  <Button
+                  {/* <Button
                     onClick={() => setIsAcknowledged(true)}
                     disabled={isAcknowledged}
                     className={`w-full ${
@@ -905,11 +962,11 @@ function FloatingCoachingWidget({
                     ) : (
                       "Acknowledge"
                     )}
-                  </Button>
+                  </Button> */}
 
                   {/* CTA Button */}
                   <Button
-                    onClick={() => window.open('/agent-dashboard', '_blank')}
+                    onClick={() => window.open("/agent-dashboard", "_blank")}
                     className="w-full bg-blue-600 hover:bg-blue-700 text-white"
                   >
                     See Details

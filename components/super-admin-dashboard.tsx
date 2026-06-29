@@ -259,6 +259,8 @@ export function SuperAdminDashboard({ onLogout }: SuperAdminDashboardProps) {
       companyName: data.companyName,
       amazonConnectId: data.amazonConnectInstanceId,
       llmApiKey: data.llmApiKey,
+      llmProvider: "gemini",
+      bedrockModel: "claude-sonnet",
       status: "active",
       primaryAdminEmail: data.primaryAdminEmail,
       region: data.region,
