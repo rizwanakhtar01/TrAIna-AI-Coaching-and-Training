@@ -3468,21 +3468,13 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                       </DialogDescription>
                     </DialogHeader>
                     <div className="space-y-4 py-4">
-                      <div className="grid grid-cols-3 gap-3">
+                      <div className="grid grid-cols-2 gap-3">
                         <div className="bg-green-50 border border-green-200 rounded-lg p-3 text-center">
                           <div className="text-2xl font-bold text-green-600">
                             {getValidCount()}
                           </div>
                           <div className="text-xs text-green-700">
                             Valid Users
-                          </div>
-                        </div>
-                        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 text-center">
-                          <div className="text-2xl font-bold text-yellow-600">
-                            {getWarningCount()}
-                          </div>
-                          <div className="text-xs text-yellow-700">
-                            Warnings
                           </div>
                         </div>
                         <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-center">
