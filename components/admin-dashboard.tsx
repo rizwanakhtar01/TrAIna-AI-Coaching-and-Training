@@ -2174,7 +2174,6 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
             </Card>
           </TabsContent>
 
-
           <TabsContent value="orchestrator" className="space-y-6">
             <div className="flex items-center justify-between">
               <div>
@@ -3513,8 +3512,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                       )}
 
                       <p className="text-xs text-muted-foreground bg-muted/50 p-3 rounded">
-                        Users with errors will be skipped. Users with warnings
-                        will be imported with default values.
+                        Users with errors will be skipped during import.
                       </p>
                     </div>
                     <DialogFooter className="gap-2">
@@ -3547,22 +3545,21 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                         Import Successful
                       </DialogTitle>
                     </DialogHeader>
-                    <div className="py-6 text-center space-y-4">
-                      <div className="h-16 w-16 rounded-full bg-green-100 flex items-center justify-center mx-auto">
-                        <CheckCircle className="h-8 w-8 text-green-600" />
+                    <div className="py-8 text-center space-y-4">
+                      <div className="h-20 w-20 rounded-full bg-green-100 flex items-center justify-center mx-auto">
+                        <CheckCircle className="h-10 w-10 text-green-600" />
                       </div>
-                      <div>
-                        <p className="text-lg font-medium">
-                          {importedCount} users imported
+                      <div className="space-y-2 px-4">
+                        <p className="text-lg font-bold text-blue-900">
+                          Your import is being processed.
                         </p>
                         <p className="text-sm text-muted-foreground">
-                          {importedCount} users have been successfully imported
-                          to the platform
+                          Users will appear in the list once they have been created, if you don't see them straight away, wait a moment and refresh the list.
                         </p>
                       </div>
                     </div>
                     <DialogFooter>
-                      <Button onClick={resetImportModal}>Done</Button>
+                      <Button className="bg-blue-600 hover:bg-blue-700 text-white" onClick={resetImportModal}>Done</Button>
                     </DialogFooter>
                   </>
                 )}
@@ -4194,7 +4191,6 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
               </AlertDialogContent>
             </AlertDialog>
           </TabsContent>
-
 
           {/* <TabsContent value="training" className="space-y-6">
             <div className="flex items-center justify-between">
