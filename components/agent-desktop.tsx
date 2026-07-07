@@ -30,6 +30,8 @@ import {
   KeyRound,
   ChevronDown,
   ChevronUp,
+  ExternalLink,
+  LayoutDashboard,
 } from "lucide-react";
 
 interface AgentDesktopProps {
@@ -47,6 +49,7 @@ function FloatingCoachingWidget({
   onSeeDetails,
 }: FloatingWidgetProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [widgetRole, setWidgetRole] = useState<"agent" | "supervisor">("agent");
   const [winsOpen, setWinsOpen] = useState(false);
   const [challengingOpen, setChallengingOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -832,117 +835,181 @@ function FloatingCoachingWidget({
                 )
               ) : (
                 <>
-                  {/* Pro Tip for Today — pinned at top */}
-                  <div className="p-3 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-md border border-blue-200">
-                    <h4 className="font-semibold text-gray-800 text-sm mb-2 flex items-center gap-2">
-                      <MessageCircle className="h-4 w-4 text-blue-600" />
-                      Pro Tip for Today
-                    </h4>
-                    <p className="text-sm text-gray-700 italic">
-                      {yesterdayPerformance.aiTip}
-                    </p>
+                  {/* Role switcher */}
+                  <div className="flex rounded-lg bg-gray-100 p-0.5 gap-0.5">
+                    <button
+                      type="button"
+                      onClick={() => setWidgetRole("agent")}
+                      className={`flex-1 text-xs font-medium py-1.5 px-3 rounded-md transition-colors ${
+                        widgetRole === "agent"
+                          ? "bg-white text-gray-900 shadow-sm"
+                          : "text-gray-500 hover:text-gray-700"
+                      }`}
+                    >
+                      Agent
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setWidgetRole("supervisor")}
+                      className={`flex-1 text-xs font-medium py-1.5 px-3 rounded-md transition-colors ${
+                        widgetRole === "supervisor"
+                          ? "bg-white text-gray-900 shadow-sm"
+                          : "text-gray-500 hover:text-gray-700"
+                      }`}
+                    >
+                      Supervisor
+                    </button>
                   </div>
 
-                  {/* Today's Focus Areas */}
-                  <div className="space-y-2">
-                    <h4 className="font-semibold text-gray-800 text-sm flex items-center gap-2">
-                      <Star className="h-4 w-4 text-blue-500" />
-                      Today’s Focus Areas
-                    </h4>
-                    <ul className="space-y-1">
-                      {yesterdayPerformance.focusAreas.map((area, index) => (
-                        <li
-                          key={index}
-                          className="text-sm text-gray-600 pl-4 border-l-2 border-blue-200"
+                  {widgetRole === "agent" ? (
+                    <>
+                      {/* Pro Tip for Today — pinned at top */}
+                      <div className="p-3 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-md border border-blue-200">
+                        <h4 className="font-semibold text-gray-800 text-sm mb-2 flex items-center gap-2">
+                          <MessageCircle className="h-4 w-4 text-blue-600" />
+                          Pro Tip for Today
+                        </h4>
+                        <p className="text-sm text-gray-700 italic">
+                          {yesterdayPerformance.aiTip}
+                        </p>
+                      </div>
+
+                      {/* Today's Focus Areas */}
+                      <div className="space-y-2">
+                        <h4 className="font-semibold text-gray-800 text-sm flex items-center gap-2">
+                          <Star className="h-4 w-4 text-blue-500" />
+                          Today's Focus Areas
+                        </h4>
+                        <ul className="space-y-1">
+                          {yesterdayPerformance.focusAreas.map((area, index) => (
+                            <li
+                              key={index}
+                              className="text-sm text-gray-600 pl-4 border-l-2 border-blue-200"
+                            >
+                              • {area}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+
+                      {/* Yesterday's Wins — collapsible, collapsed by default */}
+                      <div className="border rounded-md overflow-hidden">
+                        <button
+                          type="button"
+                          onClick={() => setWinsOpen((v) => !v)}
+                          className="w-full flex items-center justify-between px-3 py-2.5 bg-gray-50 hover:bg-gray-100 transition-colors text-left"
                         >
-                          • {area}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  {/* Yesterday’s Wins — collapsible, collapsed by default */}
-                  <div className="border rounded-md overflow-hidden">
-                    <button
-                      type="button"
-                      onClick={() => setWinsOpen((v) => !v)}
-                      className="w-full flex items-center justify-between px-3 py-2.5 bg-gray-50 hover:bg-gray-100 transition-colors text-left"
-                    >
-                      <span className="font-semibold text-gray-800 text-sm flex items-center gap-2">
-                        <Star className="h-4 w-4 text-green-500" />
-                        Yesterday’s Wins
-                      </span>
-                      {winsOpen ? (
-                        <ChevronUp className="h-4 w-4 text-gray-400 flex-shrink-0" />
-                      ) : (
-                        <ChevronDown className="h-4 w-4 text-gray-400 flex-shrink-0" />
-                      )}
-                    </button>
-                    {winsOpen && (
-                      <ul className="space-y-1 px-3 py-2.5">
-                        {yesterdayPerformance.struggledAreas.map(
-                          (area, index) => (
-                            <li
-                              key={index}
-                              className="text-sm text-gray-600 pl-4 border-l-2 border-green-200"
-                            >
-                              • {area}
-                            </li>
-                          ),
+                          <span className="font-semibold text-gray-800 text-sm flex items-center gap-2">
+                            <Star className="h-4 w-4 text-green-500" />
+                            Yesterday's Wins
+                          </span>
+                          {winsOpen ? (
+                            <ChevronUp className="h-4 w-4 text-gray-400 flex-shrink-0" />
+                          ) : (
+                            <ChevronDown className="h-4 w-4 text-gray-400 flex-shrink-0" />
+                          )}
+                        </button>
+                        {winsOpen && (
+                          <ul className="space-y-1 px-3 py-2.5">
+                            {yesterdayPerformance.struggledAreas.map(
+                              (area, index) => (
+                                <li
+                                  key={index}
+                                  className="text-sm text-gray-600 pl-4 border-l-2 border-green-200"
+                                >
+                                  • {area}
+                                </li>
+                              ),
+                            )}
+                          </ul>
                         )}
-                      </ul>
-                    )}
-                  </div>
+                      </div>
 
-                  {/* Challenging Areas — collapsible, collapsed by default */}
-                  <div className="border rounded-md overflow-hidden">
-                    <button
-                      type="button"
-                      onClick={() => setChallengingOpen((v) => !v)}
-                      className="w-full flex items-center justify-between px-3 py-2.5 bg-gray-50 hover:bg-gray-100 transition-colors text-left"
-                    >
-                      <span className="font-semibold text-gray-800 text-sm flex items-center gap-2">
-                        <BarChart3 className="h-4 w-4 text-amber-500" />
-                        Challenging Areas
-                      </span>
-                      {challengingOpen ? (
-                        <ChevronUp className="h-4 w-4 text-gray-400 flex-shrink-0" />
-                      ) : (
-                        <ChevronDown className="h-4 w-4 text-gray-400 flex-shrink-0" />
-                      )}
-                    </button>
-                    {challengingOpen && (
-                      <ul className="space-y-1 px-3 py-2.5">
-                        {yesterdayPerformance.challengingAreas.map(
-                          (area, index) => (
-                            <li
-                              key={index}
-                              className="text-sm text-gray-600 pl-4 border-l-2 border-amber-200"
-                            >
-                              • {area}
-                            </li>
-                          ),
+                      {/* Challenging Areas — collapsible, collapsed by default */}
+                      <div className="border rounded-md overflow-hidden">
+                        <button
+                          type="button"
+                          onClick={() => setChallengingOpen((v) => !v)}
+                          className="w-full flex items-center justify-between px-3 py-2.5 bg-gray-50 hover:bg-gray-100 transition-colors text-left"
+                        >
+                          <span className="font-semibold text-gray-800 text-sm flex items-center gap-2">
+                            <BarChart3 className="h-4 w-4 text-amber-500" />
+                            Challenging Areas
+                          </span>
+                          {challengingOpen ? (
+                            <ChevronUp className="h-4 w-4 text-gray-400 flex-shrink-0" />
+                          ) : (
+                            <ChevronDown className="h-4 w-4 text-gray-400 flex-shrink-0" />
+                          )}
+                        </button>
+                        {challengingOpen && (
+                          <ul className="space-y-1 px-3 py-2.5">
+                            {yesterdayPerformance.challengingAreas.map(
+                              (area, index) => (
+                                <li
+                                  key={index}
+                                  className="text-sm text-gray-600 pl-4 border-l-2 border-amber-200"
+                                >
+                                  • {area}
+                                </li>
+                              ),
+                            )}
+                          </ul>
                         )}
-                      </ul>
-                    )}
-                  </div>
+                      </div>
 
-                  {/* CTA Button */}
-                  <Button
-                    onClick={() => window.open("/agent-dashboard", "_blank")}
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white"
-                  >
-                    See Details
-                  </Button>
+                      {/* CTA Button */}
+                      <Button
+                        onClick={() => window.open("/agent-dashboard", "_blank")}
+                        className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                      >
+                        See Details
+                      </Button>
 
-                  {/* Logout button */}
-                  <Button
-                    onClick={handleLogout}
-                    variant="outline"
-                    className="w-full"
-                  >
-                    Logout
-                  </Button>
+                      {/* Logout button */}
+                      <Button
+                        onClick={handleLogout}
+                        variant="outline"
+                        className="w-full"
+                      >
+                        Logout
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      {/* Supervisor empty state */}
+                      <div className="flex flex-col items-center justify-center text-center space-y-4 py-12">
+                        <div className="w-14 h-14 rounded-full bg-blue-50 flex items-center justify-center">
+                          <LayoutDashboard className="h-7 w-7 text-blue-400" />
+                        </div>
+                        <div className="space-y-2">
+                          <h4 className="font-semibold text-gray-900 text-base">
+                            View feedback in TrAIna
+                          </h4>
+                          <p className="text-sm text-gray-500 max-w-[220px] mx-auto">
+                            Supervisor accounts access coaching feedback and
+                            team insights in the TrAIna application.
+                          </p>
+                        </div>
+                        <Button
+                          onClick={() => console.log("Open TrAIna clicked")}
+                          className="bg-blue-600 hover:bg-blue-700 text-white"
+                        >
+                          <ExternalLink className="h-4 w-4 mr-2" />
+                          Open TrAIna
+                        </Button>
+                      </div>
+
+                      {/* Logout button */}
+                      <Button
+                        onClick={handleLogout}
+                        variant="outline"
+                        className="w-full"
+                      >
+                        Logout
+                      </Button>
+                    </>
+                  )}
                 </>
               )}
             </CardContent>
