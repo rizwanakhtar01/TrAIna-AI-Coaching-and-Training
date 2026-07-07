@@ -371,6 +371,32 @@ function FloatingCoachingWidget({
             </CardHeader>
 
             <CardContent className="p-4 space-y-4 flex-1 overflow-y-auto">
+              {/* Role switcher — always visible */}
+              <div className="flex rounded-lg bg-gray-100 p-0.5 gap-0.5">
+                <button
+                  type="button"
+                  onClick={() => setWidgetRole("agent")}
+                  className={`flex-1 text-xs font-medium py-1.5 px-3 rounded-md transition-colors ${
+                    widgetRole === "agent"
+                      ? "bg-white text-gray-900 shadow-sm"
+                      : "text-gray-500 hover:text-gray-700"
+                  }`}
+                >
+                  Agent
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setWidgetRole("supervisor")}
+                  className={`flex-1 text-xs font-medium py-1.5 px-3 rounded-md transition-colors ${
+                    widgetRole === "supervisor"
+                      ? "bg-white text-gray-900 shadow-sm"
+                      : "text-gray-500 hover:text-gray-700"
+                  }`}
+                >
+                  Supervisor
+                </button>
+              </div>
+
               {!isLoggedIn ? (
                 showForgotPassword ? (
                   <div className="space-y-4 py-4">
@@ -835,32 +861,6 @@ function FloatingCoachingWidget({
                 )
               ) : (
                 <>
-                  {/* Role switcher */}
-                  <div className="flex rounded-lg bg-gray-100 p-0.5 gap-0.5">
-                    <button
-                      type="button"
-                      onClick={() => setWidgetRole("agent")}
-                      className={`flex-1 text-xs font-medium py-1.5 px-3 rounded-md transition-colors ${
-                        widgetRole === "agent"
-                          ? "bg-white text-gray-900 shadow-sm"
-                          : "text-gray-500 hover:text-gray-700"
-                      }`}
-                    >
-                      Agent
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setWidgetRole("supervisor")}
-                      className={`flex-1 text-xs font-medium py-1.5 px-3 rounded-md transition-colors ${
-                        widgetRole === "supervisor"
-                          ? "bg-white text-gray-900 shadow-sm"
-                          : "text-gray-500 hover:text-gray-700"
-                      }`}
-                    >
-                      Supervisor
-                    </button>
-                  </div>
-
                   {widgetRole === "agent" ? (
                     <>
                       {/* Pro Tip for Today — pinned at top */}
