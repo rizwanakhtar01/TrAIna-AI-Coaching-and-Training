@@ -371,7 +371,8 @@ function FloatingCoachingWidget({
             </CardHeader>
 
             <CardContent className="p-4 space-y-4 flex-1 overflow-y-auto">
-              {/* Role switcher — always visible */}
+              {/* Role switcher — only before login */}
+              {!isLoggedIn && (
               <div className="flex rounded-lg bg-gray-100 p-0.5 gap-0.5">
                 <button
                   type="button"
@@ -396,6 +397,7 @@ function FloatingCoachingWidget({
                   Supervisor
                 </button>
               </div>
+              )}
 
               {!isLoggedIn ? (
                 showForgotPassword ? (
