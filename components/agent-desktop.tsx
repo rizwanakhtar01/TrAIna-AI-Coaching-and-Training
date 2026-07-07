@@ -813,23 +813,6 @@ function FloatingCoachingWidget({
                         </button>
                       </div>
 
-                      <div className="flex items-center space-x-2">
-                        <Checkbox
-                          id="firstTimeLogin"
-                          checked={isFirstTimeLogin}
-                          onCheckedChange={(checked) =>
-                            setIsFirstTimeLogin(checked as boolean)
-                          }
-                          disabled={isLoading}
-                        />
-                        <Label
-                          htmlFor="firstTimeLogin"
-                          className="text-sm text-gray-600 cursor-pointer"
-                        >
-                          First time login (setup new password)
-                        </Label>
-                      </div>
-
                       <Button
                         type="submit"
                         className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-lg"
