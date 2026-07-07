@@ -1002,14 +1002,6 @@ function FloatingCoachingWidget({
                         </Button>
                       </div>
 
-                      {/* Logout button */}
-                      <Button
-                        onClick={handleLogout}
-                        variant="outline"
-                        className="w-full"
-                      >
-                        Logout
-                      </Button>
                     </>
                   )}
                 </>
