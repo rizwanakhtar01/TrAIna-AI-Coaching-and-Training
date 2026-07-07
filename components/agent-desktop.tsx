@@ -364,8 +364,9 @@ function FloatingCoachingWidget({
               </div>
               {isLoggedIn && (
                 <CardDescription className="text-base font-medium text-blue-600">
-                  I'm your AI Coach. Let's reflect on yesterday and get ready
-                  for today 🚀
+                  {widgetRole === "supervisor"
+                    ? "Your team's coaching insights are ready in TrAIna."
+                    : "I'm your AI Coach. Let's reflect on yesterday and get ready for today 🚀"}
                 </CardDescription>
               )}
             </CardHeader>
@@ -373,30 +374,30 @@ function FloatingCoachingWidget({
             <CardContent className="p-4 space-y-4 flex-1 overflow-y-auto">
               {/* Role switcher — only before login */}
               {!isLoggedIn && (
-              <div className="flex rounded-lg bg-gray-100 p-0.5 gap-0.5">
-                <button
-                  type="button"
-                  onClick={() => setWidgetRole("agent")}
-                  className={`flex-1 text-xs font-medium py-1.5 px-3 rounded-md transition-colors ${
-                    widgetRole === "agent"
-                      ? "bg-white text-gray-900 shadow-sm"
-                      : "text-gray-500 hover:text-gray-700"
-                  }`}
-                >
-                  Agent
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setWidgetRole("supervisor")}
-                  className={`flex-1 text-xs font-medium py-1.5 px-3 rounded-md transition-colors ${
-                    widgetRole === "supervisor"
-                      ? "bg-white text-gray-900 shadow-sm"
-                      : "text-gray-500 hover:text-gray-700"
-                  }`}
-                >
-                  Supervisor
-                </button>
-              </div>
+                <div className="flex rounded-lg bg-gray-100 p-0.5 gap-0.5">
+                  <button
+                    type="button"
+                    onClick={() => setWidgetRole("agent")}
+                    className={`flex-1 text-xs font-medium py-1.5 px-3 rounded-md transition-colors ${
+                      widgetRole === "agent"
+                        ? "bg-white text-gray-900 shadow-sm"
+                        : "text-gray-500 hover:text-gray-700"
+                    }`}
+                  >
+                    Agent
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setWidgetRole("supervisor")}
+                    className={`flex-1 text-xs font-medium py-1.5 px-3 rounded-md transition-colors ${
+                      widgetRole === "supervisor"
+                        ? "bg-white text-gray-900 shadow-sm"
+                        : "text-gray-500 hover:text-gray-700"
+                    }`}
+                  >
+                    Supervisor
+                  </button>
+                </div>
               )}
 
               {!isLoggedIn ? (
@@ -883,14 +884,16 @@ function FloatingCoachingWidget({
                           Today's Focus Areas
                         </h4>
                         <ul className="space-y-1">
-                          {yesterdayPerformance.focusAreas.map((area, index) => (
-                            <li
-                              key={index}
-                              className="text-sm text-gray-600 pl-4 border-l-2 border-blue-200"
-                            >
-                              • {area}
-                            </li>
-                          ))}
+                          {yesterdayPerformance.focusAreas.map(
+                            (area, index) => (
+                              <li
+                                key={index}
+                                className="text-sm text-gray-600 pl-4 border-l-2 border-blue-200"
+                              >
+                                • {area}
+                              </li>
+                            ),
+                          )}
                         </ul>
                       </div>
 
@@ -962,7 +965,9 @@ function FloatingCoachingWidget({
 
                       {/* CTA Button */}
                       <Button
-                        onClick={() => window.open("/agent-dashboard", "_blank")}
+                        onClick={() =>
+                          window.open("/agent-dashboard", "_blank")
+                        }
                         className="w-full bg-blue-600 hover:bg-blue-700 text-white"
                       >
                         See Details
@@ -988,9 +993,9 @@ function FloatingCoachingWidget({
                           <h4 className="font-semibold text-gray-900 text-base">
                             View feedback in TrAIna
                           </h4>
-                          <p className="text-sm text-gray-500 max-w-[220px] mx-auto">
-                            Supervisor accounts access coaching feedback and
-                            team insights in the TrAIna application.
+                          <p className="text-sm text-gray-500 max-w-[320px] mx-auto">
+                            Access detailed coaching feedback and team
+                            performance insights in the TrAIna application.
                           </p>
                         </div>
                         <Button
@@ -1001,7 +1006,6 @@ function FloatingCoachingWidget({
                           Open TrAIna
                         </Button>
                       </div>
-
                     </>
                   )}
                 </>
