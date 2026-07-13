@@ -96,7 +96,7 @@ const DEFAULT_FORM: WizardFormData = {
   thresholdValue: 70,
   bedrockAccountId: "",
   bedrockRegion: "",
-  bedrockModel: "claude-sonnet",
+  bedrockModel: "claude-haiku",
   iamRoleArn: "",
 };
 
@@ -655,15 +655,6 @@ export function CustomerOnboardingWizard({
                         <FieldLabel>Foundation Model</FieldLabel>
                         <div className="space-y-2">
                           <RadioCard
-                            selected={form.bedrockModel === "claude-sonnet"}
-                            onClick={() => set("bedrockModel", "claude-sonnet")}
-                            title="Claude Sonnet 4.6"
-                          >
-                            <p className="text-xs text-muted-foreground mt-1.5">
-                              Best balance of quality and speed
-                            </p>
-                          </RadioCard>
-                          <RadioCard
                             selected={form.bedrockModel === "claude-haiku"}
                             onClick={() => set("bedrockModel", "claude-haiku")}
                             title="Claude Haiku 4.5"
@@ -676,6 +667,15 @@ export function CustomerOnboardingWizard({
                                 Faster and more cost-efficient
                               </span>
                             </div>
+                          </RadioCard>
+                          <RadioCard
+                            selected={form.bedrockModel === "claude-sonnet"}
+                            onClick={() => set("bedrockModel", "claude-sonnet")}
+                            title="Claude Sonnet 4.6"
+                          >
+                            <p className="text-xs text-muted-foreground mt-1.5">
+                              Best balance of quality and speed
+                            </p>
                           </RadioCard>
                           <RadioCard
                             selected={form.bedrockModel === "nova-pro"}
