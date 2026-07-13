@@ -659,23 +659,23 @@ export function CustomerOnboardingWizard({
                             onClick={() => set("bedrockModel", "claude-sonnet")}
                             title="Claude Sonnet 4.6"
                           >
-                            <div className="flex items-center gap-2 mt-1.5">
-                              <Badge className="text-[10px] px-1.5 py-0 bg-emerald-100 text-emerald-700 border-0 hover:bg-emerald-100">
-                                Recommended
-                              </Badge>
-                              <span className="text-xs text-muted-foreground">
-                                Best balance of quality and speed
-                              </span>
-                            </div>
+                            <p className="text-xs text-muted-foreground mt-1.5">
+                              Best balance of quality and speed
+                            </p>
                           </RadioCard>
                           <RadioCard
                             selected={form.bedrockModel === "claude-haiku"}
                             onClick={() => set("bedrockModel", "claude-haiku")}
                             title="Claude Haiku 4.5"
                           >
-                            <p className="text-xs text-muted-foreground mt-1.5">
-                              Faster and more cost-efficient
-                            </p>
+                            <div className="flex items-center gap-2 mt-1.5">
+                              <Badge className="text-[10px] px-1.5 py-0 bg-emerald-100 text-emerald-700 border-0 hover:bg-emerald-100">
+                                Recommended
+                              </Badge>
+                              <span className="text-xs text-muted-foreground">
+                                Faster and more cost-efficient
+                              </span>
+                            </div>
                           </RadioCard>
                           <RadioCard
                             selected={form.bedrockModel === "nova-pro"}
