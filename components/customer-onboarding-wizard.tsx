@@ -591,7 +591,9 @@ export function CustomerOnboardingWizard({
                         }`}
                       >
                         <div className="flex items-start justify-between gap-2 mb-1">
-                          <span className="font-semibold text-sm">Gemini</span>
+                          <span className="font-semibold text-sm">
+                            Google Gemini
+                          </span>
                           <Badge className="text-[10px] px-1.5 py-0 bg-[#1A56DB] text-white border-0 hover:bg-[#1A56DB] flex-shrink-0">
                             Default
                           </Badge>
