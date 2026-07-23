@@ -300,11 +300,37 @@ function ChallengeDetailView({ pattern, onBack }: ChallengeDetailViewProps) {
   )
 }
 
+// Returns approximate number of days from a relative date string
+function parseDateDays(date: string): number {
+  const lower = date.toLowerCase()
+  if (lower.includes("day ago") || lower === "yesterday") return 1
+  const daysMatch = lower.match(/(\d+)\s*day/)
+  if (daysMatch) return parseInt(daysMatch[1])
+  const weeksMatch = lower.match(/(\d+)\s*week/)
+  if (weeksMatch) return parseInt(weeksMatch[1]) * 7
+  return 30
+}
+
+function getMaxDays(timeFilter: "yesterday" | "week" | "month"): number {
+  if (timeFilter === "yesterday") return 1
+  if (timeFilter === "week") return 7
+  return 30
+}
+
 export function ChallengePatternsScreen() {
   const [selectedPattern, setSelectedPattern] = useState<ChallengePattern | null>(null)
+  const [timeFilter, setTimeFilter] = useState<"yesterday" | "week" | "month">("week")
+
+  const filteredPatterns = challengePatterns
+    .map((p) => ({
+      ...p,
+      examples: p.examples.filter((e) => parseDateDays(e.date) <= getMaxDays(timeFilter)),
+    }))
+    .filter((p) => p.examples.length > 0)
 
   if (selectedPattern) {
-    return <ChallengeDetailView pattern={selectedPattern} onBack={() => setSelectedPattern(null)} />
+    const refreshed = filteredPatterns.find((p) => p.id === selectedPattern.id) ?? selectedPattern
+    return <ChallengeDetailView pattern={refreshed} onBack={() => setSelectedPattern(null)} />
   }
 
   return (
@@ -314,16 +340,42 @@ export function ChallengePatternsScreen() {
           <h2 className="text-2xl font-bold text-foreground">Challenge Patterns</h2>
           <p className="text-muted-foreground">Recurring coaching areas identified by AI analysis</p>
         </div>
-        <Badge variant="secondary" className="bg-primary/10 text-primary">
-          {challengePatterns.length} Active Patterns
-        </Badge>
+        <div className="flex items-center gap-3">
+          {/* Time filter — same style as supervisor dashboard */}
+          <div className="flex items-center gap-1 bg-zinc-100 p-1 rounded-lg">
+            {(["yesterday", "week", "month"] as const).map((value) => (
+              <button
+                key={value}
+                onClick={() => setTimeFilter(value)}
+                className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
+                  timeFilter === value
+                    ? "bg-background shadow text-foreground"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {value === "yesterday" ? "Yesterday" : value === "week" ? "This Week" : "This Month"}
+              </button>
+            ))}
+          </div>
+          <Badge variant="secondary" className="bg-primary/10 text-primary">
+            {filteredPatterns.length} Active Patterns
+          </Badge>
+        </div>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {challengePatterns.map((pattern) => (
-          <ChallengePatternCard key={pattern.id} pattern={pattern} onViewDetails={setSelectedPattern} />
-        ))}
-      </div>
+      {filteredPatterns.length === 0 ? (
+        <div className="text-center py-16 text-muted-foreground">
+          <BarChart3 className="h-10 w-10 mx-auto mb-3 opacity-30" />
+          <p className="font-medium">No patterns found</p>
+          <p className="text-sm">No challenge patterns were identified for this time period.</p>
+        </div>
+      ) : (
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {filteredPatterns.map((pattern) => (
+            <ChallengePatternCard key={pattern.id} pattern={pattern} onViewDetails={setSelectedPattern} />
+          ))}
+        </div>
+      )}
 
       <Card>
         <CardHeader>
@@ -335,11 +387,15 @@ export function ChallengePatternsScreen() {
         <CardContent>
           <div className="grid gap-4 md:grid-cols-2">
             <div className="text-center space-y-2">
-              <div className="text-2xl font-bold text-chart-4">2</div>
+              <div className="text-2xl font-bold text-chart-4">
+                {filteredPatterns.filter((p) => p.trend === "improving").length}
+              </div>
               <div className="text-sm text-muted-foreground">Patterns Improving</div>
             </div>
             <div className="text-center space-y-2">
-              <div className="text-2xl font-bold text-muted-foreground">1</div>
+              <div className="text-2xl font-bold text-muted-foreground">
+                {filteredPatterns.filter((p) => p.trend === "stable").length}
+              </div>
               <div className="text-sm text-muted-foreground">Patterns Stable</div>
             </div>
           </div>
