@@ -1,10 +1,20 @@
 "use client"
 
 import { useState } from "react"
+import { format } from "date-fns"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Calendar as CalendarPicker } from "@/components/ui/calendar"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import {
   TrendingUp,
   TrendingDown,
@@ -15,6 +25,7 @@ import {
   BarChart3,
   ChevronRight,
   Calendar,
+  Calendar as CalendarIcon,
 } from "lucide-react"
 
 interface ChallengePattern {
@@ -26,10 +37,12 @@ interface ChallengePattern {
   trend: "improving" | "declining" | "stable"
   trendPercentage: number
   priority: "high" | "medium" | "low"
+  channels: string[]
   examples: {
     id: string
     contactId: string
     date: string
+    channel: string
     situation: string
     whatHappened: string
     betterApproach: string
@@ -52,11 +65,13 @@ const challengePatterns: ChallengePattern[] = [
     trend: "improving",
     trendPercentage: 16,
     priority: "high",
+    channels: ["phone", "chat"],
     examples: [
       {
         id: "1",
         contactId: "CTX-048291",
         date: "2 days ago",
+        channel: "phone",
         situation: "Customer angry about delayed refund",
         whatHappened: "Jumped straight into troubleshooting without acknowledging frustration",
         betterApproach: 'Start with "I completely understand how frustrating this delay must be for you"',
@@ -66,6 +81,7 @@ const challengePatterns: ChallengePattern[] = [
         id: "2",
         contactId: "CTX-051837",
         date: "1 week ago",
+        channel: "chat",
         situation: "Third callback for same technical issue",
         whatHappened: "Focused on the technical problem immediately",
         betterApproach:
@@ -95,11 +111,13 @@ const challengePatterns: ChallengePattern[] = [
     trend: "improving",
     trendPercentage: 10,
     priority: "medium",
+    channels: ["chat"],
     examples: [
       {
         id: "1",
         contactId: "CTX-039504",
         date: "3 days ago",
+        channel: "chat",
         situation: "Customer asking about order status",
         whatHappened: "Took 45 seconds to respond while researching",
         betterApproach: 'Acknowledge immediately: "Let me look that up for you right now" then research',
@@ -128,11 +146,13 @@ const challengePatterns: ChallengePattern[] = [
     trend: "stable",
     trendPercentage: 2,
     priority: "low",
+    channels: ["phone"],
     examples: [
       {
         id: "1",
         contactId: "CTX-062748",
         date: "1 day ago",
+        channel: "phone",
         situation: "Subscription cancellation request",
         whatHappened: "Processed cancellation and ended chat without confirmation",
         betterApproach: 'Ask "Have I fully addressed your concern today?" before closing',
@@ -303,7 +323,7 @@ function ChallengeDetailView({ pattern, onBack }: ChallengeDetailViewProps) {
 // Returns approximate number of days from a relative date string
 function parseDateDays(date: string): number {
   const lower = date.toLowerCase()
-  if (lower.includes("day ago") || lower === "yesterday") return 1
+  if (lower === "yesterday" || lower === "1 day ago") return 1
   const daysMatch = lower.match(/(\d+)\s*day/)
   if (daysMatch) return parseInt(daysMatch[1])
   const weeksMatch = lower.match(/(\d+)\s*week/)
@@ -311,22 +331,33 @@ function parseDateDays(date: string): number {
   return 30
 }
 
-function getMaxDays(timeFilter: "yesterday" | "week" | "month"): number {
+function getMaxDays(timeFilter: string): number {
   if (timeFilter === "yesterday") return 1
-  if (timeFilter === "week") return 7
-  return 30
+  if (timeFilter === "last3days") return 3
+  if (timeFilter === "last7days") return 7
+  return 999 // custom — show all
 }
 
 export function ChallengePatternsScreen() {
   const [selectedPattern, setSelectedPattern] = useState<ChallengePattern | null>(null)
-  const [timeFilter, setTimeFilter] = useState<"yesterday" | "week" | "month">("week")
+  const [patternTimeFilter, setPatternTimeFilter] = useState("last7days")
+  const [patternCustomDate, setPatternCustomDate] = useState<Date | undefined>(undefined)
+  const [patternCalendarOpen, setPatternCalendarOpen] = useState(false)
+  const [channelFilter, setChannelFilter] = useState("all")
 
   const filteredPatterns = challengePatterns
-    .map((p) => ({
-      ...p,
-      examples: p.examples.filter((e) => parseDateDays(e.date) <= getMaxDays(timeFilter)),
-    }))
-    .filter((p) => p.examples.length > 0)
+    .map((p) => {
+      const filteredExamples = p.examples.filter((e) => {
+        const withinTime = parseDateDays(e.date) <= getMaxDays(patternTimeFilter)
+        const matchesChannel = channelFilter === "all" || e.channel === channelFilter
+        return withinTime && matchesChannel
+      })
+      return { ...p, examples: filteredExamples }
+    })
+    .filter((p) => {
+      if (channelFilter !== "all" && !p.channels.includes(channelFilter)) return false
+      return p.examples.length > 0
+    })
 
   if (selectedPattern) {
     const refreshed = filteredPatterns.find((p) => p.id === selectedPattern.id) ?? selectedPattern
@@ -335,28 +366,69 @@ export function ChallengePatternsScreen() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <h2 className="text-2xl font-bold text-foreground">Challenge Patterns</h2>
           <p className="text-muted-foreground">Recurring coaching areas identified by AI analysis</p>
         </div>
-        <div className="flex items-center gap-3">
-          {/* Time filter — same style as supervisor dashboard */}
-          <div className="flex items-center gap-1 bg-zinc-100 p-1 rounded-lg">
-            {(["yesterday", "week", "month"] as const).map((value) => (
-              <button
-                key={value}
-                onClick={() => setTimeFilter(value)}
-                className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
-                  timeFilter === value
-                    ? "bg-background shadow text-foreground"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                {value === "yesterday" ? "Yesterday" : value === "week" ? "This Week" : "This Month"}
-              </button>
-            ))}
-          </div>
+        <div className="flex items-center gap-2 flex-wrap">
+          {/* Time filter */}
+          <Select value={patternTimeFilter} onValueChange={(val) => {
+            setPatternTimeFilter(val)
+            if (val !== "custom") setPatternCustomDate(undefined)
+            if (val === "custom") setPatternCalendarOpen(true)
+          }}>
+            <SelectTrigger className="w-36">
+              <SelectValue placeholder="Time Range" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="yesterday">Yesterday</SelectItem>
+              <SelectItem value="last3days">Last 3 Days</SelectItem>
+              <SelectItem value="last7days">Last 7 Days</SelectItem>
+              <SelectItem value="custom">Custom Date</SelectItem>
+            </SelectContent>
+          </Select>
+
+          {patternTimeFilter === "custom" && (
+            <Popover open={patternCalendarOpen} onOpenChange={setPatternCalendarOpen}>
+              <PopoverTrigger asChild>
+                <Button variant="outline" size="sm" className="w-40 justify-start text-left font-normal">
+                  <CalendarIcon className="mr-2 h-4 w-4 shrink-0 opacity-50" />
+                  {patternCustomDate ? format(patternCustomDate, "MMM dd, yyyy") : "Pick a date"}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <CalendarPicker
+                  mode="single"
+                  selected={patternCustomDate}
+                  onSelect={(date) => {
+                    setPatternCustomDate(date ?? undefined)
+                    setPatternCalendarOpen(false)
+                  }}
+                  disabled={(date) => date > new Date()}
+                />
+              </PopoverContent>
+            </Popover>
+          )}
+
+          {/* Channel filter */}
+          <Select value={channelFilter} onValueChange={setChannelFilter}>
+            <SelectTrigger className="w-36">
+              <SelectValue placeholder="All Channels" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Channels</SelectItem>
+              <SelectItem value="phone">Phone</SelectItem>
+              <SelectItem value="chat">Chat</SelectItem>
+            </SelectContent>
+          </Select>
+
+          {channelFilter !== "all" && (
+            <Button variant="ghost" size="sm" onClick={() => setChannelFilter("all")}>
+              Clear Filters
+            </Button>
+          )}
+
           <Badge variant="secondary" className="bg-primary/10 text-primary">
             {filteredPatterns.length} Active Patterns
           </Badge>
@@ -367,7 +439,7 @@ export function ChallengePatternsScreen() {
         <div className="text-center py-16 text-muted-foreground">
           <BarChart3 className="h-10 w-10 mx-auto mb-3 opacity-30" />
           <p className="font-medium">No patterns found</p>
-          <p className="text-sm">No challenge patterns were identified for this time period.</p>
+          <p className="text-sm">No challenge patterns were identified for this time period or channel.</p>
         </div>
       ) : (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
