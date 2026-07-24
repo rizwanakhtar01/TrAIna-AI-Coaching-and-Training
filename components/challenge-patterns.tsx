@@ -429,9 +429,6 @@ export function ChallengePatternsScreen() {
             </Button>
           )}
 
-          <Badge variant="secondary" className="bg-primary/10 text-primary">
-            {filteredPatterns.length} Active Patterns
-          </Badge>
         </div>
       </div>
 
