@@ -258,6 +258,12 @@ function FloatingCoachingWidget({
     setForgotPasswordLoading(false);
   };
 
+  const yesterdayDateLabel = (() => {
+    const d = new Date();
+    d.setDate(d.getDate() - 1);
+    return d.toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short" });
+  })();
+
   const yesterdayPerformance = {
     struggledAreas: [
       "Maintained positive tone across most interactions",
@@ -906,7 +912,7 @@ function FloatingCoachingWidget({
                         >
                           <span className="font-semibold text-gray-800 text-sm flex items-center gap-2">
                             <Star className="h-4 w-4 text-green-500" />
-                            Yesterday's Wins
+                            {yesterdayDateLabel} Wins
                           </span>
                           {winsOpen ? (
                             <ChevronUp className="h-4 w-4 text-gray-400 flex-shrink-0" />
@@ -915,18 +921,23 @@ function FloatingCoachingWidget({
                           )}
                         </button>
                         {winsOpen && (
-                          <ul className="space-y-1 px-3 py-2.5">
-                            {yesterdayPerformance.struggledAreas.map(
-                              (area, index) => (
-                                <li
-                                  key={index}
-                                  className="text-sm text-gray-600 pl-4 border-l-2 border-green-200"
-                                >
-                                  • {area}
-                                </li>
-                              ),
-                            )}
-                          </ul>
+                          <div className="px-3 py-2.5 space-y-2">
+                            <ul className="space-y-1">
+                              {yesterdayPerformance.struggledAreas.map(
+                                (area, index) => (
+                                  <li
+                                    key={index}
+                                    className="text-sm text-gray-600 pl-4 border-l-2 border-green-200"
+                                  >
+                                    • {area}
+                                  </li>
+                                ),
+                              )}
+                            </ul>
+                            <p className="text-xs text-gray-400 italic">
+                              Based on contacts handled on {yesterdayDateLabel}
+                            </p>
+                          </div>
                         )}
                       </div>
 
@@ -948,18 +959,23 @@ function FloatingCoachingWidget({
                           )}
                         </button>
                         {challengingOpen && (
-                          <ul className="space-y-1 px-3 py-2.5">
-                            {yesterdayPerformance.challengingAreas.map(
-                              (area, index) => (
-                                <li
-                                  key={index}
-                                  className="text-sm text-gray-600 pl-4 border-l-2 border-amber-200"
-                                >
-                                  • {area}
-                                </li>
-                              ),
-                            )}
-                          </ul>
+                          <div className="px-3 py-2.5 space-y-2">
+                            <ul className="space-y-1">
+                              {yesterdayPerformance.challengingAreas.map(
+                                (area, index) => (
+                                  <li
+                                    key={index}
+                                    className="text-sm text-gray-600 pl-4 border-l-2 border-amber-200"
+                                  >
+                                    • {area}
+                                  </li>
+                                ),
+                              )}
+                            </ul>
+                            <p className="text-xs text-gray-400 italic">
+                              Based on contacts handled on {yesterdayDateLabel}
+                            </p>
+                          </div>
                         )}
                       </div>
 
