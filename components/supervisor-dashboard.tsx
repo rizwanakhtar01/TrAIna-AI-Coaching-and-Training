@@ -1195,7 +1195,7 @@ export function SupervisorDashboard({ onLogout, onSwitchToAgent }: SupervisorDas
             key={`${messageIndex}-${referenceIndex}`}
             type="button"
             onClick={() => openTranscriptMessage(messageIndex)}
-            className="ml-1 inline rounded-sm font-medium underline underline-offset-2 hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="ml-1 inline rounded-sm font-medium hover:underline hover:underline-offset-2 hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             aria-label={`Open transcript message at ${timestamp}`}
           >
             [{timestamp}]
