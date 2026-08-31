@@ -236,22 +236,22 @@ export function AiCoachingDashboard({ onLogout, onSwitchToSupervisor }: AiCoachi
                       <li>
                         You opened with an empathetic question that invited the
                         customer to explain why they wanted to cancel.
-                        {messageReference("14:33", 1)}
-                        {messageReference("14:33", 2)}
+                        {messageReference("14:34", 1)}
+                        {messageReference("14:36", 2)}
                       </li>
                       <li>
                         You clearly explained the refund process and the
                         expected 5–7 business day timeline.
-                        {messageReference("14:34", 3)}
-                        {messageReference("14:36", 5)}
-                        {messageReference("14:41", 11)}
+                        {messageReference("14:38", 3)}
+                        {messageReference("14:42", 5)}
+                        {messageReference("15:04", 11)}
                       </li>
                       <li>
                         You processed the cancellation efficiently and
                         maintained a professional, respectful tone.
-                        {messageReference("14:35", 4)}
-                        {messageReference("14:39", 7)}
-                        {messageReference("14:43", 14)}
+                        {messageReference("14:40", 4)}
+                        {messageReference("14:46", 7)}
+                        {messageReference("15:00", 14)}
                       </li>
                     </ul>
                   </div>
@@ -265,22 +265,22 @@ export function AiCoachingDashboard({ onLogout, onSwitchToSupervisor }: AiCoachi
                       <li>
                         Explore the customer's reason for leaving more deeply
                         before moving straight to cancellation.
-                        {messageReference("14:33", 2)}
-                        {messageReference("14:34", 3)}
+                        {messageReference("14:36", 2)}
+                        {messageReference("14:38", 3)}
                       </li>
                       <li>
                         Offer a relevant retention option, such as a lower plan
                         or pause, when low usage is the concern.
-                        {messageReference("14:34", 3)}
-                        {messageReference("14:37", 5)}
-                        {messageReference("14:38", 7)}
+                        {messageReference("14:38", 3)}
+                        {messageReference("14:42", 5)}
+                        {messageReference("14:46", 7)}
                       </li>
                       <li>
                         Confirm the customer's final preference and summarize
                         the next steps before ending the conversation.
-                        {messageReference("14:35", 4)}
-                        {messageReference("14:39", 8)}
-                        {messageReference("14:42", 13)}
+                        {messageReference("14:40", 4)}
+                        {messageReference("14:50", 8)}
+                        {messageReference("14:58", 13)}
                       </li>
                     </ul>
                   </div>

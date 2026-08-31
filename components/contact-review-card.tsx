@@ -163,122 +163,122 @@ const sampleReviews: ContactReview[] = [
         speaker: "agent",
         message:
           "I understand you'd like to cancel. Can I ask what's prompting this decision?",
-        timestamp: "14:33",
+        timestamp: "14:34",
         highlight: "positive",
         aiNote: "Good empathetic opening",
       },
       {
         speaker: "customer",
         message: "I'm not using the service enough to justify the cost",
-        timestamp: "14:33",
+        timestamp: "14:36",
       },
       {
         speaker: "agent",
         message:
           "I can process that cancellation for you right away. Your refund will be processed within 5-7 business days.",
-        timestamp: "14:34",
+        timestamp: "14:38",
         highlight: "negative",
         aiNote: "Missed opportunity to offer retention options",
       },
       {
         speaker: "customer",
         message: "Thank you for the quick help",
-        timestamp: "14:35",
+        timestamp: "14:40",
       },
       {
         speaker: "agent",
         message:
           "Before I finalize the cancellation, may I ask what has made the service less useful for you recently?",
-        timestamp: "14:36",
+        timestamp: "14:42",
         highlight: "neutral",
       },
       {
         speaker: "customer",
         message:
           "I only use it a few times a month, so the subscription feels too expensive.",
-        timestamp: "14:36",
+        timestamp: "14:44",
       },
       {
         speaker: "agent",
         message:
           "That makes sense. Based on your usage, our pause option or Essentials plan may be a better fit than cancelling completely.",
-        timestamp: "14:37",
+        timestamp: "14:46",
         highlight: "positive",
       },
       {
         speaker: "customer",
         message:
           "I did not know I could pause the subscription. How would that work?",
-        timestamp: "14:37",
+        timestamp: "14:48",
       },
       {
         speaker: "agent",
         message:
           "You can pause for up to three months, and your saved projects and preferences will remain available when you return.",
-        timestamp: "14:38",
+        timestamp: "14:50",
         highlight: "positive",
       },
       {
         speaker: "customer",
         message:
           "That could help, but I am still not sure when I would use it again.",
-        timestamp: "14:38",
+        timestamp: "14:52",
       },
       {
         speaker: "agent",
         message:
           "Understood. I can also complete the cancellation now, so you can choose the option that feels right without any pressure.",
-        timestamp: "14:39",
+        timestamp: "14:54",
       },
       {
         speaker: "customer",
         message:
           "Please go ahead with the cancellation for now.",
-        timestamp: "14:39",
+        timestamp: "14:56",
       },
       {
         speaker: "agent",
         message:
           "I have cancelled the subscription effective today. You will retain access through the end of the current billing period.",
-        timestamp: "14:40",
+        timestamp: "14:58",
         highlight: "positive",
       },
       {
         speaker: "customer",
         message:
           "Will I still receive the refund you mentioned?",
-        timestamp: "14:40",
+        timestamp: "15:00",
       },
       {
         speaker: "agent",
         message:
           "Yes. The refund request is submitted, and the amount should appear on your original payment method within 5–7 business days.",
-        timestamp: "14:41",
+        timestamp: "15:02",
         highlight: "positive",
       },
       {
         speaker: "customer",
         message:
           "Is there anything else I need to do on my side?",
-        timestamp: "14:41",
+        timestamp: "15:04",
       },
       {
         speaker: "agent",
         message:
           "No further action is needed. I will send a confirmation email with the cancellation and refund details.",
-        timestamp: "14:42",
+        timestamp: "15:05",
       },
       {
         speaker: "customer",
         message:
           "Please include the date when access ends in that email.",
-        timestamp: "14:42",
+        timestamp: "15:06",
       },
       {
         speaker: "agent",
         message:
           "Absolutely. The email will include your access end date, refund amount, and support contact information if you need us later.",
-        timestamp: "14:43",
+        timestamp: "15:08",
         highlight: "positive",
       },
     ],
