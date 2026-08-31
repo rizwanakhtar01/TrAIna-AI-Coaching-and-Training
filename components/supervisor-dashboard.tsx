@@ -117,14 +117,32 @@ interface ContactReview {
 
 const supervisorFeedbackMessageReferences: Record<
   string,
-  { whatWentWell: number[]; couldImprove: number[] }
+  { whatWentWell: number[][]; couldImprove: number[][] }
 > = {
-  "1": { whatWentWell: [1, 3, 4], couldImprove: [2, 3, 4] },
-  "2": { whatWentWell: [2, 4, 4], couldImprove: [2, 4, 4] },
-  "3": { whatWentWell: [1, 1, 4], couldImprove: [0, 2, 4] },
-  "4": { whatWentWell: [1, 1, 3], couldImprove: [3, 2, 3] },
-  "5": { whatWentWell: [2, 2, 2], couldImprove: [3, 3, 3] },
-  "6": { whatWentWell: [2, 2, 1], couldImprove: [2, 2, 3] },
+  "1": {
+    whatWentWell: [[1, 2], [3, 5, 7], [9, 11, 14]],
+    couldImprove: [[2, 3], [3, 5], [7, 8, 9]],
+  },
+  "2": {
+    whatWentWell: [[0, 2], [2, 4], [4]],
+    couldImprove: [[1, 2], [2, 4], [4]],
+  },
+  "3": {
+    whatWentWell: [[1, 3], [1, 2], [4]],
+    couldImprove: [[0, 2], [2, 3], [3, 4]],
+  },
+  "4": {
+    whatWentWell: [[1, 2], [1, 3], [3]],
+    couldImprove: [[2, 3], [1, 2], [3]],
+  },
+  "5": {
+    whatWentWell: [[0, 2], [2, 3], [0, 2]],
+    couldImprove: [[1, 2], [2, 3], [0, 2]],
+  },
+  "6": {
+    whatWentWell: [[1, 2], [2, 3], [1, 2]],
+    couldImprove: [[1, 2], [2], [2, 3]],
+  },
 };
 
 // Comprehensive data models for supervisor dashboard
@@ -1159,28 +1177,31 @@ export function SupervisorDashboard({ onLogout, onSwitchToAgent }: SupervisorDas
       setMessageToFocus({ index: messageIndex });
     };
 
-    const renderMessageReference = (
+    const renderMessageReferences = (
       category: "whatWentWell" | "couldImprove",
       feedbackIndex: number,
     ) => {
-      const messageIndex =
+      const messageIndexes =
         supervisorFeedbackMessageReferences[review.id]?.[category][
           feedbackIndex
-        ] ?? 0;
-      const timestamp = review.transcript[messageIndex]?.timestamp;
+        ] ?? [];
 
-      if (!timestamp) return null;
+      return messageIndexes.map((messageIndex, referenceIndex) => {
+        const timestamp = review.transcript[messageIndex]?.timestamp;
+        if (!timestamp) return null;
 
-      return (
-        <button
-          type="button"
-          onClick={() => openTranscriptMessage(messageIndex)}
-          className="ml-1 inline rounded-sm font-medium underline underline-offset-2 hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          aria-label={`Open transcript message at ${timestamp}`}
-        >
-          [{timestamp}]
-        </button>
-      );
+        return (
+          <button
+            key={`${messageIndex}-${referenceIndex}`}
+            type="button"
+            onClick={() => openTranscriptMessage(messageIndex)}
+            className="ml-1 inline rounded-sm font-medium underline underline-offset-2 hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            aria-label={`Open transcript message at ${timestamp}`}
+          >
+            [{timestamp}]
+          </button>
+        );
+      });
     };
 
     const getChannelIcon = (channel: string) => {
@@ -1328,7 +1349,7 @@ export function SupervisorDashboard({ onLogout, onSwitchToAgent }: SupervisorDas
                   {review.whatWentWell.map((point, index) => (
                     <li key={index}>
                       {point}
-                      {renderMessageReference("whatWentWell", index)}
+                      {renderMessageReferences("whatWentWell", index)}
                     </li>
                   ))}
                 </ul>
@@ -1341,7 +1362,7 @@ export function SupervisorDashboard({ onLogout, onSwitchToAgent }: SupervisorDas
                   {review.couldImprove.map((point, index) => (
                     <li key={index}>
                       {point}
-                      {renderMessageReference("couldImprove", index)}
+                      {renderMessageReferences("couldImprove", index)}
                     </li>
                   ))}
                 </ul>

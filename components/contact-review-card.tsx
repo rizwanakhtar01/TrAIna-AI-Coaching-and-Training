@@ -105,11 +105,20 @@ interface ContactReview {
 
 const feedbackMessageReferences: Record<
   string,
-  { whatWentWell: number[]; couldImprove: number[] }
+  { whatWentWell: number[][]; couldImprove: number[][] }
 > = {
-  "1": { whatWentWell: [1, 3, 4], couldImprove: [2, 3, 4] },
-  "2": { whatWentWell: [2, 4, 4], couldImprove: [2, 4, 4] },
-  "3": { whatWentWell: [1, 1, 4], couldImprove: [0, 2, 4] },
+  "1": {
+    whatWentWell: [[1, 2], [3, 5, 7], [9, 11, 14]],
+    couldImprove: [[2, 3], [3, 5], [7, 8, 9]],
+  },
+  "2": {
+    whatWentWell: [[0, 2], [2, 4], [4]],
+    couldImprove: [[1, 2], [2, 4], [4]],
+  },
+  "3": {
+    whatWentWell: [[1, 3], [1, 2], [4]],
+    couldImprove: [[0, 2], [2, 3], [3, 4]],
+  },
 };
 
 const sampleReviews: ContactReview[] = [
@@ -821,26 +830,29 @@ function ContactReviewCard({
     setMessageToFocus({ index: messageIndex });
   };
 
-  const renderMessageReference = (
+  const renderMessageReferences = (
     category: "whatWentWell" | "couldImprove",
     feedbackIndex: number,
   ) => {
-    const messageIndex =
-      feedbackMessageReferences[review.id]?.[category][feedbackIndex] ?? 0;
-    const timestamp = review.transcript[messageIndex]?.timestamp;
+    const messageIndexes =
+      feedbackMessageReferences[review.id]?.[category][feedbackIndex] ?? [];
 
-    if (!timestamp) return null;
+    return messageIndexes.map((messageIndex, referenceIndex) => {
+      const timestamp = review.transcript[messageIndex]?.timestamp;
+      if (!timestamp) return null;
 
-    return (
-      <button
-        type="button"
-        onClick={() => openTranscriptMessage(messageIndex)}
-        className="ml-1 inline rounded-sm font-medium text-primary underline underline-offset-2 hover:text-primary/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-        aria-label={`Open transcript message at ${timestamp}`}
-      >
-        [{timestamp}]
-      </button>
-    );
+      return (
+        <button
+          key={`${messageIndex}-${referenceIndex}`}
+          type="button"
+          onClick={() => openTranscriptMessage(messageIndex)}
+          className="ml-1 inline rounded-sm font-medium text-primary underline underline-offset-2 hover:text-primary/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          aria-label={`Open transcript message at ${timestamp}`}
+        >
+          [{timestamp}]
+        </button>
+      );
+    });
   };
 
   const getChannelIcon = (channel: string) => {
@@ -935,7 +947,7 @@ function ContactReviewCard({
               {review.whatWentWell.map((point, index) => (
                 <li key={index}>
                   {point}
-                  {renderMessageReference("whatWentWell", index)}
+                  {renderMessageReferences("whatWentWell", index)}
                 </li>
               ))}
             </ul>
@@ -950,7 +962,7 @@ function ContactReviewCard({
               {review.couldImprove.map((point, index) => (
                 <li key={index}>
                   {point}
-                  {renderMessageReference("couldImprove", index)}
+                  {renderMessageReferences("couldImprove", index)}
                 </li>
               ))}
             </ul>
