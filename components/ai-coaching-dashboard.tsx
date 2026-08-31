@@ -209,9 +209,20 @@ export function AiCoachingDashboard({ onLogout, onSwitchToSupervisor }: AiCoachi
                       <CheckCircle className="h-4 w-4" />
                       What went well
                     </div>
-                    <p className="text-sm text-muted-foreground">
-                      You clearly explained the refund process and timeline
-                    </p>
+                    <ul className="list-disc space-y-1 pl-5 text-sm text-muted-foreground">
+                      <li>
+                        You opened with an empathetic question that invited the
+                        customer to explain why they wanted to cancel.
+                      </li>
+                      <li>
+                        You clearly explained the refund process and the
+                        expected 5–7 business day timeline.
+                      </li>
+                      <li>
+                        You processed the cancellation efficiently and
+                        maintained a professional, respectful tone.
+                      </li>
+                    </ul>
                   </div>
 
                   <div className="space-y-2">
@@ -219,10 +230,20 @@ export function AiCoachingDashboard({ onLogout, onSwitchToSupervisor }: AiCoachi
                       <AlertTriangle className="h-4 w-4" />
                       Could improve
                     </div>
-                    <p className="text-sm text-muted-foreground">
-                      Consider offering retention options before processing
-                      cancellation
-                    </p>
+                    <ul className="list-disc space-y-1 pl-5 text-sm text-muted-foreground">
+                      <li>
+                        Explore the customer's reason for leaving more deeply
+                        before moving straight to cancellation.
+                      </li>
+                      <li>
+                        Offer a relevant retention option, such as a lower plan
+                        or pause, when low usage is the concern.
+                      </li>
+                      <li>
+                        Confirm the customer's final preference and summarize
+                        the next steps before ending the conversation.
+                      </li>
+                    </ul>
                   </div>
 
                   <div className="space-y-2">

@@ -101,8 +101,8 @@ interface ContactReview {
     previousContacts: number;
   };
   overallScore: number;
-  whatWentWell: string;
-  couldImprove: string;
+  whatWentWell: string[];
+  couldImprove: string[];
   tipForNextTime: string;
   transcript: {
     speaker: "agent" | "customer";
@@ -590,10 +590,16 @@ export function SupervisorDashboard({ onLogout, onSwitchToAgent }: SupervisorDas
         previousContacts: 2,
       },
       overallScore: 8.2,
-      whatWentWell:
-        "You clearly explained the refund process and timeline to the customer",
-      couldImprove:
-        "Consider offering retention options before processing cancellation",
+      whatWentWell: [
+        "You opened with an empathetic question that invited the customer to explain why they wanted to cancel.",
+        "You clearly explained the refund process and the expected 5–7 business day timeline.",
+        "You processed the cancellation efficiently and maintained a professional, respectful tone throughout the interaction.",
+      ],
+      couldImprove: [
+        "Explore the customer's reason for leaving more deeply before moving straight to cancellation.",
+        "Offer a relevant retention option, such as a lower plan or pause, when low usage is the stated concern.",
+        "Confirm the customer's final preference and summarize what will happen next before ending the conversation.",
+      ],
       tipForNextTime:
         'Ask "Is there anything we can do to keep you as a customer?" before proceeding',
       transcript: [
@@ -685,8 +691,16 @@ export function SupervisorDashboard({ onLogout, onSwitchToAgent }: SupervisorDas
         previousContacts: 1,
       },
       overallScore: 7.8,
-      whatWentWell: "Clear explanation of refund policy and next steps",
-      couldImprove: "Opening lacked empathy for customer frustration",
+      whatWentWell: [
+        "You verified the account details before discussing the delayed refund.",
+        "You explained the refund status and next steps clearly, including the expedited-processing request.",
+        "You stayed calm and took ownership of the escalation, helping rebuild the customer's confidence.",
+      ],
+      couldImprove: [
+        "Acknowledge the customer's frustration before asking for additional information.",
+        "Set a specific expectation for when the customer will receive the next update.",
+        "Close by confirming the escalation reference and checking whether the customer has any other concerns.",
+      ],
       tipForNextTime:
         'Start with "I understand how frustrating delayed refunds can be" to acknowledge their concern',
       transcript: [
@@ -774,8 +788,16 @@ export function SupervisorDashboard({ onLogout, onSwitchToAgent }: SupervisorDas
         previousContacts: 3,
       },
       overallScore: 6.5,
-      whatWentWell: "Remained calm and professional under pressure",
-      couldImprove: "Should have escalated to technical team sooner",
+      whatWentWell: [
+        "You remained calm and professional despite the customer's frustration after multiple unsuccessful attempts.",
+        "You apologized for the repeated inconvenience and avoided asking the customer to repeat steps unnecessarily.",
+        "You documented the symptoms clearly before escalating the issue to the technical team.",
+      ],
+      couldImprove: [
+        "Recognize this as a repeat contact earlier and review the previous troubleshooting history first.",
+        "Escalate after the second failed troubleshooting attempt instead of continuing with another standard approach.",
+        "Give the customer a clear escalation timeline and explain what information the technical team needs next.",
+      ],
       tipForNextTime:
         "For repeat technical issues, escalate after the second failed troubleshooting attempt",
       transcript: [
@@ -834,10 +856,16 @@ export function SupervisorDashboard({ onLogout, onSwitchToAgent }: SupervisorDas
         previousContacts: 0,
       },
       overallScore: 9.1,
-      whatWentWell:
-        "Excellent product knowledge and clear communication of features and benefits",
-      couldImprove:
-        "Could have been more proactive in suggesting trial options",
+      whatWentWell: [
+        "You demonstrated strong product knowledge by connecting premium features to the customer's interests.",
+        "You asked a focused qualifying question instead of giving a generic feature list.",
+        "You communicated the benefits clearly and offered to provide relevant examples.",
+      ],
+      couldImprove: [
+        "Recommend a trial or demo while the customer is actively exploring premium features.",
+        "Ask about the customer's decision timeline and intended use case to tailor the recommendation.",
+        "End with a specific next step, such as sending examples or scheduling a product walkthrough.",
+      ],
       tipForNextTime:
         "Offer free trial or demo when customers show interest in premium features",
       transcript: [
@@ -890,10 +918,16 @@ export function SupervisorDashboard({ onLogout, onSwitchToAgent }: SupervisorDas
         previousContacts: 0,
       },
       overallScore: 8.8,
-      whatWentWell:
-        "Patient guidance and comprehensive explanation of platform features",
-      couldImprove:
-        "Could have scheduled a follow-up call to ensure successful onboarding",
+      whatWentWell: [
+        "You paced the walkthrough patiently and checked the customer's understanding along the way.",
+        "You explained the key platform features in practical terms relevant to the customer's setup.",
+        "You provided follow-up resources so the customer could continue onboarding independently.",
+      ],
+      couldImprove: [
+        "Confirm that the customer has completed the most important setup steps before ending the call.",
+        "Schedule a follow-up check-in to catch blockers before they affect the customer's first use.",
+        "Prioritize the next two actions in a short recap so the onboarding plan feels manageable.",
+      ],
       tipForNextTime:
         "Offer scheduled follow-up calls for new customers to ensure smooth onboarding experience",
       transcript: [
@@ -942,10 +976,16 @@ export function SupervisorDashboard({ onLogout, onSwitchToAgent }: SupervisorDas
         previousContacts: 1,
       },
       overallScore: 8.5,
-      whatWentWell:
-        "Thorough investigation and quick resolution with appropriate compensation",
-      couldImprove:
-        "Could have provided more explanation about how the error occurred",
+      whatWentWell: [
+        "You investigated the billing history thoroughly and identified the duplicate-charge system error.",
+        "You resolved the issue promptly by processing the appropriate refund.",
+        "You apologized clearly and took responsibility for helping the customer reach a fair resolution.",
+      ],
+      couldImprove: [
+        "Explain the root cause in plain language without exposing unnecessary internal technical detail.",
+        "Confirm the exact refund amount and expected posting date before closing the case.",
+        "Explain what has been done to prevent the same billing issue from recurring.",
+      ],
       tipForNextTime:
         "When system errors cause billing issues, explain the root cause to build customer confidence",
       transcript: [
@@ -1130,13 +1170,21 @@ export function SupervisorDashboard({ onLogout, onSwitchToAgent }: SupervisorDas
                 <h5 className="font-medium text-green-800 text-sm mb-1">
                   What Went Well
                 </h5>
-                <p className="text-sm text-green-700">{review.whatWentWell}</p>
+                <ul className="list-disc space-y-1 pl-5 text-sm text-green-700">
+                  {review.whatWentWell.map((point, index) => (
+                    <li key={index}>{point}</li>
+                  ))}
+                </ul>
               </div>
               <div className="p-3 bg-orange-50 border border-orange-200 rounded-lg">
                 <h5 className="font-medium text-orange-800 text-sm mb-1">
                   Could Improve
                 </h5>
-                <p className="text-sm text-orange-700">{review.couldImprove}</p>
+                <ul className="list-disc space-y-1 pl-5 text-sm text-orange-700">
+                  {review.couldImprove.map((point, index) => (
+                    <li key={index}>{point}</li>
+                  ))}
+                </ul>
               </div>
               <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
                 <h5 className="font-medium text-blue-800 text-sm mb-1">

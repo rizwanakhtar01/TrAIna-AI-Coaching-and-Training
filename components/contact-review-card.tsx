@@ -90,8 +90,8 @@ interface ContactReview {
     previousContacts: number;
   };
   overallScore: number;
-  whatWentWell: string;
-  couldImprove: string;
+  whatWentWell: string[];
+  couldImprove: string[];
   tipForNextTime: string;
   transcript: {
     speaker: "agent" | "customer";
@@ -122,10 +122,16 @@ const sampleReviews: ContactReview[] = [
       previousContacts: 2,
     },
     overallScore: 8.2,
-    whatWentWell:
-      "You clearly explained the refund process and timeline to the customer",
-    couldImprove:
-      "Consider offering retention options before processing cancellation",
+    whatWentWell: [
+      "You opened with an empathetic question that invited the customer to explain why they wanted to cancel.",
+      "You clearly explained the refund process and the expected 5–7 business day timeline.",
+      "You processed the cancellation efficiently and maintained a professional, respectful tone throughout the interaction.",
+    ],
+    couldImprove: [
+      "Explore the customer's reason for leaving more deeply before moving straight to cancellation.",
+      "Offer a relevant retention option, such as a lower plan or pause, when low usage is the stated concern.",
+      "Confirm the customer's final preference and summarize what will happen next before ending the conversation.",
+    ],
     tipForNextTime:
       'Ask "Is there anything we can do to keep you as a customer?" before proceeding',
     transcript: [
@@ -316,8 +322,16 @@ const sampleReviews: ContactReview[] = [
       previousContacts: 1,
     },
     overallScore: 7.8,
-    whatWentWell: "Clear explanation of refund policy and next steps",
-    couldImprove: "Opening lacked empathy for customer frustration",
+    whatWentWell: [
+      "You verified the account details before discussing the delayed refund.",
+      "You explained the refund status and next steps clearly, including the expedited-processing request.",
+      "You stayed calm and took ownership of the escalation, helping rebuild the customer's confidence.",
+    ],
+    couldImprove: [
+      "Acknowledge the customer's frustration before asking for additional information.",
+      "Set a specific expectation for when the customer will receive the next update.",
+      "Close by confirming the escalation reference and checking whether the customer has any other concerns.",
+    ],
     tipForNextTime:
       'Start with "I understand how frustrating delayed refunds can be" to acknowledge their concern',
     transcript: [
@@ -450,8 +464,16 @@ const sampleReviews: ContactReview[] = [
       previousContacts: 3,
     },
     overallScore: 6.5,
-    whatWentWell: "Remained calm and professional under pressure",
-    couldImprove: "Should have escalated to technical team sooner",
+    whatWentWell: [
+      "You remained calm and professional despite the customer's frustration after multiple unsuccessful attempts.",
+      "You apologized for the repeated inconvenience and avoided asking the customer to repeat steps unnecessarily.",
+      "You documented the symptoms clearly before escalating the issue to the technical team.",
+    ],
+    couldImprove: [
+      "Recognize this as a repeat contact earlier and review the previous troubleshooting history first.",
+      "Escalate after the second failed troubleshooting attempt instead of continuing with another standard approach.",
+      "Give the customer a clear escalation timeline and explain what information the technical team needs next.",
+    ],
     tipForNextTime:
       "For repeat technical issues, escalate after the second failed troubleshooting attempt",
     transcript: [
@@ -752,9 +774,11 @@ function ContactReviewCard({
               <CheckCircle className="h-4 w-4" />
               What went well
             </div>
-            <p className="text-sm text-muted-foreground">
-              {review.whatWentWell}
-            </p>
+            <ul className="list-disc space-y-1 pl-5 text-sm text-muted-foreground">
+              {review.whatWentWell.map((point, index) => (
+                <li key={index}>{point}</li>
+              ))}
+            </ul>
           </div>
 
           <div className="space-y-2">
@@ -762,9 +786,11 @@ function ContactReviewCard({
               <AlertTriangle className="h-4 w-4" />
               Could improve
             </div>
-            <p className="text-sm text-muted-foreground">
-              {review.couldImprove}
-            </p>
+            <ul className="list-disc space-y-1 pl-5 text-sm text-muted-foreground">
+              {review.couldImprove.map((point, index) => (
+                <li key={index}>{point}</li>
+              ))}
+            </ul>
           </div>
 
           <div className="space-y-2">
@@ -942,12 +968,12 @@ export function ContactReviewsList({
       review.customerIssue
         .toLowerCase()
         .includes(effectiveSearchTerm.toLowerCase()) ||
-      review.whatWentWell
-        .toLowerCase()
-        .includes(effectiveSearchTerm.toLowerCase()) ||
-      review.couldImprove
-        .toLowerCase()
-        .includes(effectiveSearchTerm.toLowerCase());
+      review.whatWentWell.some((point) =>
+        point.toLowerCase().includes(effectiveSearchTerm.toLowerCase()),
+      ) ||
+      review.couldImprove.some((point) =>
+        point.toLowerCase().includes(effectiveSearchTerm.toLowerCase()),
+      );
 
     const matchesChannel =
       effectiveFilterChannel === "all" ||
