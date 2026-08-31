@@ -42,8 +42,31 @@ interface AiCoachingDashboardProps {
 export function AiCoachingDashboard({ onLogout, onSwitchToSupervisor }: AiCoachingDashboardProps) {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null);
+  const [reviewMessageRequest, setReviewMessageRequest] = useState<{
+    reviewId: string;
+    messageIndex: number;
+    requestId: number;
+  } | null>(null);
 
   const navigateToReviews = () => setActiveTab("reviews");
+  const openReviewMessage = (messageIndex: number) => {
+    setReviewMessageRequest((current) => ({
+      reviewId: "1",
+      messageIndex,
+      requestId: (current?.requestId ?? 0) + 1,
+    }));
+    setActiveTab("reviews");
+  };
+  const messageReference = (timestamp: string, messageIndex: number) => (
+    <button
+      type="button"
+      onClick={() => openReviewMessage(messageIndex)}
+      className="ml-1 inline rounded-sm font-medium text-primary underline underline-offset-2 hover:text-primary/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      aria-label={`Open transcript message at ${timestamp}`}
+    >
+      [{timestamp}]
+    </button>
+  );
   const navigateToPatterns = () => setActiveTab("patterns");
   const navigateToSentiment = () => setActiveTab("sentiment");
   const navigateToCoaching = () => setActiveTab("coaching");
@@ -213,14 +236,17 @@ export function AiCoachingDashboard({ onLogout, onSwitchToSupervisor }: AiCoachi
                       <li>
                         You opened with an empathetic question that invited the
                         customer to explain why they wanted to cancel.
+                        {messageReference("14:33", 1)}
                       </li>
                       <li>
                         You clearly explained the refund process and the
                         expected 5–7 business day timeline.
+                        {messageReference("14:34", 3)}
                       </li>
                       <li>
                         You processed the cancellation efficiently and
                         maintained a professional, respectful tone.
+                        {messageReference("14:35", 4)}
                       </li>
                     </ul>
                   </div>
@@ -234,14 +260,17 @@ export function AiCoachingDashboard({ onLogout, onSwitchToSupervisor }: AiCoachi
                       <li>
                         Explore the customer's reason for leaving more deeply
                         before moving straight to cancellation.
+                        {messageReference("14:33", 2)}
                       </li>
                       <li>
                         Offer a relevant retention option, such as a lower plan
                         or pause, when low usage is the concern.
+                        {messageReference("14:34", 3)}
                       </li>
                       <li>
                         Confirm the customer's final preference and summarize
                         the next steps before ending the conversation.
+                        {messageReference("14:35", 4)}
                       </li>
                     </ul>
                   </div>
@@ -401,7 +430,10 @@ export function AiCoachingDashboard({ onLogout, onSwitchToSupervisor }: AiCoachi
 
           {/* Contact Reviews */}
           <TabsContent value="reviews" className="space-y-6">
-            <ContactReviewsList evaluationEnabled={false} />
+            <ContactReviewsList
+              evaluationEnabled={false}
+              messageRequest={reviewMessageRequest ?? undefined}
+            />
           </TabsContent>
 
           {/* Challenge Patterns */}

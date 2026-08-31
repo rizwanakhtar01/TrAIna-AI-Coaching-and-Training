@@ -103,6 +103,15 @@ interface ContactReview {
   evaluations?: EvaluationResult[];
 }
 
+const feedbackMessageReferences: Record<
+  string,
+  { whatWentWell: number[]; couldImprove: number[] }
+> = {
+  "1": { whatWentWell: [1, 3, 4], couldImprove: [2, 3, 4] },
+  "2": { whatWentWell: [2, 4, 4], couldImprove: [2, 4, 4] },
+  "3": { whatWentWell: [1, 1, 4], couldImprove: [0, 2, 4] },
+};
+
 const sampleReviews: ContactReview[] = [
   {
     id: "1",
@@ -675,16 +684,68 @@ export function EvaluationScoresPanel({
 interface ContactReviewCardProps {
   review: ContactReview;
   evaluationEnabled?: boolean;
+  requestedMessage?: { messageIndex: number; requestId: number };
 }
 
 function ContactReviewCard({
   review,
   evaluationEnabled = true,
+  requestedMessage,
 }: ContactReviewCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration] = useState(225); // 3:45 in seconds
+  const [messageToFocus, setMessageToFocus] = useState<{
+    index: number;
+  } | null>(null);
+
+  useEffect(() => {
+    if (!requestedMessage) return;
+    setIsExpanded(true);
+    setMessageToFocus({ index: requestedMessage.messageIndex });
+  }, [requestedMessage]);
+
+  useEffect(() => {
+    if (!isExpanded || !messageToFocus) return;
+
+    const timeout = window.setTimeout(() => {
+      const message = document.getElementById(
+        `contact-review-${review.id}-message-${messageToFocus.index}`,
+      );
+      message?.scrollIntoView({ behavior: "smooth", block: "center" });
+      message?.focus({ preventScroll: true });
+    }, 100);
+
+    return () => window.clearTimeout(timeout);
+  }, [isExpanded, messageToFocus, review.id]);
+
+  const openTranscriptMessage = (messageIndex: number) => {
+    setIsExpanded(true);
+    setMessageToFocus({ index: messageIndex });
+  };
+
+  const renderMessageReference = (
+    category: "whatWentWell" | "couldImprove",
+    feedbackIndex: number,
+  ) => {
+    const messageIndex =
+      feedbackMessageReferences[review.id]?.[category][feedbackIndex] ?? 0;
+    const timestamp = review.transcript[messageIndex]?.timestamp;
+
+    if (!timestamp) return null;
+
+    return (
+      <button
+        type="button"
+        onClick={() => openTranscriptMessage(messageIndex)}
+        className="ml-1 inline rounded-sm font-medium text-primary underline underline-offset-2 hover:text-primary/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        aria-label={`Open transcript message at ${timestamp}`}
+      >
+        [{timestamp}]
+      </button>
+    );
+  };
 
   const getChannelIcon = (channel: string) => {
     switch (channel) {
@@ -776,7 +837,10 @@ function ContactReviewCard({
             </div>
             <ul className="list-disc space-y-1 pl-5 text-sm text-muted-foreground">
               {review.whatWentWell.map((point, index) => (
-                <li key={index}>{point}</li>
+                <li key={index}>
+                  {point}
+                  {renderMessageReference("whatWentWell", index)}
+                </li>
               ))}
             </ul>
           </div>
@@ -788,7 +852,10 @@ function ContactReviewCard({
             </div>
             <ul className="list-disc space-y-1 pl-5 text-sm text-muted-foreground">
               {review.couldImprove.map((point, index) => (
-                <li key={index}>{point}</li>
+                <li key={index}>
+                  {point}
+                  {renderMessageReference("couldImprove", index)}
+                </li>
               ))}
             </ul>
           </div>
@@ -840,7 +907,9 @@ function ContactReviewCard({
                 {review.transcript.map((message, index) => (
                   <div
                     key={index}
-                    className={`p-3 rounded-md ${getHighlightColor(message.highlight)}`}
+                    id={`contact-review-${review.id}-message-${index}`}
+                    tabIndex={-1}
+                    className={`p-3 rounded-md outline-none focus-visible:ring-2 focus-visible:ring-ring ${getHighlightColor(message.highlight)}`}
                   >
                     <div className="flex justify-between items-start mb-1">
                       <span className="text-xs font-medium capitalize text-foreground">
@@ -884,6 +953,11 @@ interface ContactReviewsListProps {
   controlledCustomDate?: Date;
   hideFilters?: boolean;
   evaluationEnabled?: boolean;
+  messageRequest?: {
+    reviewId: string;
+    messageIndex: number;
+    requestId: number;
+  };
 }
 
 export function ContactReviewsList({
@@ -895,6 +969,7 @@ export function ContactReviewsList({
   controlledCustomDate,
   hideFilters = false,
   evaluationEnabled = true,
+  messageRequest,
 }: ContactReviewsListProps) {
   const isControlled = controlledFilterTime !== undefined;
 
@@ -1152,6 +1227,14 @@ export function ContactReviewsList({
             key={review.id}
             review={review}
             evaluationEnabled={evaluationEnabled}
+            requestedMessage={
+              messageRequest?.reviewId === review.id
+                ? {
+                    messageIndex: messageRequest.messageIndex,
+                    requestId: messageRequest.requestId,
+                  }
+                : undefined
+            }
           />
         ))}
 
