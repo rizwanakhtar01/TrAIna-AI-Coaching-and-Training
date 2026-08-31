@@ -647,6 +647,102 @@ export function SupervisorDashboard({ onLogout, onSwitchToAgent }: SupervisorDas
           message: "Thank you for the quick help",
           timestamp: "14:35",
         },
+        {
+          speaker: "agent",
+          message:
+            "Before I finalize the cancellation, may I ask what has made the service less useful for you recently?",
+          timestamp: "14:36",
+          highlight: "neutral",
+        },
+        {
+          speaker: "customer",
+          message:
+            "I only use it a few times a month, so the subscription feels too expensive.",
+          timestamp: "14:36",
+        },
+        {
+          speaker: "agent",
+          message:
+            "That makes sense. Based on your usage, our pause option or Essentials plan may be a better fit than cancelling completely.",
+          timestamp: "14:37",
+          highlight: "positive",
+        },
+        {
+          speaker: "customer",
+          message:
+            "I did not know I could pause the subscription. How would that work?",
+          timestamp: "14:37",
+        },
+        {
+          speaker: "agent",
+          message:
+            "You can pause for up to three months, and your saved projects and preferences will remain available when you return.",
+          timestamp: "14:38",
+          highlight: "positive",
+        },
+        {
+          speaker: "customer",
+          message:
+            "That could help, but I am still not sure when I would use it again.",
+          timestamp: "14:38",
+        },
+        {
+          speaker: "agent",
+          message:
+            "Understood. I can also complete the cancellation now, so you can choose the option that feels right without any pressure.",
+          timestamp: "14:39",
+        },
+        {
+          speaker: "customer",
+          message:
+            "Please go ahead with the cancellation for now.",
+          timestamp: "14:39",
+        },
+        {
+          speaker: "agent",
+          message:
+            "I have cancelled the subscription effective today. You will retain access through the end of the current billing period.",
+          timestamp: "14:40",
+          highlight: "positive",
+        },
+        {
+          speaker: "customer",
+          message:
+            "Will I still receive the refund you mentioned?",
+          timestamp: "14:40",
+        },
+        {
+          speaker: "agent",
+          message:
+            "Yes. The refund request is submitted, and the amount should appear on your original payment method within 5–7 business days.",
+          timestamp: "14:41",
+          highlight: "positive",
+        },
+        {
+          speaker: "customer",
+          message:
+            "Is there anything else I need to do on my side?",
+          timestamp: "14:41",
+        },
+        {
+          speaker: "agent",
+          message:
+            "No further action is needed. I will send a confirmation email with the cancellation and refund details.",
+          timestamp: "14:42",
+        },
+        {
+          speaker: "customer",
+          message:
+            "Please include the date when access ends in that email.",
+          timestamp: "14:42",
+        },
+        {
+          speaker: "agent",
+          message:
+            "Absolutely. The email will include your access end date, refund amount, and support contact information if you need us later.",
+          timestamp: "14:43",
+          highlight: "positive",
+        },
       ],
       agentName: "Sarah Mitchell",
       evaluations: [
