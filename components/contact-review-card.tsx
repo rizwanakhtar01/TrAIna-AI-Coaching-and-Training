@@ -804,6 +804,9 @@ function ContactReviewCard({
   const [messageToFocus, setMessageToFocus] = useState<{
     index: number;
   } | null>(null);
+  const [focusedMessageIndex, setFocusedMessageIndex] = useState<number | null>(
+    null,
+  );
 
   useEffect(() => {
     if (!requestedMessage) return;
@@ -827,6 +830,7 @@ function ContactReviewCard({
 
   const openTranscriptMessage = (messageIndex: number) => {
     setIsExpanded(true);
+    setFocusedMessageIndex(messageIndex);
     setMessageToFocus({ index: messageIndex });
   };
 
@@ -1017,7 +1021,17 @@ function ContactReviewCard({
                     key={index}
                     id={`contact-review-${review.id}-message-${index}`}
                     tabIndex={-1}
-                    className={`p-3 rounded-md outline-none focus-visible:ring-2 focus-visible:ring-ring ${getHighlightColor(message.highlight)}`}
+                    onFocus={() => setFocusedMessageIndex(index)}
+                    onBlur={() =>
+                      setFocusedMessageIndex((current) =>
+                        current === index ? null : current,
+                      )
+                    }
+                    className={`p-3 rounded-md outline-none transition-all duration-200 ${
+                      focusedMessageIndex === index
+                        ? "!bg-primary/15 ring-2 ring-primary ring-offset-2 shadow-md"
+                        : ""
+                    } ${getHighlightColor(message.highlight)}`}
                   >
                     <div className="flex justify-between items-start mb-1">
                       <span className="text-xs font-medium capitalize text-foreground">
