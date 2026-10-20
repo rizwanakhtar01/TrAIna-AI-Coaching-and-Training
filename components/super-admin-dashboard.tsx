@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { CustomerOnboardingWizard } from "@/components/customer-onboarding-wizard";
+import type { WizardFormData } from "@/components/customer-onboarding-wizard";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -63,7 +64,7 @@ interface Customer {
   amazonConnectId: string;
   llmApiKey: string;
   llmProvider: "gemini" | "bedrock";
-  bedrockModel: "claude-sonnet" | "claude-haiku" | "nova-pro";
+  bedrockModel: WizardFormData["bedrockModel"];
   status: "active" | "inactive";
   primaryAdminEmail: string;
   region: string;
@@ -242,25 +243,15 @@ export function SuperAdminDashboard({ onLogout }: SuperAdminDashboardProps) {
   const kbPercentage = Math.round((customersWithKB / customers.length) * 100);
   const trainingPercentage = Math.round((customersWithActiveTraining / customers.length) * 100);
 
-  const handleCreateCustomer = (data: {
-    companyName: string;
-    primaryAdminEmail: string;
-    amazonConnectInstanceId: string;
-    llmApiKey: string;
-    numberOfAgents: string;
-    region: string;
-    licenseEndDate: string;
-    aiCoachingTier: "none" | "base" | "standard" | "advanced";
-    training: boolean;
-  }) => {
+  const handleCreateCustomer = (data: WizardFormData) => {
     const newId = (customers.length + 1).toString();
     const customer: Customer = {
       id: newId,
       companyName: data.companyName,
       amazonConnectId: data.amazonConnectInstanceId,
       llmApiKey: data.llmApiKey,
-      llmProvider: "gemini",
-      bedrockModel: "claude-sonnet",
+      llmProvider: data.llmProvider,
+      bedrockModel: data.bedrockModel,
       status: "active",
       primaryAdminEmail: data.primaryAdminEmail,
       region: data.region,
@@ -813,7 +804,8 @@ export function SuperAdminDashboard({ onLogout }: SuperAdminDashboardProps) {
                   <Label>Foundation Model</Label>
                   <div className="space-y-2">
                     {[
-                      { value: "claude-sonnet", label: "Claude Sonnet 4.6", note: "Best balance of quality and speed", recommended: true },
+                      { value: "claude-5-5", label: "Claude 5.5", note: "", recommended: true },
+                      { value: "claude-sonnet", label: "Claude Sonnet 4.6", note: "Best balance of quality and speed" },
                       { value: "claude-haiku",  label: "Claude Haiku 4.5",  note: "Faster and more cost-efficient" },
                       { value: "nova-pro",       label: "Amazon Nova Pro",   note: "AWS-native multimodal model" },
                     ].map(({ value, label, note, recommended }) => (
@@ -826,7 +818,7 @@ export function SuperAdminDashboard({ onLogout }: SuperAdminDashboardProps) {
                           name="editBedrockModel"
                           value={value}
                           checked={showEditCustomer.bedrockModel === value}
-                          onChange={() => setShowEditCustomer({ ...showEditCustomer, bedrockModel: value as "claude-sonnet" | "claude-haiku" | "nova-pro" })}
+                          onChange={() => setShowEditCustomer({ ...showEditCustomer, bedrockModel: value as Customer["bedrockModel"] })}
                           className="mt-0.5 h-4 w-4"
                         />
                         <div>

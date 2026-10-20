@@ -42,7 +42,7 @@ export interface WizardFormData {
   thresholdValue: number;
   bedrockAccountId: string;
   bedrockRegion: string;
-  bedrockModel: "claude-sonnet" | "claude-haiku" | "nova-pro";
+  bedrockModel: "claude-5-5" | "claude-sonnet" | "claude-haiku" | "nova-pro";
   iamRoleArn: string;
 }
 
@@ -657,18 +657,22 @@ export function CustomerOnboardingWizard({
                         <FieldLabel>Foundation Model</FieldLabel>
                         <div className="space-y-2">
                           <RadioCard
+                            selected={form.bedrockModel === "claude-5-5"}
+                            onClick={() => set("bedrockModel", "claude-5-5")}
+                            title="Claude 5.5"
+                          >
+                            <Badge className="mt-1.5 text-[10px] px-1.5 py-0 bg-emerald-100 text-emerald-700 border-0 hover:bg-emerald-100">
+                              Recommended
+                            </Badge>
+                          </RadioCard>
+                          <RadioCard
                             selected={form.bedrockModel === "claude-haiku"}
                             onClick={() => set("bedrockModel", "claude-haiku")}
                             title="Claude Haiku 4.5"
                           >
-                            <div className="flex items-center gap-2 mt-1.5">
-                              <Badge className="text-[10px] px-1.5 py-0 bg-emerald-100 text-emerald-700 border-0 hover:bg-emerald-100">
-                                Recommended
-                              </Badge>
-                              <span className="text-xs text-muted-foreground">
-                                Faster and more cost-efficient
-                              </span>
-                            </div>
+                            <p className="text-xs text-muted-foreground mt-1.5">
+                              Faster and more cost-efficient
+                            </p>
                           </RadioCard>
                           <RadioCard
                             selected={form.bedrockModel === "claude-sonnet"}
@@ -891,11 +895,13 @@ export function CustomerOnboardingWizard({
                           <ReviewRow
                             label="Foundation Model"
                             value={
-                              form.bedrockModel === "claude-sonnet"
-                                ? "Claude Sonnet 4.6"
-                                : form.bedrockModel === "claude-haiku"
-                                  ? "Claude Haiku 4.5"
-                                  : "Amazon Nova Pro"
+                              form.bedrockModel === "claude-5-5"
+                                ? "Claude 5.5"
+                                : form.bedrockModel === "claude-sonnet"
+                                  ? "Claude Sonnet 4.6"
+                                  : form.bedrockModel === "claude-haiku"
+                                    ? "Claude Haiku 4.5"
+                                    : "Amazon Nova Pro"
                             }
                           />
                         </>
