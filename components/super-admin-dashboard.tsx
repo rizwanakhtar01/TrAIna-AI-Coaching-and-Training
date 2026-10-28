@@ -804,7 +804,7 @@ export function SuperAdminDashboard({ onLogout }: SuperAdminDashboardProps) {
                   <Label>Foundation Model</Label>
                   <div className="space-y-2">
                     {[
-                      { value: "claude-5-5", label: "Claude 5.5", note: "", recommended: true },
+                      { value: "claude-5-5", label: "Claude Haiku 5.5", note: "Balanced and cost-effective", recommended: true },
                       { value: "claude-sonnet", label: "Claude Sonnet 4.6", note: "Best balance of quality and speed" },
                       { value: "claude-haiku",  label: "Claude Haiku 4.5",  note: "Faster and more cost-efficient" },
                       { value: "nova-pro",       label: "Amazon Nova Pro",   note: "AWS-native multimodal model" },
